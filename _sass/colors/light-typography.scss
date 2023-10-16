@@ -18,7 +18,7 @@
   --link-underline-color: #dee2e6;
   --button-bg: #ffffff;
   --btn-border-color: #d0dbe4;
-  --btn-backtotop-color: #0e2dab;
+  --btn-backtotop-color: #7d86ab;
   --btn-backtotop-border-color: #f1f1f1;
   --btn-box-shadow: #eaeaea;
   --checkbox-color: #c5c5c5;
@@ -88,6 +88,24 @@
   --prompt-warning-icon-color: #ef9c03;
   --prompt-danger-bg: rgb(248, 215, 218, 0.56);
   --prompt-danger-icon-color: #df3c30;
+
+  --waline-white: #fff;
+  --waline-light-grey: #999;
+  --waline-dark-grey: #666;
+  --waline-color: #444;
+  --waline-bgcolor: #f0f3f6;
+  --waline-bgcolor-light: #f8f8f8;
+  --waline-bgcolor-hover: #f0f0f0;
+  --waline-border-color: #ddd;
+  --waline-disable-bgcolor: #f8f8f8;
+  --waline-disable-color: #000;
+  --waline-bq-color: #f0f0f0;
+  --waline-info-bgcolor: #f8f8f8;
+  --waline-info-color: #999;
+  
+  --waline-theme-color: #80a4dc;
+  --waline-active-color: #5b7ed5;
+  --waline-code-bgcolor: #434d62;
 
   [class^='prompt-'] {
     --link-underline-color: rgb(219, 216, 216);
