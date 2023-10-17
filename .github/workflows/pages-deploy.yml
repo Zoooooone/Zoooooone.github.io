@@ -4,8 +4,7 @@ on:
     branches:
       - main
       - master
-      - test-comment-layout
-      - test-theme-version
+      
     paths-ignore:
       - .gitignore
       - README.md
