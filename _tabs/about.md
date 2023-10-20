@@ -15,7 +15,7 @@ order: 4
   
 # Links
 - <i class="fa-brands fa-github fa-fw"></i> &ensp; [Github](https://github.com/Zoooooone)
-- <i class="fa-solid fa-laptop-code fa-fw"></i> &ensp; [Leetcode](https://leetcode.com/isi2023/)
+- <i class="fa-solid fa-laptop-code fa-fw"></i> &ensp; [Leetcode](https://leetcode.com/Zoooooone/)
 - <i class="fa-brands fa-bilibili fa-fw"></i> &ensp; [Bilibili](https://space.bilibili.com/19356816?spm_id_from=333.1007.0.0) 
 - ...
 
