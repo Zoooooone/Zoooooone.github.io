@@ -1,5 +1,5 @@
 ---
-title: Java学习笔记
+title: Java基础-学习笔记
 date: 2023-11-06 22:36:00 +0900
 categories: [Study notes, Java]
 tags: [java]
@@ -7,6 +7,40 @@ mermaid: true
 ---
 
 ## 数据类型
+框架示意图如下：
+```mermaid
+graph TD
+    data[数据类型] --- primitive[基本数据类型];
+    data --- reference[引用数据类型];
+
+    %% primitive
+    primitive --- N[数值型];
+    primitive --- C[字符型];
+    primitive --- B[布尔型];
+
+    %% N
+    N --- I[整数型];
+    N --- F[浮点型];
+    I --- b[byte];
+    I --- s[short];
+    I --- i[int];
+    I --- l[long];
+
+    %% F
+    F --- f[float];
+    F --- D[double];
+
+    %% C
+    C --- c[char];
+
+    %% B
+    B --- bool[boolean];
+
+    %% reference
+    reference --- cl[类 class];
+    reference --- in[接口 interface];
+    reference --- ar[数组 array];
+```
 
 ### 基本数据类型 (Primitive types)
 1. byte **8位**
@@ -985,3 +1019,85 @@ m1 * m2 = [[19, -8], [43, -11]]
 | `fill(Object[], int val)` | 将数组中所有元素替换为指定元素 |
 | `sort(Object[] array)` | 升序排序 |
 | ... | ... |
+
+
+## 方法
+方法的命名规则：
+- 第一个单词以**小写字母**开头，后续的单词以**大写字母**开头，不使用连接符
+- 下划线在JUnit测试方法名称中用以分隔名称的逻辑组件，一个典型的模式为：`test<MethodUnderTest>_<state>`，例：`testPop_emptyStack`
+
+### 定义方法
+```java
+修饰符 返回值类型 方法名(参数类型 参数名){
+    ...
+    方法体
+    ...
+    return 返回值;
+}
+```
+注：返回值类型为`void`时，方法**没有返回值**
+
+### 方法重载 (Method Overloading)
+Java中允许多个名称相同但是**传入参数类型不同**的方法同时存在，且会根据传入参数的类型自动调用对应的方法。代码示例如下：
+```java
+public class overload{
+    public static void main(String[] args){
+        print(max(1, 3));
+        print(max(4.5, 9.3));
+    }
+
+    public static int max(int n1, int n2){
+        return n1 > n2 ? n1 : n2;
+    }
+
+    public static double max(double n1, double n2){
+        return n1 > n2 ? n1 : n2;
+    }
+
+    public static void print(int n){
+        System.out.println(n);
+    }
+
+    public static void print(double n){
+        System.out.println(n);
+    }
+}
+```
+`max`和`print`方法存在针对`int`和`double`两种数据类型的参数调用，最终依据传入的参数类型决定调用哪一个方法。输出如下：
+```
+3
+9.3
+```
+
+### 可变参数 (Variable Arguments)
+Java支持传递**同类型**的可变参数给一个方法，遵循以下原则：
+- 在指定参数类型后加上`...`
+- 一个方法中**只能存在一个**可变参数
+- 可变参数必须是方法的**最后一个**参数
+
+代码示例：
+```java
+public class variable_arguments {
+    public static void main(String[] args){
+        max(10, 4, 1, -9, 8, 100, 2);
+        max();
+    }
+
+    public static void max(int... nums){
+        if (nums.length == 0){
+            System.out.println("No arguments");
+            return;
+        }
+        int res = nums[0];
+        for (int i = 1; i < nums.length; i++){
+            res = nums[i] > res ? nums[i] : res;
+        }
+        System.out.println("Maximum: " + res);
+    }
+}
+```
+输出：
+```
+Maximum: 100
+No arguments
+```
