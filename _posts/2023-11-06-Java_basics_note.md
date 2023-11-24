@@ -1018,6 +1018,7 @@ m1 * m2 = [[19, -8], [43, -11]]
 | `equals(Object[] array1, Object[] array2)` | 判断两个数组是否相等 |
 | `fill(Object[], int val)` | 将数组中所有元素替换为指定元素 |
 | `sort(Object[] array)` | 升序排序 |
+| `copyOfRange(object[] array, int start, int end)` | 返回指定数组的指定索引切片副本，**左闭右开** |
 | ... | ... |
 
 
