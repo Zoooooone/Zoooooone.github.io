@@ -4,7 +4,7 @@ date: 2023-08-19 00:00:00 +0900
 categories: [Study notes, Machine learning]
 tags: [machine learning, back propagation]     # TAG names should always be lowercase
 math: true
-img_path: /assets/img/2023-08-19-神经网络中基于BP（反向传播）的梯度下降法/
+img_path: /assets/img/2023-08-19-back_propagation/
 ---
 
 # 前言

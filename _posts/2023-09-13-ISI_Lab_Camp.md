@@ -3,7 +3,7 @@ title: 记2023年度ISI研究室合宿
 date: 2023-09-13 18:35:00 +0900
 categories: [Daily life, Travels]
 tags: [travel, izu]     # TAG names should always be lowercase
-img_path: /assets/img/2023-09-13-ISI合宿/
+img_path: /assets/img/2023-09-13-ISI_Lab_Camp/
 math: true
 ---
 
