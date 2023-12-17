@@ -29,6 +29,28 @@ tail_includes:
     </span>
     {% endif %}
 
+    <!-- pageview count -->
+    <style>
+        .waline-pageview-count {
+        font-family: var(--bs-font-sans-serif);
+        font-size: 0.8rem;
+        color: rgb(137, 152, 166);
+      }
+    </style>
+    
+    &ensp; PageView <span class="waline-pageview-count"></span>
+
+    <script type="module">
+      import { pageviewCount } from 'https://unpkg.com/@waline/client/dist/pageview.mjs';
+    
+      pageviewCount({
+        serverURL: 'https://waline-beige-eight.vercel.app/',
+        path: window.location.pathname,
+        selector: 'waline-pageview-count',
+        update: true,
+      });
+    </script>
+    
   {% if page.image %}
     {% capture src %}src="{{ page.image.path | default: page.image }}"{% endcapture %}
     {% capture class %}class="preview-img{% if page.image.no_bg %}{{ ' no-bg' }}{% endif %}"{% endcapture %}
