@@ -10,7 +10,8 @@
 
   /* Common color */
   --text-color: rgb(137, 152, 166);
-  --text-muted-color: rgb(107, 116, 124);
+  --text-muted-color: rgb(104, 111, 118);
+  --strong-text-color: rgb(189 198 206);
   --heading-color: #cccccc;
   --blockquote-border-color: rgb(66, 66, 66);
   --blockquote-text-color: rgb(117, 117, 117);
@@ -165,5 +166,27 @@
   /* stylelint-disable-next-line selector-id-pattern */
   #disqus_thread {
     color-scheme: none;
+  }
+
+  #core-wrapper {
+    strong {
+      text-shadow: 0 0 0.1rem var(--strong-text-color), 0 0 0.05rem var(--strong-text-color);
+      color: var(--strong-text-color);
+      code {
+        text-shadow: none;
+      }
+    }
+    h2 {
+      text-shadow: 0 0 0.1rem var(--strong-text-color), 0 0 0.7rem var(--text-color);
+    }
+    h3 {
+      text-shadow: 0 0 0.1rem var(--strong-text-color), 0 0 0.5rem var(--text-color);
+    }
+    h4 {
+      text-shadow: 0 0 0.1rem var(--strong-text-color), 0 0 0.3rem var(--text-color);
+    }
+    h5 {
+      text-shadow: 0 0 0.1rem var(--strong-text-color), 0 0 0.2rem var(--text-color);
+    }
   }
 } /* dark-scheme */
