@@ -36,19 +36,26 @@ tail_includes:
         font-size: 0.8rem;
         color: rgb(137, 152, 166);
       }
-    </style>
-    
+    </style>    
+
     &ensp; PageView <span class="waline-pageview-count"></span>
 
     <script type="module">
-      import { pageviewCount } from 'https://unpkg.com/@waline/client/dist/pageview.mjs';
-    
-      pageviewCount({
-        serverURL: 'https://waline-beige-eight.vercel.app/',
-        path: window.location.pathname,
-        selector: 'waline-pageview-count',
-        update: true,
-      });
+      if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+        import('https://unpkg.com/@waline/client@3.0.0-alpha.7/dist/pageview.js')
+          .then(({ pageviewCount }) => {
+            pageviewCount({
+              serverURL: 'https://waline-beige-eight.vercel.app/',
+              path: window.location.pathname,
+              update: true
+            });
+          })
+          .catch(error => {
+            console.error("Error loading pageviewCount:", error);
+          });
+      } else {
+        console.log("In local environment, pageview count is not updated.");
+      }
     </script>
     
   {% if page.image %}
