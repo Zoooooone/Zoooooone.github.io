@@ -218,10 +218,12 @@ div {
 
     &[timeout] {
       &:hover {
+        transition: 0.4s;
         border-color: var(--clipboard-checked-color);
       }
 
       i {
+        transition: 0.4s;
         color: var(--clipboard-checked-color);
       }
     }
@@ -231,9 +233,11 @@ div {
     }
 
     &:not([timeout]):hover {
+      transition: 0.5s;
       background-color: rgba(128, 128, 128, 0.37);
 
       i {
+        transition: 0.5s;
         color: white;
       }
     }

@@ -4,7 +4,7 @@
 
 @mixin dark-syntax {
   --language-border-color: rgba(84, 83, 83, 0.27);
-  --highlight-bg-color: #252525;
+  --highlight-bg-color: rgb(19, 19, 22);
   --highlighter-rouge-color: #de6b18;
   --highlight-lineno-color: #6c6c6d;
   --inline-code-bg: #272822;
