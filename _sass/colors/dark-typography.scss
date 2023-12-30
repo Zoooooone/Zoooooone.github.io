@@ -17,7 +17,7 @@
   --blockquote-text-color: rgb(117, 117, 117);
   --link-color: rgb(138, 180, 248);
   --link-underline-color: rgb(82, 108, 150);
-  --button-bg: rgb(39, 40, 43);
+  --button-bg: var(--main-bg);
   --btn-border-color: rgb(63, 65, 68);
   --btn-backtotop-color: var(--text-color);
   --btn-backtotop-border-color: var(--btn-border-color);
@@ -116,8 +116,10 @@
   --waline-info-bgcolor: #272727;
   --waline-info-color: #666;
   --waline-theme-color: #4a84d9;
-  --waline-active-color: #6faeff;
+  --waline-active-color: #98c4fe;
   --waline-code-bgcolor: #282c34;
+  --waline-badge-color: #0ecf75;
+  --waline-box-shadow: 0 12px 40px #0f0e0d;
 
   .light {
     display: none;

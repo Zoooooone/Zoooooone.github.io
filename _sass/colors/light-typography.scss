@@ -16,7 +16,7 @@
   --blockquote-text-color: #9a9a9a;
   --link-color: #0153ab;
   --link-underline-color: #dee2e6;
-  --button-bg: #ffffff;
+  --button-bg: var(--main-bg);
   --btn-border-color: #d0dbe4;
   --btn-backtotop-color: #7d86ab;
   --btn-backtotop-border-color: #f1f1f1;
@@ -41,7 +41,7 @@
   --sidebar-active-color: #1d1d1d;
   --sidebar-hover-bg: rgba(211, 212, 239, 0.941);
   --sidebar-btn-bg: white;
-  --sidebar-btn-color: #8e8e8e;
+  --sidebar-btn-color: #44507d;
   --avatar-border-color: white;
 
   /* Topbar */
@@ -54,9 +54,9 @@
 
   /* Home page */
   --post-list-text-color: dimgray;
-  --btn-patinator-text-color: #555555;
-  --btn-paginator-hover-color: var(--sidebar-bg);
-  --btn-paginator-border-color: var(--sidebar-bg);
+  --btn-patinator-text-color: #2c2a3f;
+  --btn-paginator-hover-color: rgb(223, 223, 223);
+  --btn-paginator-border-color: rgb(208, 208, 208);
   --btn-text-color: #676666;
 
   /* Posts */
@@ -97,16 +97,17 @@
   --waline-bgcolor: #f0f3f6;
   --waline-bgcolor-light: #f8f8f8;
   --waline-bgcolor-hover: #f0f0f0;
-  --waline-border-color: #ddd;
+  --waline-border-color: #d3d4d7;
   --waline-disable-bgcolor: #f8f8f8;
   --waline-disable-color: #000;
   --waline-bq-color: #f0f0f0;
   --waline-info-bgcolor: #f8f8f8;
   --waline-info-color: #999;
-  
   --waline-theme-color: #80a4dc;
-  --waline-active-color: #5b7ed5;
+  --waline-active-color: #4870d4;
   --waline-code-bgcolor: #434d62;
+  --waline-badge-color: #109658;
+  --waline-box-shadow: 0 12px 40px rgb(134 151 168 / 25%);
 
   [class^='prompt-'] {
     --link-underline-color: rgb(219, 216, 216);

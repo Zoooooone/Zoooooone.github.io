@@ -64,42 +64,10 @@ layout: default
         {% assign _include_path = _include | append: '.html' %}
         {% include {{ _include_path }} lang=lang %}
       {% endfor %}
-    </div>
-  </div>
-{% endif %}
-
-<!-- waline -->
-{% if page.comments %}
-  <style>
-    #waline-container {
-      margin-top: 0%;
-      margin-bottom: 10%;
-    }
-    #waline {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
-  
-  <div class="col-12 col-lg-11 col-xl-9 px-3 pe-xl-4 mt-0">
-    <div id="waline-container">
-      <div id="waline">
-        <script type="module">
-          import { init } from 'https://unpkg.com/@waline/client@v2/dist/waline.mjs';
-
-          init({
-            el: '#waline',
-            serverURL: 'https://waline-beige-eight.vercel.app/',
-            comment: true,
-            texRenderer: (blockMode, tex) =>
-              window.MathJax.startup.adaptor.outerHTML(
-                window.MathJax.tex2svg(tex, {
-                  display: blockMode,
-                }),
-              ),
-          });
-        </script>
-      </div>
+      <!-- waline -->
+      {% if page.comments %}
+        {% include comments/waline.html %}
+      {% endif %}
     </div>
   </div>
 {% endif %}
