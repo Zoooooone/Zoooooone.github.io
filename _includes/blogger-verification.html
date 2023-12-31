@@ -1,45 +1,5 @@
 <div id="access-links">
   <div class="panel-heading pb-2"><strong>Blogger Verification</strong></div>
   <a href="#" id="setCookieLink" onclick="verifyPassword();"><span style="color: white">Verification</span></a>
-  <style>
-    #setCookieLink {
-      display: inline-block;
-      padding: 4px 8px;
-      margin: 8px 0;
-      background-color: #00428e;
-      border-radius: 5px;
-      border: 1px solid #003366;
-      text-decoration: none;
-      font-size: 14px;
-      transition: background-color 0.45s, border-color 0.45s, box-shadow 0.45s;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-    #setCookieLink:hover, #setCookieLink:focus, #setCookieLink:active {
-      background-color: #3692f5;
-      border-color: #1057b5;
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
-    }
-  </style>
-  <script>
-    function setBloggerCookie() {
-      document.cookie = "blogger_visit=true; max-age=31536000; path=/";
-      alert('Blogger cookie set!');
-    }
-    async function verifyPassword() {
-      const password = prompt("Please enter the password: ");
-      const msgBuffer = new TextEncoder().encode(password);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-      const passwordHash = "d5a71d4f65f0c41f6c4a87574910392fb0fb293e6e09cfaf130be42efc60b3b9"; 
-
-      if(hashHex === passwordHash) {
-        setBloggerCookie();
-      } else {
-        alert("Password is incorrect");
-      }
-    }
-  </script>
+  <script src="/assets/js/setCookie.js"></script>
 </div>
