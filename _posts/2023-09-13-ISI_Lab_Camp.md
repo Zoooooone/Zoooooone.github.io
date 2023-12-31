@@ -64,32 +64,32 @@ URL：[合宿路线](https://www.google.com/maps/d/u/1/edit?mid=1NQWqEdIBg6aOj-u
 </style>
 
 <div class="image-container">
-    <img src="marinetown.jpg" alt="marine-town" />
+    <img src="marinetown.jpg" alt="marine-town" class="custom-img"/>
 </div>
 
 ### 城ヶ崎海岸
 <div class="image-container">
-    <img src="jogasaki1.jpg" alt="城崎海岸 1" />
-    <img src="jogasaki2.jpg" alt="城崎海岸 2" />
-    <img src="jogasaki3.jpg" alt="城崎海岸 3" />
-    <img src="jogasaki4.jpg" alt="城崎海岸 4" />
+    <img src="jogasaki1.jpg" alt="城崎海岸 1" class="custom-img"/>
+    <img src="jogasaki2.jpg" alt="城崎海岸 2" class="custom-img"/>
+    <img src="jogasaki3.jpg" alt="城崎海岸 3" class="custom-img"/>
+    <img src="jogasaki4.jpg" alt="城崎海岸 4" class="custom-img"/>
 </div>
 
 ### MOA美術館
 <div class="image-container">
-    <img src="moa1.jpg" alt="moa 1" />
-    <img src="moa2.jpg" alt="moa 2" />
-    <img src="moa3.jpg" alt="moa 3" />
-    <img src="moa4.jpg" alt="moa 4" />
-    <img src="moa5.jpg" alt="moa 5" />
-    <img src="moa6.jpg" alt="moa 6" />
+    <img src="moa1.jpg" alt="moa 1" class="custom-img"/>
+    <img src="moa2.jpg" alt="moa 2" class="custom-img"/>
+    <img src="moa3.jpg" alt="moa 3" class="custom-img"/>
+    <img src="moa4.jpg" alt="moa 4" class="custom-img"/>
+    <img src="moa5.jpg" alt="moa 5" class="custom-img"/>
+    <img src="moa6.jpg" alt="moa 6" class="custom-img"/>
 </div>
 
 ### 食事
 <div class="image-container">
-    <img src="lunch_day1.jpg" alt="lunch_day1" />
-    <img src="dinner_day1.jpg" alt="dinner_day1" />
-    <img src="lunch_day2.jpg" alt="lunch_day2" />
+    <img src="lunch_day1.jpg" alt="lunch_day1" class="custom-img"/>
+    <img src="dinner_day1.jpg" alt="dinner_day1" class="custom-img"/>
+    <img src="lunch_day2.jpg" alt="lunch_day2" class="custom-img"/>
 </div>
 
 ## 人数 & 费用（日元）

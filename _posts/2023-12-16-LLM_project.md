@@ -127,7 +127,7 @@ print(response.content)
 
 项目开发流程示意图如下: 
 
-![img](/assets/img/2023-12-16-LLM_project/dev_flow.svg)
+<img src="/assets/img/2023-12-16-LLM_project/dev_flow.svg" class="custom-img"/>
 
 ### 项目框架
 
