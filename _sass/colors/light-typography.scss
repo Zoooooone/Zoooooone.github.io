@@ -62,9 +62,8 @@
 
   /* Posts */
   --toc-highlight: #2982f7;
-  --btn-share-hover-color: var(--link-color);
   --card-bg: rgb(237, 241, 245);
-  --card-hovor-bg: rgba(156, 159, 235, 0.941);
+  --card-hovor-bg: rgba(122, 125, 228, 0.941);
   --card-shadow: rgba(24, 24, 24, 0.05) 1px 8px 8px 1px,
     rgba(107, 130, 141, 0.114) 0 0 0 1px;
   --label-color: #616161;
@@ -110,6 +109,18 @@
   --waline-code-bgcolor: #434d62;
   --waline-badge-color: #109658;
   --waline-box-shadow: 0 12px 40px rgb(134 151 168 / 25%);
+
+  /* font awesome icons */
+  --icon-github: #211F1F;
+  --icon-code: #bc5e00;
+  --icon-bilibili: #ff759c;
+  --icon-gaming: #0058a3;
+  --icon-video: #5b009c;
+  --icon-cooking: #e2c37d;
+  --icon-guitar: #5e3c0f;
+  --icon-football: #000000;
+  --icon-envelope: rgb(16, 163, 50);
+  --icon-linkedin: rgb(0, 63, 181);
 
   [class^='prompt-'] {
     --link-underline-color: rgb(219, 216, 216);

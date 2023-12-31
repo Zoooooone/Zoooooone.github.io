@@ -45,7 +45,8 @@
 
 %tag-hover {
   background: var(--tag-hover);
-  transition: background 0.35s ease-in-out;
+  transition: background 0.3s ease, transform 0.3s ease;
+  transform: scale(1.08);
 }
 
 %table-cell {

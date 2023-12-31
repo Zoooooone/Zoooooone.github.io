@@ -65,12 +65,10 @@
   --tb-odd-bg: rgba(42, 47, 53, 0.52); /* odd rows of the posts' table */
   --tb-even-bg: rgb(31, 31, 34); /* even rows of the posts' table */
   --tb-border-color: var(--tb-odd-bg);
-  --footnote-target-bg: rgb(63, 81, 181);
-  --btn-share-color: #6c757d;
-  --btn-share-hover-color: #bfc1ca;
+  --footnote-target-bg: rgb(63, 81, 181);  
   --relate-post-date: var(--text-muted-color);
   --card-bg: #1e1e22;
-  --card-hovor-bg: #586495;
+  --card-hovor-bg: #667eb1;
   --card-shadow: rgba(15, 16, 22, 0.72) 0 6px 18px 0,
     rgb(137, 135, 135, 0.24) 0 0 0 1px;
   --kbd-wrap-color: #6a6a6a;
@@ -121,6 +119,18 @@
   --waline-code-bgcolor: #282c34;
   --waline-badge-color: #0ecf75;
   --waline-box-shadow: 0 12px 40px #0f0e0d;
+
+  /* font awesome icons */
+  --icon-github: #fffefe;
+  --icon-code: #e18515;
+  --icon-bilibili: #f88dab;
+  --icon-gaming: #89c4f4;
+  --icon-video: #b39ddb;
+  --icon-cooking: #f3ecd8;
+  --icon-guitar: #c49846;
+  --icon-football: #ffffff;
+  --icon-envelope: rgb(12, 172, 100);
+  --icon-linkedin: rgb(22, 107, 254); 
 
   .light {
     display: none;

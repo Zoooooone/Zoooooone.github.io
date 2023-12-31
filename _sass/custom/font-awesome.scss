@@ -1,0 +1,48 @@
+i {
+    &.fa-brands.fa-github.fa-fw {
+        color: var(--icon-github);
+    }
+
+    &.fa-solid.fa-laptop.fa-fw {
+        color: var(--icon-code);
+    }
+
+    &.fa-brands.fa-bilibili.fa-fw {
+        color: var(--icon-bilibili);
+    }
+
+    &.fa-brands.fa-steam.fa-fw {
+        color: var(--icon-gaming);
+    }
+
+    &.fa-solid.fa-clapperboard.fa-fw {
+        color: var(--icon-video);
+    }
+
+    &.fa-solid.fa-bowl-food.fa-fw {
+        color: var(--icon-cooking);
+    }
+
+    &.fa-solid.fa-guitar.fa-fw {
+        color: var(--icon-guitar);
+    }
+
+    &.fa-solid.fa-futbol.fa-fw {
+        color: var(--icon-football);
+    }
+
+    &.fa-regular.fa-envelope.fa-fw {
+        color: var(--icon-envelope);
+    }
+
+    &.fa-brands.fa-linkedin.fa-fw {
+        color: var(--icon-linkedin);
+    }
+
+    &.fa-fw:hover {
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        transform: scale(1.2);
+    }
+}
+

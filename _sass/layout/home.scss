@@ -110,6 +110,8 @@
       background-color: var(--button-bg);
 
       &:hover {
+        transition: transform 0.2s ease;
+        transform: scale(1.2);
         background-color: var(--btn-paginator-hover-color);
       }
     }
