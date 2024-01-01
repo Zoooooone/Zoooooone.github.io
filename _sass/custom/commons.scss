@@ -1,0 +1,31 @@
+.embed-video.bilibili {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2em;
+    transition: box-shadow 0.3s ease;
+    border-radius: 20px;
+
+    &:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+}
+
+nav {
+    button {
+        background-color: #4c6faf;
+        color: white;
+        padding: 6px 12px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    
+    button:hover {
+        background-color: #80a7ef;
+        transform: scale(1.05);
+    }
+}

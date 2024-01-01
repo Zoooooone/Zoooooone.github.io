@@ -18,3 +18,19 @@ img {
     border: 5px solid var(--img-hover-color);
     transform: scale(1.03);
 }
+
+.image-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.image-block {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.image-caption {
+    text-align: center;
+    font-size: 0.9em;
+    margin: 0;
+}
