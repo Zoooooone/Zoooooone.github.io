@@ -29,3 +29,12 @@ nav {
         transform: scale(1.05);
     }
 }
+
+#aplayer {
+    border-radius: 8px;
+
+    &:hover {
+        transition: box-shadow 0.3s ease;
+        box-shadow: 0 8px 16px var(--text-muted-color);
+    }
+}

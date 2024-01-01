@@ -92,8 +92,13 @@
     <link rel="stylesheet" href="{{ site.data.origin[type].magnific-popup.css | relative_url }}">
   {% endif %}
 
-  <!-- JavaScript -->
+  <!-- require APlayer -->
+	<link rel="stylesheet" href="{{ '/assets/css/aplayer.css' | prepend: site.baseurl }}">
+	<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+	<!-- require MetingJS -->
+	<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
 
+  <!-- JavaScript -->
   {% unless site.theme_mode %}
     {% include mode-toggle.html %}
   {% endunless %}
