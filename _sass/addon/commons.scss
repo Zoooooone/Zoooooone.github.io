@@ -73,6 +73,10 @@ img {
   height: auto;
   border-radius: 9px;
 
+  &:hover {
+    cursor: pointer;
+  }
+
   &[data-src] {
     &[data-lqip='true'] {
       &.lazyload,

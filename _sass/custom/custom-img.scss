@@ -15,7 +15,6 @@ img {
 
 .custom-img:hover {
     --img-hover-color: var(--toc-highlight);
-    border: 5px solid var(--img-hover-color);
     transform: scale(1.03);
 }
 

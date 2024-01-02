@@ -129,6 +129,9 @@
   --aplayer-list-hover: #efefef;
   --aplayer-icon-hover: #000;
 
+  /* animation */
+  --animated-block-alpha: 0.13;
+
   [class^='prompt-'] {
     --link-underline-color: rgb(219, 216, 216);
   }
