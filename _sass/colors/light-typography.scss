@@ -4,12 +4,12 @@
 
 @mixin light-scheme {
   /* Framework color */
-  --main-bg: rgb(239, 241, 246);
+  --main-bg: rgb(248, 248, 248);
   --mask-bg: #c1c3c5;
   --main-border-color: #d1d9e6;
 
   /* Common color */
-  --table-border-color: #ababab;
+  --table-border-color: #c3c3c3;
   --text-color: #34343c;
   --text-muted-color: #8e8e8e;
   --heading-color: black;
@@ -20,7 +20,7 @@
   --button-bg: var(--main-bg);
   --btn-border-color: #d0dbe4;
   --btn-backtotop-color: #7d86ab;
-  --btn-backtotop-border-color: #f1f1f1;
+  --btn-backtotop-border-color: var(--btn-border-color);
   --btn-box-shadow: #eaeaea;
   --checkbox-color: #c5c5c5;
   --checkbox-checked-color: #07a8f7;
@@ -62,11 +62,12 @@
 
   /* Posts */
   --toc-highlight: #2982f7;
-  --card-bg: rgb(237, 241, 245);
-  --card-hovor-bg: rgba(122, 125, 228, 0.941);
+  --card-bg: rgb(246, 246, 246);
+  --card-hovor-bg: rgba(151, 159, 174, 0.941);
   --card-shadow: rgba(24, 24, 24, 0.05) 1px 8px 8px 1px,
     rgba(107, 130, 141, 0.114) 0 0 0 1px;
-  --label-color: #616161;
+  --card-hover-border: #a09f9f;
+  --label-color: #757575;
   --relate-post-date: rgba(30, 55, 70, 0.4);
   --footnote-target-bg: lightcyan;
   --tag-bg: rgba(0, 0, 0, 0.075);
@@ -95,8 +96,8 @@
   --waline-light-grey: #999;
   --waline-dark-grey: #666;
   --waline-color: #444;
-  --waline-bgcolor: #f0f3f6;
-  --waline-bgcolor-light: #f8f8f8;
+  --waline-bgcolor: #fafafb;
+  --waline-bgcolor-light: #f0f0f0;
   --waline-bgcolor-hover: #f0f0f0;
   --waline-border-color: #d3d4d7;
   --waline-disable-bgcolor: #f8f8f8;

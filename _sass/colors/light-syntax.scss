@@ -4,19 +4,16 @@
 
  @mixin light-syntax {
   --language-border-color: rgba(84, 83, 83, 0.27);
-  --highlight-bg-color: rgb(238, 241, 246);
-  --highlighter-rouge-color: #766cdc;
+  --highlight-bg-color: rgb(255, 255, 255);
+  --highlighter-rouge-color: #8868df;
   --highlight-lineno-color: #6c6c6d;
-  --inline-code-bg: #f4f6fa;
+  --inline-code-bg: #fdfdff;
+  --inline-code-border: #e1e1e1;
   --code-header-text-color: #6a6a6a;
   --code-header-muted-color: rgb(185, 172, 172);
   --code-header-icon-color: rgb(86, 86, 86);
   --clipboard-checked-color: #2bcc2b;
   --filepath-text-color: #bdbdbd;
-
-  code{
-    box-shadow: 0 1.2px 2px 0 var(--filepath-text-color);
-  }
 
   /* override Bootstrap */
   pre {

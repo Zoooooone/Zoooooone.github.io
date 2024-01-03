@@ -332,7 +332,7 @@ i {
     border-spacing: 0;
 
     thead {
-      border-bottom: solid 2px rgba(100, 100, 100, 0.75);
+      border-bottom: solid 1.5px var(--table-border-color);
 
       th {
         @extend %table-cell;
@@ -341,7 +341,7 @@ i {
 
     tbody {
       tr {
-        border-bottom: 1px solid var(--tb-border-color);
+        border-bottom: 1px solid var(--table-border-color);
 
         &:nth-child(2n) {
           background-color: var(--tb-even-bg);
@@ -381,8 +381,9 @@ i {
   }
 
   &:hover {
-    transition: transform 0.25s ease;
+    transition: transform 0.3s ease;
     transform: scale(1.02);
+    border: 0.1px solid var(--card-hover-border);
     &::before {
       opacity: 0.3;
     }
