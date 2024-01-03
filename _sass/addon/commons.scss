@@ -381,8 +381,9 @@ i {
   }
 
   &:hover {
-    transition: transform 0.25s ease;
+    transition: transform 0.3s ease;
     transform: scale(1.02);
+    border: 0.1px solid var(--card-hover-border);
     &::before {
       opacity: 0.3;
     }
