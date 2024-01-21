@@ -7,8 +7,8 @@ const musicPlay = new APlayer({
             name: "Nuit Silencieuse",
             artist: "Days",
             url: "/assets/audio/Days - Nuit Silencieuse.mp3",
-            cover: "/assets/img/audio-cover/Nuit Silencieuse.jpg",
-            lrc: "/assets/audio/lrc/Nuit Silencieuse.lrc"
+            cover: "/assets/img/audio-cover/nuit-silencieuse.jpg",
+            lrc: "/assets/audio/lrc/nuit-silencieuse.lrc"
         },
         {
             name: "No differences ＜a0v＞ -Instrumental-",
@@ -51,6 +51,20 @@ const musicPlay = new APlayer({
             url: "/assets/audio/Skrillex,Sirah - Bangarang.mp3",
             cover: "/assets/img/audio-cover/bangarang.jpg",
             lrc: "/assets/audio/lrc/bangarang.lrc"
+        },
+        {
+            name: "杀死那个石家庄人",
+            artist: "万能青年旅店",
+            url: "/assets/audio/万能青年旅店 - 杀死那个石家庄人.mp3",
+            cover: "/assets/img/audio-cover/杀死那个石家庄人.jpeg",
+            lrc: "/assets/audio/lrc/杀死那个石家庄人.lrc"
+        },
+        {
+            name: "The Process",
+            artist: "LAKEY INSPIRED",
+            url: "/assets/audio/LAKEY INSPIRED - The Process.mp3",
+            cover: "/assets/img/audio-cover/the-process.jpeg",
+            lrc: "/assets/audio/lrc/the-process.lrc"
         },
     ]
 });
