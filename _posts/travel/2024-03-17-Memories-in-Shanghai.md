@@ -4,7 +4,6 @@ date: 2024-03-17 9:30:00 +0800
 categories: [Daily life, Travels]
 tags: [travel, shanghai]
 math: true
-pin: true
 image: /assets/img/2024-03-17-Memories-in-Shanghai/20240314_4.jpg
 ---
 
