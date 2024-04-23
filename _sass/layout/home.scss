@@ -105,8 +105,8 @@
       display: -webkit-box;
       -webkit-box-pack: center;
       -webkit-box-align: center;
-      border-radius: 50%;
-      border: 1px solid var(--btn-paginator-border-color);
+      border-radius: 25%;
+      border: 1px solid var(--button-bg);
       background-color: var(--button-bg);
 
       &:hover {
@@ -128,14 +128,14 @@
 
       .page-link {
         color: rgba(108, 117, 125, 0.57);
-        border-color: var(--btn-paginator-border-color);
+        border-color: var(--button-bg);
         background-color: var(--button-bg);
       }
     }
 
     &:first-child .page-link,
     &:last-child .page-link {
-      border-radius: 50%;
+      border-radius: 25%;
     }
   } /* .page-item */
 } /* .pagination */
