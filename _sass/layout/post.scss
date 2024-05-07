@@ -139,6 +139,13 @@ h1 + .post-meta {
           }
         }
 
+        &.fa-line {
+          @include btn-sharing-color(rgb(25, 167, 37));
+          &:hover {
+            @include btn-sharing-color(rgb(20, 211, 29));
+          }
+        }
+
         &.fa-telegram {
           @include btn-sharing-color(rgb(39, 159, 217));
           &:hover {
@@ -170,9 +177,9 @@ h1 + .post-meta {
     } /* .share-icons */
 
     .fas.fa-link {
-      @include btn-sharing-color(rgb(14, 182, 16));
+      @include btn-sharing-color(rgb(219, 133, 21));
       &:hover {
-        @include btn-sharing-color(rgb(62, 255, 66));
+        @include btn-sharing-color(rgb(255, 157, 45));
       }
     }
   } /* .share-wrapper */
