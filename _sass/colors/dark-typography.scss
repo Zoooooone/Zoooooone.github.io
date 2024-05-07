@@ -9,7 +9,6 @@
   --main-border-color: rgb(5, 34, 57);
 
   /* Common color */
-  --table-border-color: #3d3d3d;
   --text-color: rgb(137, 152, 166);
   --text-muted-color: rgb(104, 111, 118);
   --strong-text-color: rgb(189 198 206);
@@ -62,9 +61,10 @@
   --toc-highlight: rgb(6, 126, 255);
   --tag-bg: rgb(41, 40, 40);
   --tag-hover: rgb(31, 38, 60);
-  --tb-odd-bg: rgba(42, 47, 53, 0.52); /* odd rows of the posts' table */
+  --tb-odd-bg: #252526; /* odd rows of the posts' table */
   --tb-even-bg: rgb(31, 31, 34); /* even rows of the posts' table */
   --tb-border-color: var(--tb-odd-bg);
+  --tb-shade-color: 255, 255, 255;
   --footnote-target-bg: rgb(63, 81, 181);  
   --relate-post-date: var(--text-muted-color);
   --card-bg: #1e1e22;
