@@ -81,7 +81,20 @@
     rel="stylesheet"
     href="https://unpkg.com/@waline/client@v2/dist/waline.css"
   />
+
+  <!-- MathJax -->
   <script src="https://unpkg.com/mathjax@v3/es5/tex-svg.js"></script>
+
+  <!-- Json -->
+  <script src="/assets/js/json.js"></script>
+
+  <!-- lightGallery -->
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/lightgallery.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lightgallery-bundle.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/thumbnail/lg-thumbnail.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/zoom/lg-zoom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/autoplay/lg-autoplay.min.js"></script>
+  <script src="/assets/js/gallery.js"></script>
 
   {% if site.toc and page.toc %}
     <link rel="stylesheet" href="{{ site.data.origin[type].toc.css | relative_url }}">

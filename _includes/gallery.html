@@ -1,0 +1,7 @@
+<div id="{{ include.id }}" class="inline-gallery-container"></div>
+<script>
+(async () => {
+    const data = await asyncLoadJSON("/assets/src/{{ include.path }}/info.json");
+    initGallery("{{ include.id }}", data);
+})();
+</script>
