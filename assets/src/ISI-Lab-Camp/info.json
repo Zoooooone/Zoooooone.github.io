@@ -1,0 +1,71 @@
+[
+    {
+        "src": "/assets/src/ISI-Lab-Camp/marinetown.jpg",
+        "title": "静岡・伊東",
+        "description": "道の駅　伊東マリンタウン"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/jogasaki1.jpg",
+        "title": "静岡・伊東",
+        "description": "城ケ崎海岸"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/jogasaki2.jpg",
+        "title": "静岡・伊東",
+        "description": "城ケ崎海岸"
+    },{
+        "src": "/assets/src/ISI-Lab-Camp/jogasaki3.jpg",
+        "title": "静岡・伊東",
+        "description": "城ケ崎海岸"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/jogasaki4.jpg",
+        "title": "静岡・伊東",
+        "description": "城ケ崎海岸"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/moa1.jpg",
+        "title": "静岡・熱海",
+        "description": "MOA美術館"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/moa2.jpg",
+        "title": "静岡・熱海",
+        "description": "MOA美術館"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/moa3.jpg",
+        "title": "静岡・熱海",
+        "description": "MOA美術館"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/moa4.jpg",
+        "title": "静岡・熱海",
+        "description": "MOA美術館"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/moa5.jpg",
+        "title": "静岡・熱海",
+        "description": "MOA美術館"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/moa6.jpg",
+        "title": "静岡・熱海",
+        "description": "MOA美術館"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/lunch_day1.jpg",
+        "title": "食事",
+        "description": "一日目・昼ご飯"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/dinner_day1.jpg",
+        "title": "食事",
+        "description": "一日目・晩ご飯"
+    },
+    {
+        "src": "/assets/src/ISI-Lab-Camp/lunch_day2.jpg",
+        "title": "食事",
+        "description": "二日目・昼ご飯"
+    }
+]

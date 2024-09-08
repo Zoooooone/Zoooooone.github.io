@@ -2,13 +2,13 @@
 title: 记2023年度ISI研究室合宿
 date: 2023-09-13 18:35:00 +0900
 categories: [Daily life, Travels]
-tags: [travel, izu]     # TAG names should always be lowercase
-img_path: /assets/img/2023-09-13-ISI_Lab_Camp/
+tags: [travel, izu]
 math: true
+image: /assets/src/ISI-Lab-Camp/jogasaki2.jpg
 ---
 
 ## 合宿旅行路线
-<iframe src="https://www.google.com/maps/d/u/1/embed?mid=1NQWqEdIBg6aOj-uOvVdCmDt5rO6d6AA&ehbc=2E312F" width="640" height="480"></iframe>
+<iframe src="https://www.google.com/maps/d/u/1/embed?mid=1NQWqEdIBg6aOj-uOvVdCmDt5rO6d6AA&ehbc=2E312F" width="100%" height="480"></iframe>
 
 URL：[合宿路线](https://www.google.com/maps/d/u/1/edit?mid=1NQWqEdIBg6aOj-uOvVdCmDt5rO6d6AA&ll=35.70297973282599%2C139.29352137467765&z=9)
 
@@ -49,48 +49,8 @@ URL：[合宿路线](https://www.google.com/maps/d/u/1/edit?mid=1NQWqEdIBg6aOj-u
 | 18:10 | 17:40 | 東京駅に到着 |
 
 ## 沿途风光 & 美食
-### 伊東マリンタウン
-<style>
-    .image-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .image-container img {
-        width: 540px;
-        height: auto;
-        margin-bottom: 30px
-    }
-</style>
 
-<div class="image-container">
-    <img src="marinetown.jpg" alt="marine-town" class="custom-img"/>
-</div>
-
-### 城ヶ崎海岸
-<div class="image-container">
-    <img src="jogasaki1.jpg" alt="城崎海岸 1" class="custom-img"/>
-    <img src="jogasaki2.jpg" alt="城崎海岸 2" class="custom-img"/>
-    <img src="jogasaki3.jpg" alt="城崎海岸 3" class="custom-img"/>
-    <img src="jogasaki4.jpg" alt="城崎海岸 4" class="custom-img"/>
-</div>
-
-### MOA美術館
-<div class="image-container">
-    <img src="moa1.jpg" alt="moa 1" class="custom-img"/>
-    <img src="moa2.jpg" alt="moa 2" class="custom-img"/>
-    <img src="moa3.jpg" alt="moa 3" class="custom-img"/>
-    <img src="moa4.jpg" alt="moa 4" class="custom-img"/>
-    <img src="moa5.jpg" alt="moa 5" class="custom-img"/>
-    <img src="moa6.jpg" alt="moa 6" class="custom-img"/>
-</div>
-
-### 食事
-<div class="image-container">
-    <img src="lunch_day1.jpg" alt="lunch_day1" class="custom-img"/>
-    <img src="dinner_day1.jpg" alt="dinner_day1" class="custom-img"/>
-    <img src="lunch_day2.jpg" alt="lunch_day2" class="custom-img"/>
-</div>
+{% include gallery.html id="gallery" path="ISI-Lab-Camp" %}
 
 ## 人数 & 费用（日元）
 - 人数: **31 (教职员: 6, 学生: 25)**
