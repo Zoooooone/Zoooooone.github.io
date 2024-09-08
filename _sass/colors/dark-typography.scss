@@ -144,6 +144,14 @@
   /* animation */
   --animated-block-alpha: 0.1;
 
+  /* lightGallery */
+  --lg-outer-bgcolor: #131315;
+  --lg-thumb-outer-bgcolor: #131315;
+  --lg-caption-bgcolor: rgba(26, 26, 34, 0.6);
+  --lg-prev-bgcolor: #131315;
+  --lg-next-bgcolor: #131315;
+  --lg-button-hover: #2f3031;
+
   .light {
     display: none;
   }
