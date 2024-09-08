@@ -303,13 +303,50 @@ To record study notes and daily life, and to enjoy the process of starting a blo
 
   </details>
 
+- **Added** the gallery functionality using **[lightGallery](https://github.com/sachinchoolur/lightGallery)**.
+  <details>
+    <summary> Details </summary>
+
+    - Installation
+      ```html
+      <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/lightgallery.min.js"></script>
+      <link href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lightgallery-bundle.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/thumbnail/lg-thumbnail.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/zoom/lg-zoom.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/autoplay/lg-autoplay.min.js"></script>
+      ```
+
+    - The gallery supports **fullscreen display**, **zoom**, **download**, **autoplay**, **thumbnails**, and more. You can also customize additional features using plugins provided by lightGallery.
+
+    - In **[assets/src/](assets/src/)**, add your own gallery folder and include an `info.json` file in the following format：
+      ```json
+      [
+        {
+          "src": "Path to image",
+          "title": "The caption of the image",
+          "description": "The description of the image"
+        }
+      ]
+      ```
+
+    - For more details, please check **[_includes/gallery.html](_includes/gallery.html)**, **[_sass/custom/gallery.scss](_sass/custom/gallery.scss)** and **[assets/js/gallery.js](assets/js/gallery.js)**.
+
+    - Usage:
+      ```liquid
+      {% include gallery.html id="Your gallery id" path="Your gallery folder name" %}
+      ```
+
+  </details>
+
 ## Future works
 
-- **Add** h4 to the auto-generated table of contents in blog posts.
-- **Fix** the conflict between Aplayer scrollbar and tocbot.
-- **Enhance** the tags page and implement sorting by frequency.
-- **Introduce** a gallery feature to the blog and optimize image display.
-- ...
+| Task | Status |
+| --- | --- |
+| **Add** h4 to the auto-generated table of contents | 🔴 Not Started |
+| **Fix** the conflict between Aplayer scrollbar and tocbot | 🔴 Not Started |
+| **Enhance** the tags page and implement sorting by frequency | 🔴 Not Started |
+| **Introduce** a gallery feature to the blog and optimize image display | 🟢 Completed |
+| ... | ... |
 
 # Start-up
 - Install **Ruby** and **Jekyll**, the tutorial is **[here](https://jekyllrb.com/docs/installation/)**. More details:
