@@ -134,11 +134,13 @@
   --animated-block-alpha: 0.13;
 
   /* lightGallery */
-  --lg-outer-bgcolor: #e1e1e1;
-  --lg-thumb-outer-bgcolor: #e1e1e1;
+  --lg-container-shadow: #949494;
+  --lg-outer-bgcolor: #eeeeee;
+  --lg-thumb-outer-bgcolor: #eeeeee;
   --lg-caption-bgcolor: rgba(222, 222, 222, 0.5);
-  --lg-prev-bgcolor: #e1e1e1;
-  --lg-next-bgcolor: #e1e1e1;
+  --lg-caption-text-color: #000000;
+  --lg-prev-bgcolor: #eeeeee;
+  --lg-next-bgcolor: #eeeeee;
   --lg-button-hover: #c7c7c7;
 
   [class^='prompt-'] {
