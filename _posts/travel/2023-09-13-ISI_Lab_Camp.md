@@ -13,7 +13,11 @@ image: /assets/src/ISI-Lab-Camp/jogasaki2.jpg
 URL：[合宿路线](https://www.google.com/maps/d/u/1/edit?mid=1NQWqEdIBg6aOj-uOvVdCmDt5rO6d6AA&ll=35.70297973282599%2C139.29352137467765&z=9)
 
 ## 日程安排
-### 一日目
+
+> **时间: 2023.9.9 ~ 2024.9.10**
+{: .prompt-tip}
+
+### Day1
 
 | 予定 | 当日 | 内容 | 関連リンク |
 |:---:|:---:|:---:|:---:|
@@ -31,7 +35,7 @@ URL：[合宿路线](https://www.google.com/maps/d/u/1/edit?mid=1NQWqEdIBg6aOj-u
 || 21:00 ~ 23:00 | 発表 | 
 | 21:00 ~ |  23:00 ~ | コンパ | 
 
-### 二日目
+### Day2
 
 | 予定 | 当日 | 内容 | 関連リンク |
 |:---:|:---:|:---:|:---:|

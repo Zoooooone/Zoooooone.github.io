@@ -9,6 +9,9 @@ image: /assets/src/Memories-in-Shanghai/day4/20240314_4.jpg
 
 ## 行程
 
+> **时间: 2024.3.11 ~ 2024.3.15**
+{: .prompt-tip}
+
 ### Day1
 **上海站 $\rightarrow$ 午餐 $\rightarrow$ 城隍庙、豫园 $\rightarrow$ 晚餐 $\rightarrow$ 休息**
 
