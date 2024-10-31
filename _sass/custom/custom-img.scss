@@ -7,15 +7,15 @@ img {
 }
 
 .custom-img {
-    border: 3px solid var(--mask-bg);
-    border-radius: 15px;
+    border: 3px solid var(--img-border-color);
+    border-radius: 5px;
     transition: all 0.25s ease-in-out, transform 0.25s ease;
-    box-shadow: 0 3.5px 7px 0 var(--text-muted-color);
+    // box-shadow: 0 3.5px 7px 0 var(--text-muted-color);
 }
 
 .custom-img:hover {
     --img-hover-color: var(--toc-highlight);
-    transform: scale(1.03);
+    transform: scale(1.015);
 }
 
 .image-container {
