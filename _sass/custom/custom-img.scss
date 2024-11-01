@@ -6,6 +6,12 @@ img {
     }
 }
 
+.uniform {
+    height: 400px;
+    width: auto;
+    object-fit: cover;
+}
+
 .custom-img {
     border: 3px solid var(--img-border-color);
     border-radius: 5px;

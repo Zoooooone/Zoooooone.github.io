@@ -29,3 +29,16 @@ nav {
         transform: scale(1.05);
     }
 }
+
+.poem {
+    display: flex;
+    justify-content: center;
+}
+
+.poem-font {
+    font-family: Roboto, "LXGW WenKai GB Screen", sans-serif;
+    text-align: center;
+    white-space: pre-line;
+    padding-bottom: 2em;
+}
+
