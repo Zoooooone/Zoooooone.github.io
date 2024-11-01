@@ -84,7 +84,20 @@
   />
 
   <!-- MathJax -->
-  <script src="https://unpkg.com/mathjax@v3/es5/tex-svg.js"></script>
+  <script type="text/javascript">
+    MathJax = {
+        loader: {load: ['[tex]/color']},
+        tex: {
+            packages: {'[+]': ['color']},
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        svg: {
+            fontCache: 'global'
+        }
+    };
+  </script>
+  <script src="https://unpkg.com/mathjax@v3/es5/tex-svg.js" async></script>
 
   <!-- Json -->
   <script src="/assets/js/json.js"></script>

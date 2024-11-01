@@ -205,7 +205,7 @@
   }
 
   #core-wrapper {
-    strong {
+    strong:not(.poem-font strong) {
       text-shadow: 0 0 0.1rem var(--strong-text-color), 0 0 0.05rem var(--strong-text-color);
       color: var(--strong-text-color);
       code {

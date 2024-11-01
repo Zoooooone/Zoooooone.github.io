@@ -30,6 +30,12 @@ nav {
     }
 }
 
+.poem, .poem-font {
+    border-left: none;
+    padding-left: 0;
+    color: var(--text-color);
+}
+
 .poem {
     display: flex;
     justify-content: center;
@@ -38,7 +44,9 @@ nav {
 .poem-font {
     font-family: Roboto, "LXGW WenKai GB Screen", sans-serif;
     text-align: center;
-    white-space: pre-line;
-    padding-bottom: 2em;
+}
+
+.poem-font strong {
+    color: orange !important;
 }
 
