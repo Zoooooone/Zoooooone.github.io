@@ -42,6 +42,13 @@ tail_includes:
   {% endfor %}
 {% endif %}
 
+<div id="typing-container">
+  <span id="typed-text"></span>
+</div>
+
+<div id="curtain-left" class="curtain"></div>
+<div id="curtain-right" class="curtain"></div>
+
 <div id="post-list">
   {% for post in posts %}
     <a href="{{ post.url | relative_url }}" class="card-wrapper">

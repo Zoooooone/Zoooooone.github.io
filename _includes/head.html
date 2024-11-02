@@ -57,8 +57,13 @@
     {% endfor %}
 
     <link rel="stylesheet" href="{{ site.data.origin[type].webfonts | relative_url }}">
-    <link href="https://cdn.jsdelivr.net/npm/cn-fontsource-lxgw-wen-kai-gb-screen@1.0.6/font.min.css" rel="stylesheet">
   {% endif %}
+
+  <!-- fonts -->
+  <link href="https://cdn.jsdelivr.net/npm/cn-fontsource-lxgw-wen-kai-gb-screen@1.0.6/font.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
 
   <!-- GA -->
   {% if jekyll.environment == 'production' and site.google_analytics.id != empty and site.google_analytics.id %}
@@ -78,7 +83,7 @@
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 
   <!-- progress bar -->
-  <script src="{{ '/assets/js/progress.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/animation/progress.js' | relative_url }}"></script>
 
   <!-- Waline -->
   <link
@@ -102,6 +107,9 @@
   </script>
   <script src="https://unpkg.com/mathjax@v3/es5/tex-svg.js" async></script>
 
+  <!-- animations -->
+  <script src="{{ '/assets/js/animation/homepage.js' | relative_url }}"></script>
+
   <!-- Json -->
   <script src="/assets/js/json.js"></script>
 
@@ -111,7 +119,7 @@
   <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/thumbnail/lg-thumbnail.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/zoom/lg-zoom.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/autoplay/lg-autoplay.min.js"></script>
-  <script src="/assets/js/gallery.js"></script>
+  <script src="/assets/js/addon/gallery.js"></script>
 
   {% if site.toc and page.toc %}
     <link rel="stylesheet" href="{{ site.data.origin[type].toc.css | relative_url }}">
@@ -128,6 +136,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
   {% endif %}
+
+  <!-- typed.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.10/typed.min.js"></script>
 
   <!-- JavaScript -->
   {% unless site.theme_mode %}
