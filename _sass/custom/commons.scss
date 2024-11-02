@@ -50,3 +50,14 @@ nav {
     color: orange !important;
 }
 
+#progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 5px;
+    background-color: #3b82f6;
+    z-index: 1000;
+    transition: width 0.25s;
+}
+
