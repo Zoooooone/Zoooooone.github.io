@@ -14,9 +14,9 @@ tail_includes:
 
 <div id="progress-bar"></div>
 
-<h1 data-toc-skip>{{ page.title }}</h1>
+<h1 data-toc-skip class="fade-in-element">{{ page.title }}</h1>
 
-<div class="post-meta text-muted">
+<div class="post-meta text-muted fade-in-element">
   <!-- published date -->
   <span>
     {{ site.data.locales[lang].post.posted }}
@@ -85,11 +85,11 @@ tail_includes:
 
 </div> <!-- .post-meta -->
 
-<div class="post-content">
+<div class="post-content fade-in-element">
   {{ content }}
 </div>
 
-<div class="post-tail-wrapper text-muted">
+<div class="post-tail-wrapper text-muted fade-in-element">
 
   <!-- categories -->
   {% if page.categories.size > 0 %}

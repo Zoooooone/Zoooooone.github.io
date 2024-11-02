@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    var isLocalhost = location.hostname == '127.0.0.1' || location.hostname == 'localhost';
+    var isLocalhost = location.hostname == '127.0.0.2' || location.hostname == 'localhost';
     var hasVisited = sessionStorage.getItem('visited');
     
     if (!hasVisited || isLocalhost) {

@@ -212,3 +212,17 @@
     background-size: 100% 2px;
     pointer-events: none;
 }
+
+/* post content */
+
+.fade-in-element {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
