@@ -37,7 +37,10 @@
 }
 
 .lightGallery-captions {
-    h4 {
+    .lg-caption {
+        font-size: 13px;
+        font-weight: bold;
+        text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.8);
         color: var(--lg-caption-text-color);
         transform: translate3d(60px, 0, 0px);
     }
@@ -45,7 +48,7 @@
         color: var(--lg-caption-text-color);
         transform: translate3d(-60px, 0, 0px);
     }
-    h4, p {
+    .lg-caption, p {
         opacity: 0;
     }
     background-color: var(--lg-caption-bgcolor);
@@ -53,11 +56,11 @@
 
 .lg-current {
     .lightGallery-captions {
-        h4,
+        .lg-caption,
         p {
             transform: translate3d(0, 0, 0px);
         }
-        h4,
+        .lg-caption,
         p {
             opacity: 1;
         }
@@ -65,13 +68,13 @@
 }
 .lg-slide-progress {
     .lightGallery-captions {
-        h4 {
+        .lg-caption {
             transform: translate3d(-60px, 0, 0px);
         }
         p {
             transform: translate3d(60px, 0, 0px);
         }
-        h4,
+        .lg-caption,
         p {
             opacity: 0;
         }
@@ -79,21 +82,21 @@
 }
 
 .lightGallery-captions {
-    h4,
+    .lg-caption,
     p {
         transition: transform 0.4s ease-in-out, opacity 0.4s ease-in;
     }
 }
 .lg-current {
     .lightGallery-captions {
-        h4,
+        .lg-caption,
         p {
             transition-delay: 500ms;
         }
     }
     &.lg-slide-progress {
         .lightGallery-captions {
-            h4,
+            .lg-caption,
             p {
                 transition-delay: 0ms;
             }

@@ -13,8 +13,8 @@ const initGallery = (id, data) => {
                 src: item.src,
                 thumb: item.src,
                 subHtml: `<div class="lightGallery-captions">
-                            <h4 style="margin-bottom: 0;">${item.title}</h4>
-                            <p style="margin-top: 1;">${item.description}</p>
+                            <div class="lg-caption" style="margin-bottom: 0;">${item.title}</div>
+                            <p style="margin-top: 0;">${item.description}</p>
                           </div>`
             };
         }),
