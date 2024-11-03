@@ -1,8 +1,18 @@
 window.addEventListener('scroll', function() {
-    var progressBar = document.getElementById('progress-bar');
+    const remToPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
     var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-    var scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    var scrollPercent = (scrollTop / scrollHeight) * 100;
+    var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+    var clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
+    var scrollHeight = scrollHeight - clientHeight;   
+    
+    var progressCircle = document.querySelector(".progress-ring-circle");
+    var dashoffset = 8.168 * remToPx * (1 - scrollTop / scrollHeight);
+    // var scrollPercent = (scrollTop / scrollHeight) * 100;
+    
+    progressCircle.style.strokeDashoffset = dashoffset;
+    
+    /*
+    var progressBar = document.getElementById('progress-bar');
     progressBar.style.width = scrollPercent + '%';
 
     var startColor = { r: 20, g: 40, b: 235 };
@@ -22,4 +32,5 @@ window.addEventListener('scroll', function() {
 
     var color = `rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`;
     progressBar.style.backgroundColor = color;
+    */
 });

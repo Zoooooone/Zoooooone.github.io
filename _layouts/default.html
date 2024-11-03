@@ -36,7 +36,10 @@ layout: compress
 
     <button id="back-to-top" aria-label="back-to-top" class="btn btn-lg btn-box-shadow">
       <i class="fas fa-angle-up"></i>
-    </button>
+      <svg id="progress-ring" class="progress-ring" width="2.9rem" height="2.9rem">
+        <circle class="progress-ring-circle" cx="1.45rem" cy="1.45rem" r="1.3rem"></circle>
+      </svg>
+    </button>   
 
     {% if site.pwa.enabled %}
       <div

@@ -79,6 +79,7 @@
 
 /* progress bar */
 
+/*
 #progress-bar {
     position: fixed;
     top: 0;
@@ -88,6 +89,24 @@
     background-color: #3b82f6;
     z-index: 1000;
     transition: width 0.25s;
+}
+*/
+
+.progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+    fill: transparent;
+    stroke: #007bff;
+    stroke-width: 4.5px;
+    stroke-dasharray: 8.168rem;
+    stroke-dashoffset: 8.168rem;
+    transition: stroke-dashoffset 0.1s linear;
 }
 
 /* curtain */
