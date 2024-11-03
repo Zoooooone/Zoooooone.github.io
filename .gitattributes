@@ -14,5 +14,3 @@
 *.png binary
 *.jpg binary
 *.ico binary
-
-*.css linguist-language=css
