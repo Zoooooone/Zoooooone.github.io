@@ -14,6 +14,8 @@ tail_includes:
 
 {% assign sort_categories = site.categories | sort %}
 
+<h1 class="dynamic-title">Categories</h1>
+
 {% for category in sort_categories %}
   {% assign category_name = category | first %}
   {% assign posts_of_category = category | last %}

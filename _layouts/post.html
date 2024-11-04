@@ -14,7 +14,9 @@ tail_includes:
 
 <!-- <div id="progress-bar"></div> -->
 
-<h1 data-toc-skip class="fade-in-element">{{ page.title }}</h1>
+{% if page.title and page.title != false %}
+  <h1 data-toc-skip class="fade-in-element">{{ page.title }}</h1>
+{% endif %}
 
 <div class="post-meta text-muted fade-in-element">
   <!-- published date -->

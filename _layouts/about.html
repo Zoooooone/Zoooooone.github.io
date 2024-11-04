@@ -1,0 +1,47 @@
+---
+layout: page
+---
+
+<h1 class="dynamic-title">About</h1>
+
+<nav>
+  <button onclick="switchLanguage('en')">English</button>
+  <button onclick="switchLanguage('zh')">中文</button>
+</nav>
+
+<div id="content-area">
+  <div id="en-content" style="display: none;">
+    {% include about/about_en.html %}
+  </div>
+
+  <div id="zh-content" style="display: none;">
+    {% include about/about_zh.html %}
+  </div>
+</div>
+
+<div class="row">
+  <div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 px-3 pe-xl-4 mt-5">
+    {% include pageview.html %}
+  </div>
+</div>
+
+<script>
+  function switchLanguage(lang) {
+    var contents = document.querySelectorAll('#content-area > div');
+    contents.forEach(function(content) {
+      content.style.display = 'none';
+    });
+
+    var activeContent = document.getElementById(lang + '-content');
+    if(activeContent) {
+      activeContent.style.display = 'block';
+    }
+
+    localStorage.setItem('preferredLanguage', lang);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var preferredLanguage = localStorage.getItem('preferredLanguage') || 'en';
+    switchLanguage(preferredLanguage);
+  });
+</script>

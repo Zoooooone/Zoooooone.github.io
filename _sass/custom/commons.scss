@@ -57,3 +57,25 @@ nav {
     border-radius: 2px;
     display: inline;
 }
+
+.code-table {
+    th, td {
+        text-align: left;
+    }
+}
+
+details {
+    border-radius: 0.5rem;
+    border: solid 2px var(--text-color);
+    margin: 0;
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+  
+    > summary {
+      outline: none;
+    }
+  
+    > :last-child {
+      margin-bottom: 0;
+    }
+}

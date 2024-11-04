@@ -23,14 +23,16 @@ layout: default
       {% else %}
         {{ content }}
       {% endif %}
-    {% endcapture %}
+      {% endcapture %}
 
-      {% if page.layout == 'page' or page.collection == 'tabs' %}
+      {% if page.layout == 'page' %}  <!-- or page.collection == 'tabs' -->
         {% assign tab_key = page.title | downcase %}
         {% assign title = site.data.locales[lang].tabs[tab_key] | default: page.title %}
-        <h1 class="dynamic-title">
-          {{ title }}
-        </h1>
+        {% if page.title and page.title != false %}
+          <h1 class="dynamic-title">
+            {{ title }}
+          </h1>
+        {% endif %}
         <div class="post-content">
           {{ _content }}
         </div>
