@@ -421,6 +421,14 @@ i {
 }
 
 .post-meta {
+  div {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    text-overflow: ellipsis;
+  }
+
   font-size: 0.85rem;
 
   a {

@@ -49,3 +49,11 @@ nav {
 .poem-font strong {
     color: orange !important;
 }
+
+.search-highlight {
+    background-color: rgba(255, 233, 34, 0.6);
+    color: #333;
+    font-weight: bold;
+    border-radius: 2px;
+    display: inline;
+}
