@@ -3,17 +3,56 @@
 */
 
 .tag {
+  display: block;
+  opacity: 0;
+  color: var(--tags-tag-text-color);
   border-radius: 0.7em;
   padding: 6px 8px 7px;
-  margin-right: 0.8rem;
-  line-height: 3rem;
+  margin-top: 0.6rem;
+  margin-bottom: 0.6rem;
+  margin-left: 0.6rem;
+  margin-right: 0.6rem;
+  line-height: 1rem;
+  font-size: 1rem;
   letter-spacing: 0;
-  border: 1px solid var(--tag-border) !important;
+  border: 1px solid;
   box-shadow: 0 0 3px 0 var(--tag-shadow);
+  // background-color: var(--tags-tag-color);
+  animation: bounceIn 1.5s ease forwards;
+
+  &:hover {
+    color: var(--tags-tag-text-color);
+    border: 1px solid var(--tags-tag-hover-color);
+    // background-color: var(--tags-tag-hover-color);
+  }
 
   span {
     margin-left: 0.6em;
     font-size: 0.7em;
     font-family: Oswald, sans-serif;
+  }
+}
+
+.tag-freq {
+  color: var(--tags-tag-freq-color);
+}
+
+.tags-tag:hover {
+  transition: all 0.15s ease, transform 0.15s ease;
+  transform: scale(1.05);
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }

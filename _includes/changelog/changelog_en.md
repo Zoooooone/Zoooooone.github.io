@@ -302,5 +302,5 @@ Added the gallery functionality using **[lightGallery](https://github.com/sachin
 | **Add** h4 to the auto-generated table of contents | 🟢 Completed |
 | **Introduce** a gallery feature to the blog and optimize image display | 🟢 Completed |
 | **Fix** the conflict between Aplayer scrollbar and tocbot | 🔴 Not Started |
-| **Enhance** the tags page and implement sorting by frequency | 🔴 Not Started |
+| **Enhance** the tags page and implement sorting by frequency | 🟢 Completed |
 | ... | ... |
