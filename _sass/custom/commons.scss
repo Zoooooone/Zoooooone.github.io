@@ -79,3 +79,9 @@ details {
       margin-bottom: 0;
     }
 }
+
+.post.px-1.px-md-2 {
+    a:hover {
+        @extend %link-hover;
+    }
+}

@@ -2,14 +2,14 @@
 layout: page
 ---
 
-<h1 class="dynamic-title">About</h1>
+<div id="content-area" class="about-page">
+  <h1 class="dynamic-title">About</h1>
 
-<nav>
-  <button onclick="switchLanguage('en')">English</button>
-  <button onclick="switchLanguage('zh')">中文</button>
-</nav>
-
-<div id="content-area">
+  <nav>
+    <button onclick="switchLanguage('en')">English</button>
+    <button onclick="switchLanguage('zh')">中文</button>
+  </nav>
+ 
   <div id="en-content" style="display: none;">
     {% include about/about_en.html %}
   </div>
@@ -41,6 +41,8 @@ layout: page
   }
 
   document.addEventListener('DOMContentLoaded', function() {
+    const content = document.querySelector('.about-page');
+    content.style.animation = `slideIn 0.5s ease-out forwards`;
     var preferredLanguage = localStorage.getItem('preferredLanguage') || 'en';
     switchLanguage(preferredLanguage);
   });

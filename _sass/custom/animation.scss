@@ -154,6 +154,13 @@
     display: block;
 }
 
+/* category card */
+
+.card.categories {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
 /* post card */
 
 .card-wrapper {
@@ -218,6 +225,11 @@
 /* post content */
 
 .fade-in-element {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.about-page {
     opacity: 0;
     transform: translateY(20px);
 }

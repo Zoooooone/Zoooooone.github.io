@@ -16,6 +16,7 @@
   }
 
   .year {
+    opacity: 0;
     height: 3.5rem;
     font-size: 1.5rem;
     position: relative;
@@ -56,6 +57,7 @@
 
   ul {
     li {
+      opacity: 0;
       font-size: 1.1rem;
       line-height: 3rem;
       white-space: nowrap;

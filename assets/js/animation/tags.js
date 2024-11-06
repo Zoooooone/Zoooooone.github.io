@@ -51,10 +51,12 @@ function setTagColors() {
     });
 }
 
-setTagColors();
-
-/* mode toggle */
-const observer = new MutationObserver(() => {
+document.addEventListener('DOMContentLoaded', function () {
     setTagColors();
+
+    /* mode toggle */
+    const observer = new MutationObserver(() => {
+        setTagColors();
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
 });
-observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
