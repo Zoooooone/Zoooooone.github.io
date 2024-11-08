@@ -80,7 +80,19 @@ details {
     }
 }
 
-.post.px-1.px-md-2 {
+.pl-xl-3 {
+    a:hover {
+        @extend %link-hover;
+    }
+}
+
+.about-page {
+    a:hover {
+        @extend %link-hover;
+    }
+}
+
+.card.categories {
     a:hover {
         @extend %link-hover;
     }
