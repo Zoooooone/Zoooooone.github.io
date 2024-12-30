@@ -1,95 +1,60 @@
-const musicPlay = new APlayer({
-    container: document.getElementById("aplayer"),
-    autoplay: false,
-    lrcType: 3,
-    audio: [
-        {
-            name: "Nuit Silencieuse",
-            artist: "Days",
-            url: "/assets/audio/Days - Nuit Silencieuse.mp3",
-            cover: "/assets/img/audio-cover/nuit-silencieuse.jpg",
-            lrc: "/assets/audio/lrc/nuit-silencieuse.lrc"
-        },
-        {
-            name: "No differences ＜a0v＞ -Instrumental-",
-            artist: "澤野弘之",
-            url: "/assets/audio/澤野弘之 - No differences ＜a0v＞ -Instrumental-.mp3",
-            cover: "/assets/img/audio-cover/no-differances.jpg",
-            lrc: "/assets/audio/lrc/no-differances.lrc"
-        },
-        {
-            name: "κ",
-            artist: "α·Pav",
-            url: "/assets/audio/α·Pav - κ.mp3",
-            cover: "/assets/img/audio-cover/κ.jpg",
-            lrc: "/assets/audio/lrc/κ.lrc"
-        },
-        {
-            name: "Towards the Light",
-            artist: "Jacoo",
-            url: "/assets/audio/Jacoo - Towards the Light.mp3",
-            cover: "/assets/img/audio-cover/towards-the-light.jpg",
-            lrc: "/assets/audio/lrc/towards-the-light.lrc"
-        },
-        {
-            name: "日落大道",
-            artist: "梁博",
-            url: "/assets/audio/梁博 - 日落大道.mp3",
-            cover: "/assets/img/audio-cover/日落大道.jpg",
-            lrc: "/assets/audio/lrc/日落大道.lrc"
-        },
-        {
-            name: "Tremble (Original Mix)",
-            artist: "Vicetone",
-            url: "/assets/audio/Vicetone - Tremble (Original Mix).mp3",
-            cover: "/assets/img/audio-cover/tremble.jpg",
-            lrc: "/assets/audio/lrc/tremble.lrc"
-        },
-        {
-            name: "Bangarang",
-            artist: "Skrillex,Sirah",
-            url: "/assets/audio/Skrillex,Sirah - Bangarang.mp3",
-            cover: "/assets/img/audio-cover/bangarang.jpg",
-            lrc: "/assets/audio/lrc/bangarang.lrc"
-        },
-        {
-            name: "杀死那个石家庄人",
-            artist: "万能青年旅店",
-            url: "/assets/audio/万能青年旅店 - 杀死那个石家庄人.mp3",
-            cover: "/assets/img/audio-cover/杀死那个石家庄人.jpeg",
-            lrc: "/assets/audio/lrc/杀死那个石家庄人.lrc"
-        },
-        {
-            name: "The Process",
-            artist: "LAKEY INSPIRED",
-            url: "/assets/audio/LAKEY INSPIRED - The Process.mp3",
-            cover: "/assets/img/audio-cover/the-process.jpeg",
-            lrc: "/assets/audio/lrc/the-process.lrc"
-        },
-    ]
-});
-
-const colorThief = new ColorThief();
-const image = new Image();
-const xhr = new XMLHttpRequest();
-const setTheme = (index) => {
-    if (!musicPlay.list.audios[index].theme) {
-        xhr.onload = function(){
-            let coverUrl = URL.createObjectURL(this.response);
-            image.onload = function(){
-                let color = colorThief.getColor(image);
-                musicPlay.theme(`rgb(${color[0]}, ${color[1]}, ${color[2]})`, index);
-                URL.revokeObjectURL(coverUrl)
-            };
-            image.src = coverUrl;
-        }
-        xhr.open("GET", musicPlay.list.audios[index].cover, true);
-        xhr.responseType = "blob";
-        xhr.send();
+export class MusicPlayer {
+    constructor(containerId, playlistPath) {
+        this.container = document.getElementById(containerId);
+        this.playlistPath = playlistPath;
+        this.colorThief = new ColorThief();
+        this.image = new Image();
+        this.xhr = new XMLHttpRequest();
+        this.musicPlay = null;
+        this.init();
     }
-};
 
-setTheme(musicPlay.list.index);
-musicPlay.on('listswitch', (index) => {
-    setTheme(index.index);
-});
+    async init() {
+        const playlist = await this.loadPlaylist(this.playlistPath);
+        this.createPlayer(playlist);
+        this.setTheme(this.musicPlay.list.index);
+        this.bindThemeSwitch();
+    }
+
+    async loadPlaylist(path) {
+        const response = await fetch(path);
+        if (!response.ok) {
+            console.error(`Failed to load playlist from ${path}`);
+            return [];
+        }
+        return await response.json();
+    }
+
+    createPlayer(playlist) {
+        this.musicPlay = new APlayer({
+            container: this.container,
+            autoplay: false,
+            lrcType: 3,
+            audio: playlist,
+        });
+    }
+
+    setTheme(index) {
+        const audio = this.musicPlay.list.audios[index];
+        if (!audio.theme) {
+            this.xhr.onload = () => {
+                const coverUrl = URL.createObjectURL(this.xhr.response);
+                this.image.onload = () => {
+                    const color = this.colorThief.getColor(this.image);
+                    this.musicPlay.theme(`rgb(${color[0]}, ${color[1]}, ${color[2]})`, index);
+                    URL.revokeObjectURL(coverUrl);
+                };
+                this.image.src = coverUrl;
+            };
+            this.xhr.open('GET', audio.cover, true);
+            this.xhr.responseType = 'blob';
+            this.xhr.send();
+        }
+    }
+
+    bindThemeSwitch() {
+        this.musicPlay.on('listswitch', (event) => {
+            this.setTheme(event.index);
+        });
+    }
+}

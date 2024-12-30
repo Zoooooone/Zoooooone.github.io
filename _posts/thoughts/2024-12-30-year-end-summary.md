@@ -5,6 +5,8 @@ categories: [Daily life, Thoughts]
 tags: [thoughts, "2024", year-end summary]
 ---
 
+<div id="aplayer" data-playlist="/assets/audio/playlist/playlist2.json"></div>
+
 ## 前言
 
 转眼间2024年也即将走到尾声，借此时间节点简单回顾一下这一年。
