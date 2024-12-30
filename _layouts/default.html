@@ -19,6 +19,15 @@ layout: compress
 <html lang="{{ site.alt_lang | default: site.lang }}" {{ prefer_mode }}>
   {% include head.html %}
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('a[href^="#"]').forEach((oldNode) => {
+        const newNode = oldNode.cloneNode(true);
+        oldNode.parentNode.replaceChild(newNode, oldNode);
+      });
+    });
+  </script>
+
   <body>
     {% include sidebar.html lang=lang %}
 
