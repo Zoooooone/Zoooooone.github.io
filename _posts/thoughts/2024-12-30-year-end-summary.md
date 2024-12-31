@@ -3,6 +3,7 @@ title: 2024年终总结
 date: 2024-12-30 19:00:00 +0900
 categories: [Daily life, Thoughts]
 tags: [thoughts, "2024", year-end summary]
+image: /assets/src/2024-year-end-summary/6.jpg
 ---
 
 <div id="aplayer" data-playlist="/assets/audio/playlist/playlist2.json"></div>
