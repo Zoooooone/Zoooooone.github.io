@@ -5,10 +5,10 @@
 @mixin dark-syntax {
   --language-border-color: rgba(84, 83, 83, 0.27);
   --highlight-bg-color: rgb(19, 19, 22);
-  --highlighter-rouge-color: #de6b18;
+  --highlighter-rouge-color: #ffa260;
   --highlight-lineno-color: #6c6c6d;
-  --inline-code-bg: #272822;
-  --inline-code-border: #3a3a3a;
+  --inline-code-bg: #1b1b18;
+  --inline-code-border: #282828;
   --code-header-text-color: #6a6a6a;
   --code-header-muted-color: rgb(60, 60, 60);
   --code-header-icon-color: rgb(86, 86, 86);

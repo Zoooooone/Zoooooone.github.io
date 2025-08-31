@@ -47,8 +47,8 @@ html {
 }
 
 .highlight {
-  @extend %rounded;
   @extend %code-snippet-bg;
+  border-radius: 2px;
 
   @at-root figure#{&} {
     @extend %code-snippet-bg;
@@ -94,11 +94,13 @@ code {
 
   &.highlighter-rouge {
     font-size: $code-font-size;
-    padding: 3px 5px;
+    padding: 1px 3px;
     word-break: break-word;
     border: 1px solid var(--inline-code-border);
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: var(--inline-code-bg);
+    font-weight: 500;
+    letter-spacing: 0.02em;
   }
 
   &.filepath {
@@ -137,15 +139,14 @@ td.rouge-code {
 }
 
 div[class^='language-'] {
-  @extend %rounded;
   @extend %code-snippet-bg;
+  border-radius: 2px;
 
   box-shadow: var(--language-border-color) 0 0 0 1px;
 
   .post-content > & {
     @include ml-mr(-1.25rem);
-
-    border-radius: 0;
+    border-radius: 2px;
   }
 }
 
@@ -171,23 +172,17 @@ div {
   $code-header-height: 2.25rem;
 
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   height: $code-header-height;
   margin-left: 1rem;
   margin-right: 0.5rem;
+  position: relative;
 
   /* the label block */
   span {
-    /* label icon */
     i {
-      font-size: 1rem;
-      margin-right: 0.5rem;
-      color: var(--code-header-icon-color);
-
-      &.small {
-        font-size: 70%;
-      }
+      display: none;
     }
 
     @at-root [file] #{&} > i {
@@ -214,6 +209,8 @@ div {
     width: $code-header-height;
     padding: 0;
     background-color: inherit;
+    position: absolute;
+    right: 0;
 
     i {
       color: var(--code-header-icon-color);
@@ -251,27 +248,11 @@ div {
   div[class^='language-'] {
     .post-content > & {
       @include ml-mr(0);
-
-      border-radius: $base-radius;
+      border-radius: 2px;
     }
 
     .code-header {
       @include ml-mr(0);
-
-      &::before {
-        $dot-size: 0.75rem;
-        $dot-margin: 0.5rem;
-
-        content: '';
-        display: inline-block;
-        margin-left: 1rem;
-        width: $dot-size;
-        height: $dot-size;
-        border-radius: 50%;
-        background-color: var(--code-header-muted-color);
-        box-shadow: ($dot-size + $dot-margin) 0 0 var(--code-header-muted-color),
-          ($dot-size + $dot-margin) * 2 0 0 var(--code-header-muted-color);
-      }
     }
   }
 }
