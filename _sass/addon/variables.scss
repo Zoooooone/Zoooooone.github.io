@@ -23,5 +23,6 @@ $code-font-size: 0.85rem !default;
 
 /* fonts */
 
-$font-family-base: 'Source Sans Pro', 'Microsoft Yahei', sans-serif;
-$font-family-heading: Lato, 'Microsoft Yahei', sans-serif;
+$font-family-base: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+$font-family-heading: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+$font-family-code: 'Meslo LG', 'Meslo LG M', 'JetBrains Mono', 'Menlo', 'Consolas', monospace;

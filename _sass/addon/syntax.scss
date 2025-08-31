@@ -63,6 +63,7 @@ html {
     font-size: $code-font-size;
     line-height: 1.4rem;
     word-wrap: normal; /* Fixed Safari overflow-x */
+    font-family: $font-family-code;
   }
 
   table {
@@ -89,6 +90,7 @@ code {
   -webkit-hyphens: none;
   -ms-hyphens: none;
   hyphens: none;
+  font-family: $font-family-code;
 
   &.highlighter-rouge {
     font-size: $code-font-size;
