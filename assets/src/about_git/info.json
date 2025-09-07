@@ -1,0 +1,12 @@
+[
+  {
+    "src": "/assets/src/about_git/git_structure.png",
+    "title": "Git 示意图 1",
+    "description": "Git 结构示意图以及常用指令作用范围"
+  },
+  {
+    "src": "/assets/src/about_git/git_structure_2.jpg",
+    "title": "Git 示意图 2",
+    "description": "Git 工作流程及其对应指令"
+  }
+]

@@ -2,7 +2,7 @@
 title: Windows系统下清理Docker占用的磁盘空间
 date: 2025-09-07 19:17:00 +0900
 categories: [Study notes, Docker]
-tags: [docker, tutorial]
+tags: [docker, windows, wsl2, tutorial]
 ---
 
 ## 前言
