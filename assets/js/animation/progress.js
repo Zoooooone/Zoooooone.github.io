@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("id", "progress-circle");
-    svg.setAttribute("width", "46");
-    svg.setAttribute("height", "46");
+    svg.setAttribute("width", "41");
+    svg.setAttribute("height", "41");
     svg.style.transform = "rotate(-90deg)";
     svg.style.transformOrigin = "50% 50%";
     svg.style.position = "absolute";
@@ -17,9 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
     svg.style.zIndex = "0";
   
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", "23");
-    circle.setAttribute("cy", "23");
-    circle.setAttribute("r", "21");
+    circle.setAttribute("cx", "20.5");
+    circle.setAttribute("cy", "20.5");
+    circle.setAttribute("r", "18.5");
     circle.setAttribute("stroke-width", "4.5");
     circle.setAttribute("fill", "none");
     circle.setAttribute("stroke", "#007bff");
