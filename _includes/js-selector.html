@@ -104,3 +104,8 @@
     {% include google-analytics.html %}
   {% endif %}
 {% endif %}
+
+<!-- Umami Analytics -->
+{% if site.umami.enabled %}
+  {% include umami.html %}
+{% endif %}
