@@ -103,9 +103,9 @@
   {% if site.google_analytics.id != empty and site.google_analytics.id %}
     {% include google-analytics.html %}
   {% endif %}
-{% endif %}
 
-<!-- Umami Analytics -->
-{% if site.umami.enabled %}
-  {% include umami.html %}
+  <!-- Umami Analytics -->
+  {% if site.umami.enabled %}
+    {% include umami.html %}
+  {% endif %}
 {% endif %}

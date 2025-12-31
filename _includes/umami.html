@@ -4,5 +4,51 @@
 <script async
   src="{{ site.umami.server_url }}/script.js"
   data-website-id="{{ site.umami.website_id }}"
-  data-domains="{{ site.url | remove: 'https://' | remove: 'http://' }}"
 ></script>
+
+<script>
+  const trackingPoints = [
+    { time: 10000, event: 'read_10s', level: 0 },
+    { time: 30000, event: 'read_30s', level: 1 },
+    { time: 60000, event: 'read_60s', level: 2 },
+    { time: 180000, event: 'read_3min', level: 3 }
+  ];
+
+  const pageKey = 'umami_max_level_' + window.location.pathname;
+  let alreadySent = sessionStorage.getItem(pageKey) !== null;
+  
+  let activeTime = 0;
+  let lastCheck = Date.now();
+  let checkInterval;
+
+  function updateActiveTime() {
+    if (document.visibilityState === 'visible') {
+      const now = Date.now();
+      activeTime += now - lastCheck;
+      lastCheck = now;
+    } else {
+      lastCheck = Date.now();
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    lastCheck = Date.now();
+  });
+
+  checkInterval = setInterval(updateActiveTime, 1000);
+
+  // Only send event when leaving page
+  window.addEventListener('beforeunload', () => {
+    clearInterval(checkInterval);
+    
+    if (!alreadySent && window.umami) {
+      for (let i = trackingPoints.length - 1; i >= 0; i--) {
+        if (activeTime >= trackingPoints[i].time) {
+          umami.track(trackingPoints[i].event, { path: window.location.pathname });
+          sessionStorage.setItem(pageKey, trackingPoints[i].level.toString());
+          break;
+        }
+      }
+    }
+  });
+</script>
