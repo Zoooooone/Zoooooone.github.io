@@ -38,7 +38,7 @@ image: /assets/src/2024-year-end-summary/6.jpg
 
 较为随意地挑选一些这一年内记录下的瞬间，完全出于个人喜好。
 
-{% include gallery.html id="gallery" path="2024-year-end-summary" %}
+<div id="gallery" class="gallery" data-src="/assets/src/2024-year-end-summary/info.json"></div>
 
 ## 结语
 

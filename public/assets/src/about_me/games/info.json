@@ -1,0 +1,87 @@
+[
+    {
+        "src": "/assets/src/about_me/games/astroneer.jpg",
+        "title": "Astroneer",
+        "description": "异星探险家"
+    },
+    {
+        "src": "/assets/src/about_me/games/celeste.png",
+        "title": "Celeste",
+        "description": "蔚蓝"
+    },
+    {
+        "src": "/assets/src/about_me/games/cocoon.png",
+        "title": "Cocoon",
+        "description": ""
+    },
+    {
+        "src": "/assets/src/about_me/games/dead-cells.jpg",
+        "title": "Dead Cells",
+        "description": "死亡细胞"
+    },
+    {
+        "src": "/assets/src/about_me/games/death-stranding.jpg",
+        "title": "Death Stranding",
+        "description": "死亡搁浅"
+    },
+    {
+        "src": "/assets/src/about_me/games/dysonsphere.jpg",
+        "title": "Dyson Sphere Program",
+        "description": "戴森球计划"
+    },
+    {
+        "src": "/assets/src/about_me/games/ETS2.jpg",
+        "title": "Euro Truck Simulation 2",
+        "description": "欧洲卡车模拟2"
+    },
+    {
+        "src": "/assets/src/about_me/games/fc24.jpeg",
+        "title": "FC24",
+        "description": ""
+    },
+    {
+        "src": "/assets/src/about_me/games/forbidden-west.jpg",
+        "title": "Horizon Forbidden West",
+        "description": "地平线：西之绝境"
+    },
+    {
+        "src": "/assets/src/about_me/games/forza-horizon-5.jpg",
+        "title": "Forza Horizon 5",
+        "description": "极限竞速：地平线5"
+    },
+    {
+        "src": "/assets/src/about_me/games/genshin.jpg",
+        "title": "Genshin",
+        "description": "原神"
+    },
+    {
+        "src": "/assets/src/about_me/games/hollow-knight.jpeg",
+        "title": "Hollow Knight",
+        "description": "空洞骑士"
+    },
+    {
+        "src": "/assets/src/about_me/games/minecraft.jpg",
+        "title": "Minecraft",
+        "description": "我的世界"
+    },
+    {
+        "src": "/assets/src/about_me/games/no-mans-sky.jpg",
+        "title": "No Man's Sky",
+        "description": "无人深空"
+    },
+    {
+        "src": "/assets/src/about_me/games/slay-the-spire.jpg",
+        "title": "Slay the Spire",
+        "description": "杀戮尖塔"
+    },
+    {
+        "src": "/assets/src/about_me/games/stardew-valley.png",
+        "title": "Stardew Valley",
+        "description": "星露谷物语"
+    },
+    {
+        "src": "/assets/src/about_me/games/zerodawn.jpg",
+        "title": "Horizon Zero Dawn",
+        "description": "地平线：零之曙光"
+    }
+]

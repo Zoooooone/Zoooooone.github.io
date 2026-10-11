@@ -1,0 +1,81 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const SITE = "Zone's blog";
+const { title, description = 'Daily life records and study notes.' } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE}` : SITE;
+
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/', label: 'Posts' },
+  { href: '/categories/', label: 'Categories' },
+  { href: '/tags/', label: 'Tags' },
+  { href: '/archives/', label: 'Archives' },
+  { href: '/about/', label: 'About' },
+];
+const isActive = (href: string) => (href === '/' ? path === '/' || path.startsWith('/posts/') : path.startsWith(href));
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/assets/img/favicons/favicon.ico" />
+    <slot name="head" />
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          document.documentElement.dataset.theme = t;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <a class="brand" href="/">
+          {SITE}
+          <small>notes &amp; records</small>
+        </a>
+        <nav class="nav" aria-label="main">
+          {
+            nav.map((n) => (
+              <a href={n.href} aria-current={isActive(n.href) ? 'page' : undefined}>
+                <span class="dot" />
+                {n.label}
+              </a>
+            ))
+          }
+        </nav>
+        <div class="sidebar-foot">
+          <a href="https://github.com/Zoooooone" rel="noopener">GitHub</a>
+          <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Toggle theme">theme</button>
+        </div>
+      </aside>
+      <main>
+        <slot />
+      </main>
+    </div>
+    <script is:inline>
+      document.getElementById('theme-toggle').addEventListener('click', function () {
+        var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try {
+          localStorage.setItem('theme', next);
+        } catch (e) {}
+      });
+    </script>
+  </body>
+</html>

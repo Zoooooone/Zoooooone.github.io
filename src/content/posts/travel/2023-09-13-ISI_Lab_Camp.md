@@ -54,7 +54,7 @@ URL：[合宿路线](https://www.google.com/maps/d/u/1/edit?mid=1NQWqEdIBg6aOj-u
 
 ## 沿途风光 & 美食
 
-{% include gallery.html id="gallery" path="ISI-Lab-Camp" %}
+<div id="gallery" class="gallery" data-src="/assets/src/ISI-Lab-Camp/info.json"></div>
 
 ## 人数 & 费用（日元）
 - 人数: **31 (教职员: 6, 学生: 25)**

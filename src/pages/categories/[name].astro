@@ -1,0 +1,18 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts, groupBy } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const groups = groupBy(await getPosts(), 'categories');
+  return groups.map((g) => ({ params: { name: g.slug }, props: { group: g } }));
+}
+
+const { group } = Astro.props;
+---
+
+<Base title={group.name}>
+  <h1 class="page-title">{group.name}</h1>
+  <p class="page-desc">Category · {group.posts.length} 篇</p>
+  <PostList posts={group.posts} />
+</Base>

@@ -121,7 +121,6 @@ Claude API 按 token 数量计费，主流模型价格如下（[官方定价](ht
 
 1. 主工作流，位于项目根目录的 `.github/workflows/claude-code-review.yml`：
 
-    {% raw %}
     ```yaml
     name: Claude Code Review
 
@@ -171,7 +170,6 @@ Claude API 按 token 数量计费，主流模型价格如下（[官方定价](ht
               claude_args: |
                 --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh pr list:*),Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh search:*)"
     ```
-    {% endraw %}
 
     > Tips:
     > - `concurrency` 配置确保在同一时间只有一个审查任务在运行，避免重复调用Claude API，节省费用。
@@ -182,7 +180,6 @@ Claude API 按 token 数量计费，主流模型价格如下（[官方定价](ht
 
 2. 手动触发工作流，位于项目根目录的 `.github/workflows/claude.yml`：
 
-    {% raw %}
     ```yaml
     name: Claude Code Review (on /review comment)
 
@@ -233,7 +230,6 @@ Claude API 按 token 数量计费，主流模型价格如下（[官方定价](ht
               claude_args: |
                 --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh pr list:*),Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh search:*)"
     ```
-    {% endraw %}
 
     > Tips:
     > - `trigger` 条件确保只有在PR中添加 `/review` 评论时才会执行审查，避免不必要的API调用。
@@ -243,15 +239,15 @@ Claude API 按 token 数量计费，主流模型价格如下（[官方定价](ht
 
 - 这是某次PR的SonarQube报告截图，通过SonarQube的质量报告，可以直观了解代码质量指标和趋势。
 
-  {% include custom-image.html src="/assets/img/2025-10-21-code-quality-workflow/sonarqube.png" %}
+  <img src="/assets/img/2025-10-21-code-quality-workflow/sonarqube.png" class="custom-img" alt="" />
 
   可以进一步查看具体的issue详情，SonarQube会指出代码中的潜在问题，例：
 
-  {% include custom-image.html src="/assets/img/2025-10-21-code-quality-workflow/sonarqube_detail.png" %}
+  <img src="/assets/img/2025-10-21-code-quality-workflow/sonarqube_detail.png" class="custom-img" alt="" />
 
 - 这是某次PR中Claude Code自动生成的审查评论，指出了当前代码中的潜在问题并能够提供改进建议。
 
-  {% include custom-image.html src="/assets/img/2025-10-21-code-quality-workflow/claude.png" %}
+  <img src="/assets/img/2025-10-21-code-quality-workflow/claude.png" class="custom-img" alt="" />
 
 ## 总结
 

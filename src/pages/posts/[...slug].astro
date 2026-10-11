@@ -1,22 +1,43 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
+import 'katex/dist/katex.min.css';
+import Base from '../../layouts/Base.astro';
+import { getPosts, formatDate, slugify } from '../../lib/posts';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
+  const posts = await getPosts();
   return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+const { title, date, categories, tags } = post.data;
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <title>{post.data.title}</title>
-  </head>
-  <body>
-    <h1>{post.data.title}</h1>
-    <Content />
-  </body>
-</html>
+<Base title={title}>
+  <article>
+    <header class="post-head">
+      <h1>{title}</h1>
+      <div class="meta">
+        <time datetime={date.toISOString()}>{formatDate(date)}</time>
+        {
+          categories.map((c) => (
+            <a href={`/categories/${slugify(c)}/`}>{c}</a>
+          ))
+        }
+        {
+          tags.map((t) => (
+            <a class="tag" href={`/tags/${slugify(t)}/`}>{t}</a>
+          ))
+        }
+      </div>
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<script>
+  import '../../scripts/enhance';
+</script>

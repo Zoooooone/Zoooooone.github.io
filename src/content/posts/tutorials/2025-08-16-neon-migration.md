@@ -37,7 +37,7 @@ image: /assets/img/2025-08-16-neon-migration/neon.png
 ### 2.创建数据库
 
 - 点击界面左侧菜单中的`SQL Editor`
-  {% include custom-image.html src="/assets/img/2025-08-16-neon-migration/create.png" %}
+  <img src="/assets/img/2025-08-16-neon-migration/create.png" class="custom-img" alt="" />
 - （可选）创建pgvector扩展
   ```sql
   CREATE EXTENSION IF NOT EXISTS vector;
@@ -92,9 +92,9 @@ pg_dump -h localhost -U <local_user> -d <local_db> \
 ### 4.将导出的数据导入到Neon数据库
 
 - 打开Neon的控制台，点击`Connect`
-  {% include custom-image.html src="/assets/img/2025-08-16-neon-migration/connect.png" %}
+  <img src="/assets/img/2025-08-16-neon-migration/connect.png" class="custom-img" alt="" />
 - 选择`psql`，复制连接字符串
-  {% include custom-image.html src="/assets/img/2025-08-16-neon-migration/connect-string.png" %}
+  <img src="/assets/img/2025-08-16-neon-migration/connect-string.png" class="custom-img" alt="" />
 - 在本地终端粘贴复制的连接字符串，并运行（下方命令仅为示例）
   ```bash
   psql "postgres://<neon_user>:<pwd>@<neon_host>/<neon_db>?sslmode=require&channel_binding=require"

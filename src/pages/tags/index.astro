@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getPosts, groupBy } from '../../lib/posts';
+
+const groups = groupBy(await getPosts(), 'tags');
+---
+
+<Base title="Tags">
+  <h1 class="page-title">Tags</h1>
+  <p class="page-desc">{groups.length} 个标签</p>
+  <ul class="chips">
+    {
+      groups.map((g) => (
+        <li>
+          <a class="chip" href={`/tags/${g.slug}/`}>
+            {g.name} <span>{g.posts.length}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Base>

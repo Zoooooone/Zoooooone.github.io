@@ -1,0 +1,42 @@
+---
+import { formatDate, type Post } from '../lib/posts';
+
+interface Props {
+  posts: Post[];
+  /** 按年份分组 */
+  byYear?: boolean;
+}
+
+const { posts, byYear = true } = Astro.props;
+
+const groups: { year: string; items: Post[] }[] = [];
+if (byYear) {
+  for (const post of posts) {
+    const year = String(post.data.date.getFullYear());
+    const last = groups.at(-1);
+    if (last?.year === year) last.items.push(post);
+    else groups.push({ year, items: [post] });
+  }
+} else {
+  groups.push({ year: '', items: posts });
+}
+---
+
+{
+  groups.map((g) => (
+    <section>
+      {g.year && <h2 class="year">{g.year}</h2>}
+      <ul class="post-list">
+        {g.items.map((post) => (
+          <li>
+            <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date).slice(5)}</time>
+            <a class="title" href={`/posts/${post.id}/`}>
+              {post.data.title}
+            </a>
+            <span class="cat">{post.data.categories.at(-1)}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))
+}
