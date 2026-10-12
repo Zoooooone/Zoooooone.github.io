@@ -1,0 +1,13 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignore": ["public/sw.js"],
+  "ignoreDependencies": [
+    "@fontsource-variable/inter",
+    "@fontsource-variable/jetbrains-mono",
+    "@fontsource-variable/noto-sans-sc",
+    "@astrojs/check",
+    "@commitlint/cli",
+    "husky",
+    "lint-staged"
+  ]
+}

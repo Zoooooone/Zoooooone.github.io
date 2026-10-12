@@ -1,0 +1,9 @@
+dist/
+.astro/
+node_modules/
+public/
+src/content/
+pnpm-lock.yaml
+*.md
+# shipped inline and unminified: keep it compact
+src/scripts/core/boot.js
