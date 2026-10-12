@@ -29,6 +29,9 @@ export async function runMermaid(cleanups: Cleanup[], isStale: () => boolean) {
   const { default: mermaid } = await import('mermaid');
   if (isStale()) return;
 
+  let drawn = '';
+  let seq = 0;
+
   const render = async () => {
     const root = getComputedStyle(document.documentElement);
     const dark = document.documentElement.dataset.theme === 'dark';
@@ -42,8 +45,13 @@ export async function runMermaid(cleanups: Cleanup[], isStale: () => boolean) {
     const text = hex(c.fg);
     const accent = hex(c.accent);
 
+    const signature = [dark, fontFamily, mono, c.bg, c.fg, c.muted, c.accent].join('|');
+    if (signature === drawn) return;
+    drawn = signature;
+
     mermaid.initialize({
       startOnLoad: false,
+      suppressErrorRendering: true,
       theme: 'base',
       // Mermaid 12's default "neo" look adds drop shadows and larger padding.
       look: 'classic',
@@ -85,11 +93,18 @@ export async function runMermaid(cleanups: Cleanup[], isStale: () => boolean) {
         .marker { fill: ${line}; stroke: ${line}; }
       `,
     });
-    nodes.forEach((n) => {
-      n.removeAttribute('data-processed');
-      n.textContent = n.dataset.src ?? '';
-    });
-    await mermaid.run({ nodes });
+    for (const n of nodes) {
+      const id = `mermaid-${++seq}`;
+      try {
+        const { svg, bindFunctions } = await mermaid.render(id, n.dataset.src ?? '');
+        if (isStale()) return;
+        n.innerHTML = svg;
+        n.dataset.processed = 'true';
+        bindFunctions?.(n);
+      } catch {
+        document.getElementById(`d${id}`)?.remove();
+      }
+    }
   };
 
   await render();
