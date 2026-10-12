@@ -1,5 +1,4 @@
-// Do not import the Waline stylesheet here: it is @imported in styles/index.css. Styles injected into <head>
-// by a script are replaced on navigation, which leaves the comments unstyled.
+// Do not import the Waline stylesheet here: styles injected into <head> by a script are replaced on navigation. It is @imported in styles/index.css.
 import { pageviewCount } from '@waline/client/pageview';
 import { onPage } from '@/scripts/core/lifecycle';
 

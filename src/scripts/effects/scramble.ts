@@ -1,5 +1,4 @@
-// Scramble glyphs differ in width, so swapping text directly would make wrapped titles jump between lines.
-// Line breaks are measured first and each line is pinned as a nowrap block; only the characters change.
+// Glyph widths differ, so each line is measured and pinned as a nowrap block; otherwise wrapped titles jump between lines.
 import { onPage } from '@/scripts/core/lifecycle';
 
 const SELECTOR = '.page-head h1, .post-head h1, .latest-body h2, .pinned-body h3';

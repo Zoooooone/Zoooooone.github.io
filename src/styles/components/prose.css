@@ -337,10 +337,7 @@
 .prose img.zoomable {
   cursor: zoom-in;
 }
-/*
- * Light text on dark looks heavier, which erases the regular / bold difference: body text is lighter and dimmer;
- * bold and headings keep full brightness at an explicit 700.
- */
+/* Light text on dark looks heavier: body is lighter and dimmer, bold and headings keep full brightness. */
 .prose strong,
 .prose b {
   font-weight: 700; /* Explicit: avoids `bolder` resolving to 400 relative to the lighter body weight */

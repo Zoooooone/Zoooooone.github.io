@@ -1,4 +1,3 @@
-/* --wp-<name>-l / -d are injected per wallpaper; the values on the right are the defaults for a plain background. */
 @property --bg {
   syntax: '<color>';
   inherits: true;

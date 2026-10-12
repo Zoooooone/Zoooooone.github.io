@@ -10,7 +10,6 @@ export default defineConfig({
   reporter: process.env.CI ? 'github' : 'list',
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
-    // Uses the Chrome already installed on the machine / CI runner, so no browser download is needed.
     channel: 'chrome',
     viewport: { width: 1280, height: 800 },
     trace: 'retain-on-failure',

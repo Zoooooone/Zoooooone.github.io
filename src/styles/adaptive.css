@@ -1,6 +1,6 @@
 /*
- * data-opaque: opaque panels without blur (system reduce-transparency, or data-lite).
- * data-lite: set by the head script on low-power devices; also drops the wallpaper blur.
+ * data-opaque: opaque panels without blur (reduce-transparency or data-lite).
+ * data-lite: set by the head script on low-power devices.
  */
 html[data-opaque] .glass,
 html[data-opaque] .topbar,

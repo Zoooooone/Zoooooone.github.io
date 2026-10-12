@@ -21,7 +21,6 @@ export const site = {
   quote: { text: '写作之难，在于将网状的思维，以树状的结构，通过线性的文字表达出来。', by: '史蒂芬·平克' },
 };
 
-// MP3 files are hosted on Cloudflare R2, not in the repo.
 export const audioBase = 'https://pub-89107895d621497da89c42413d45844a.r2.dev/audio-upload';
 
 export const waline = {

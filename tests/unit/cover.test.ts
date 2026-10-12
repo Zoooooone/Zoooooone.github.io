@@ -7,7 +7,6 @@ import { coverLayout } from '@/lib/assets/cover';
 
 let root: string;
 
-/** A smooth multi-hue gradient: many distinct colors that survive downscaling, like a photograph. */
 const photoLike = (w: number, h: number, channels: 3 | 4 = 3) => {
   const data = Buffer.alloc(w * h * channels);
   for (let y = 0; y < h; y++) {
