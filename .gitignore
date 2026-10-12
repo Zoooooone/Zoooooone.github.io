@@ -32,6 +32,5 @@ public/assets/audio/**/*.mp3
 # ASCII-named copies prepared for uploading to R2
 audio-upload/
 
-# editor settings are personal; only the extension recommendations are shared
-.vscode/*
-!.vscode/extensions.json
+# editor settings
+.vscode/

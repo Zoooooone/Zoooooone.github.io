@@ -1,22 +1,23 @@
-## Development
+# Project guide
 
-When starting the dev server, use background mode:
+Personal blog built with Astro, TypeScript and plain CSS. Package manager: pnpm.
 
-```
-astro dev --background
-```
+## Commands
 
-Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
+- `pnpm dev` — thumbnails + dev server at `localhost:4321`
+- `pnpm verify` — format check, ESLint, Stylelint, `astro check`, knip, build, link check. Run before committing.
+- `pnpm format` — Prettier over the whole repo
+
+## Conventions
+
+- Source, comments and commit messages are in English; commits follow Conventional Commits.
+- Comments only for non-obvious reasons (pitfalls, magic numbers, compatibility), never for what the code already says.
+- Browser scripts live in `src/scripts/<feature>/` and register page logic with `onPage()` from `src/scripts/core/lifecycle.ts`, because navigation uses Astro's ClientRouter.
+- Styles are plain CSS in `src/styles/`; the import order in `index.css` is the cascade order. Colors, sizes and weights come from `tokens.css`.
+- Post URLs must stay `/posts/<slug>/`; they match the previous Jekyll site and the stored Waline comments.
+- MP3 files are hosted on Cloudflare R2 and are not in the repo; the base URL is `audioBase` in `src/config/site.ts`.
+- Do not edit generated output: `dist/`, `.astro/`, `public/assets/thumbs/`.
 
 ## Documentation
 
-Full documentation: https://docs.astro.build
-
-Consult these guides before working on related tasks:
-
-- [Adding pages, dynamic routes, or middleware](https://docs.astro.build/en/guides/routing/)
-- [Working with Astro components](https://docs.astro.build/en/basics/astro-components/)
-- [Using React, Vue, Svelte, or other framework components](https://docs.astro.build/en/guides/framework-components/)
-- [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
-- [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
-- [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+- Astro: https://docs.astro.build
