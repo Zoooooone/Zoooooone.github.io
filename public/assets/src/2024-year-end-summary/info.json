@@ -1,42 +1,58 @@
 [
-    {
-        "src": "/assets/src/2024-year-end-summary/1.jpg",
-        "title":"",
-        "description":""
-    },
-    {
-        "src": "/assets/src/2024-year-end-summary/2.jpg",
-        "title":"",
-        "description":""
-    },
-    {
-        "src": "/assets/src/2024-year-end-summary/3.jpg",
-        "title":"",
-        "description":""
-    },
-    {
-        "src": "/assets/src/2024-year-end-summary/4.jpg",
-        "title":"",
-        "description":""
-    },
-    {
-        "src": "/assets/src/2024-year-end-summary/5.jpg",
-        "title":"",
-        "description":""
-    },
-    {
-        "src": "/assets/src/2024-year-end-summary/6.jpg",
-        "title":"",
-        "description":""
-    },
-    {
-        "src": "/assets/src/2024-year-end-summary/7.jpg",
-        "title":"",
-        "description":""
-    },
-    {
-        "src": "/assets/src/2024-year-end-summary/8.jpg",
-        "title":"",
-        "description":""
-    }
+  {
+    "src": "/assets/src/2024-year-end-summary/1.jpg",
+    "title": "",
+    "description": "",
+    "w": 1706,
+    "h": 1279
+  },
+  {
+    "src": "/assets/src/2024-year-end-summary/2.jpg",
+    "title": "",
+    "description": "",
+    "w": 1706,
+    "h": 1279
+  },
+  {
+    "src": "/assets/src/2024-year-end-summary/3.jpg",
+    "title": "",
+    "description": "",
+    "w": 1706,
+    "h": 1279
+  },
+  {
+    "src": "/assets/src/2024-year-end-summary/4.jpg",
+    "title": "",
+    "description": "",
+    "w": 1706,
+    "h": 1279
+  },
+  {
+    "src": "/assets/src/2024-year-end-summary/5.jpg",
+    "title": "",
+    "description": "",
+    "w": 1706,
+    "h": 1279
+  },
+  {
+    "src": "/assets/src/2024-year-end-summary/6.jpg",
+    "title": "",
+    "description": "",
+    "w": 1706,
+    "h": 1279
+  },
+  {
+    "src": "/assets/src/2024-year-end-summary/7.jpg",
+    "title": "",
+    "description": "",
+    "w": 1279,
+    "h": 1706
+  },
+  {
+    "src": "/assets/src/2024-year-end-summary/8.jpg",
+    "title": "",
+    "description": "",
+    "w": 1706,
+    "h": 1279
+  }
 ]

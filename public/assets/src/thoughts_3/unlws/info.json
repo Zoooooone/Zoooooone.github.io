@@ -1,27 +1,37 @@
 [
-    {
-        "src": "/assets/src/thoughts_3/unlws/unlws_1.png",
-        "title": "UNLWS书写系统",
-        "description": "呈现形式示例一"
-    },
-    {
-        "src": "/assets/src/thoughts_3/unlws/unlws_2.png",
-        "title": "UNLWS书写系统",
-        "description": "呈现形式示例二"
-    },
-    {
-        "src": "/assets/src/thoughts_3/unlws/unlws_3.png",
-        "title": "UNLWS书写系统",
-        "description": "呈现形式示例三"
-    },
-    {
-        "src": "/assets/src/thoughts_3/unlws/unlws_4.png",
-        "title": "UNLWS书写系统",
-        "description": "解读方式示例一"
-    },
-    {
-        "src": "/assets/src/thoughts_3/unlws/unlws_5.png",
-        "title": "UNLWS书写系统",
-        "description": "解读方式示例二"
-    }
+  {
+    "src": "/assets/src/thoughts_3/unlws/unlws_1.png",
+    "title": "UNLWS书写系统",
+    "description": "呈现形式示例一",
+    "w": 588,
+    "h": 1600
+  },
+  {
+    "src": "/assets/src/thoughts_3/unlws/unlws_2.png",
+    "title": "UNLWS书写系统",
+    "description": "呈现形式示例二",
+    "w": 878,
+    "h": 932
+  },
+  {
+    "src": "/assets/src/thoughts_3/unlws/unlws_3.png",
+    "title": "UNLWS书写系统",
+    "description": "呈现形式示例三",
+    "w": 1580,
+    "h": 1600
+  },
+  {
+    "src": "/assets/src/thoughts_3/unlws/unlws_4.png",
+    "title": "UNLWS书写系统",
+    "description": "解读方式示例一",
+    "w": 849,
+    "h": 305
+  },
+  {
+    "src": "/assets/src/thoughts_3/unlws/unlws_5.png",
+    "title": "UNLWS书写系统",
+    "description": "解读方式示例二",
+    "w": 903,
+    "h": 665
+  }
 ]

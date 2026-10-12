@@ -2,11 +2,15 @@
   {
     "src": "/assets/src/about_git/git_structure.png",
     "title": "Git 示意图 1",
-    "description": "Git 结构示意图以及常用指令作用范围"
+    "description": "Git 结构示意图以及常用指令作用范围",
+    "w": 720,
+    "h": 687
   },
   {
     "src": "/assets/src/about_git/git_structure_2.jpg",
     "title": "Git 示意图 2",
-    "description": "Git 工作流程及其对应指令"
+    "description": "Git 工作流程及其对应指令",
+    "w": 850,
+    "h": 412
   }
 ]

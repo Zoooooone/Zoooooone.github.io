@@ -1,22 +1,30 @@
 [
-    {
-        "src": "/assets/src/thoughts_3/islamic-calligraphy/islamic-calligraphy-1568920.jpg",
-        "title": "伊斯兰书法",
-        "description": ""
-    },
-    {
-        "src": "/assets/src/thoughts_3/islamic-calligraphy/Tugra_Mahmuds_II.gif",
-        "title": "伊斯兰书法",
-        "description": ""
-    },
-    {
-        "src": "/assets/src/thoughts_3/islamic-calligraphy/31257.png",
-        "title": "伊斯兰书法",
-        "description": ""
-    },
-    {
-        "src": "/assets/src/thoughts_3/islamic-calligraphy/pngtree-islamic-calligraphy-png-image_6260405.jpg",
-        "title": "伊斯兰书法",
-        "description": ""
-    }
+  {
+    "src": "/assets/src/thoughts_3/islamic-calligraphy/islamic-calligraphy-1568920.jpg",
+    "title": "伊斯兰书法",
+    "description": "",
+    "w": 1599,
+    "h": 1038
+  },
+  {
+    "src": "/assets/src/thoughts_3/islamic-calligraphy/Tugra_Mahmuds_II.gif",
+    "title": "伊斯兰书法",
+    "description": "",
+    "w": 247,
+    "h": 188
+  },
+  {
+    "src": "/assets/src/thoughts_3/islamic-calligraphy/31257.png",
+    "title": "伊斯兰书法",
+    "description": "",
+    "w": 800,
+    "h": 572
+  },
+  {
+    "src": "/assets/src/thoughts_3/islamic-calligraphy/pngtree-islamic-calligraphy-png-image_6260405.jpg",
+    "title": "伊斯兰书法",
+    "description": "",
+    "w": 1200,
+    "h": 1200
+  }
 ]

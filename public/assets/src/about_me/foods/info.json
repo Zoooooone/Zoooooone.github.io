@@ -1,32 +1,44 @@
 [
-    {
-        "src": "/assets/src/about_me/foods/food-1.jpg",
-        "title": "",
-        "description": ""
-    },
-    {
-        "src": "/assets/src/about_me/foods/food-2.jpg",
-        "title": "",
-        "description": ""
-    },
-    {
-        "src": "/assets/src/about_me/foods/food-3.jpg",
-        "title": "",
-        "description": ""
-    },
-    {
-        "src": "/assets/src/about_me/foods/food-4.jpg",
-        "title": "",
-        "description": ""
-    },
-    {
-        "src": "/assets/src/about_me/foods/food-5.jpg",
-        "title": "",
-        "description": ""
-    },
-    {
-        "src": "/assets/src/about_me/foods/food-6.jpg",
-        "title": "",
-        "description": ""
-    }
+  {
+    "src": "/assets/src/about_me/foods/food-1.jpg",
+    "title": "",
+    "description": "",
+    "w": 2880,
+    "h": 2112
+  },
+  {
+    "src": "/assets/src/about_me/foods/food-2.jpg",
+    "title": "",
+    "description": "",
+    "w": 2880,
+    "h": 2160
+  },
+  {
+    "src": "/assets/src/about_me/foods/food-3.jpg",
+    "title": "",
+    "description": "",
+    "w": 2880,
+    "h": 2160
+  },
+  {
+    "src": "/assets/src/about_me/foods/food-4.jpg",
+    "title": "",
+    "description": "",
+    "w": 1440,
+    "h": 1080
+  },
+  {
+    "src": "/assets/src/about_me/foods/food-5.jpg",
+    "title": "",
+    "description": "",
+    "w": 1440,
+    "h": 1080
+  },
+  {
+    "src": "/assets/src/about_me/foods/food-6.jpg",
+    "title": "",
+    "description": "",
+    "w": 1440,
+    "h": 1080
+  }
 ]
