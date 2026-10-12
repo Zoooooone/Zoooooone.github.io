@@ -22,3 +22,16 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# generated thumbnails (scripts/make-thumbs.mjs)
+public/assets/thumbs/
+
+# audio files are hosted on Cloudflare R2; playlists and lyrics stay in the repo
+public/assets/audio/**/*.mp3
+
+# ASCII-named copies prepared for uploading to R2
+audio-upload/
+
+# editor settings are personal; only the extension recommendations are shared
+.vscode/*
+!.vscode/extensions.json
