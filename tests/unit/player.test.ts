@@ -1,0 +1,81 @@
+import { describe, expect, it } from 'vitest';
+import { lyricIndexAt, parseLrc } from '@/scripts/shell/player/lrc';
+import { formatTime, isMode, nextMode, pickNext, trackUrl } from '@/scripts/shell/player/playlist';
+
+describe('parseLrc', () => {
+  it('reads timestamps and text, sorted by time', () => {
+    const lyrics = parseLrc('[00:12.50]second\n[00:03.00]first\n[01:01.00]third');
+    expect(lyrics).toEqual([
+      { t: 3, text: 'first' },
+      { t: 12.5, text: 'second' },
+      { t: 61, text: 'third' },
+    ]);
+  });
+
+  it('supports repeated timestamps and skips empty or untimed lines', () => {
+    const lyrics = parseLrc('[00:10.00][00:30.00]chorus\n[00:20.00]\nno timestamp\r\n[ar:artist]');
+    expect(lyrics).toEqual([
+      { t: 10, text: 'chorus' },
+      { t: 30, text: 'chorus' },
+    ]);
+  });
+});
+
+describe('lyricIndexAt', () => {
+  const lyrics = [
+    { t: 5, text: 'a' },
+    { t: 10, text: 'b' },
+    { t: 20, text: 'c' },
+  ];
+
+  it('is -1 before the first line', () => {
+    expect(lyricIndexAt(lyrics, 1, -1)).toBe(-1);
+  });
+
+  it('finds the current line and follows playback', () => {
+    expect(lyricIndexAt(lyrics, 5, -1)).toBe(0);
+    expect(lyricIndexAt(lyrics, 12, 0)).toBe(1);
+    expect(lyricIndexAt(lyrics, 99, 1)).toBe(2);
+  });
+
+  it('keeps the hint while it is still right, and recovers after a seek backwards', () => {
+    expect(lyricIndexAt(lyrics, 15, 1)).toBe(1);
+    expect(lyricIndexAt(lyrics, 6, 2)).toBe(0);
+  });
+});
+
+describe('playlist helpers', () => {
+  it('cycles the play mode', () => {
+    expect(nextMode('list')).toBe('shuffle');
+    expect(nextMode('shuffle')).toBe('single');
+    expect(nextMode('single')).toBe('list');
+  });
+
+  it('validates saved modes', () => {
+    expect(isMode('shuffle')).toBe(true);
+    expect(isMode('loop')).toBe(false);
+    expect(isMode(undefined)).toBe(false);
+  });
+
+  it('resolves track URLs against the audio host', () => {
+    expect(trackUrl('a b.mp3', 'https://cdn.example/audio')).toBe('https://cdn.example/audio/a%20b.mp3');
+    expect(trackUrl('https://other.example/x.mp3', 'https://cdn.example/audio')).toBe('https://other.example/x.mp3');
+  });
+
+  it('wraps around in list mode and never repeats the current track in shuffle mode', () => {
+    expect(pickNext(2, 3, 'list', 1)).toBe(0);
+    expect(pickNext(0, 3, 'list', -1)).toBe(2);
+    expect(pickNext(1, 3, 'single', 1)).toBe(2);
+    const sequence = [0.0, 0.34, 0.7];
+    let i = 0;
+    const random = () => sequence[i++ % sequence.length];
+    expect(pickNext(0, 3, 'shuffle', 1, random)).toBe(1);
+    expect(pickNext(0, 1, 'shuffle', 1, random)).toBe(0);
+  });
+
+  it('formats times', () => {
+    expect(formatTime(0)).toBe('0:00');
+    expect(formatTime(65.9)).toBe('1:05');
+    expect(formatTime(Infinity)).toBe('0:00');
+  });
+});
