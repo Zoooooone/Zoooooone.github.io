@@ -1,0 +1,2 @@
+/* The first declaration the browser sees fixes the layer order, so every stylesheet that uses layers starts with this. */
+@layer tokens, base, vendor, effects, layout, components, pages, interaction, adaptive, overrides;

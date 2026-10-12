@@ -25,11 +25,6 @@ a {
 ::selection {
   background: var(--accent-soft);
 }
-*,
-*::before,
-*::after {
-  border-radius: 0 !important;
-}
 .mono-label {
   font: var(--fw-medium) var(--text-2xs)/1.4 var(--font-mono);
   letter-spacing: var(--tracking-label);

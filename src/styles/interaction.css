@@ -33,6 +33,9 @@
   opacity: 1;
   transform: none;
 }
+.cmdk-input input:focus-visible {
+  outline: 0;
+}
 :is(
   .filter,
   .go,

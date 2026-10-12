@@ -237,11 +237,12 @@
   fill: currentColor;
   stroke-width: 2;
 }
-.pl-play {
-  width: 2.25rem !important;
-  background: var(--accent) !important;
-  color: var(--bg) !important;
-  clip-path: polygon(0 0, 100% 0, calc(100% - 0.4375rem) 100%, 0 100%);
+.pl-ctl .pl-play,
+.pl-ctl .pl-play:hover,
+.pl-ctl .pl-play:focus-visible {
+  width: 2.25rem;
+  background: var(--accent);
+  color: var(--bg);
 }
 .pl-play:hover {
   filter: brightness(1.08);
@@ -381,8 +382,8 @@
     width: 2.25rem;
     height: 2.5rem;
   }
-  .pl-play {
-    width: 2.75rem !important;
+  .pl-ctl .pl-play {
+    width: 2.75rem;
   }
   .pl-ctl .pl-expand {
     display: grid;
@@ -524,6 +525,7 @@
 }
 .pl-list .cv {
   display: block;
+  margin: 1em 0;
   width: 2.25rem;
   height: 2.25rem;
   overflow: hidden;
