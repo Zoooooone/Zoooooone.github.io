@@ -1,8 +1,3 @@
-html[data-plain] body {
-  background-image: radial-gradient(var(--bg-dots) 1px, transparent 1px);
-  background-size: 1.375rem 1.375rem;
-  background-attachment: fixed;
-}
 .bg {
   position: fixed;
   inset: 0;
@@ -18,7 +13,7 @@ html[data-plain] body {
   opacity: 0;
   filter: blur(var(--bg-blur));
   transform: none;
-  transition: opacity 0.9s var(--ease);
+  transition: opacity 0.9s ease;
 }
 .bg-a.on,
 .bg-b.on {
@@ -117,7 +112,7 @@ html[data-plain] .bg::after {
   --fx-vig: rgba(60, 40, 20, 0.14);
 }
 html[data-plain] .fx {
-  --fx-grid: transparent;
+  display: none;
 }
 html[data-fx='off'] .fx {
   display: none;

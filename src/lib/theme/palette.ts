@@ -1,165 +1,202 @@
 import { join } from 'node:path';
+import {
+  Hct,
+  QuantizerCelebi,
+  Score,
+  TonalPalette,
+  argbFromRgb,
+  blueFromArgb,
+  greenFromArgb,
+  redFromArgb,
+} from '@material/material-color-utilities';
 import sharp from 'sharp';
-import { ensureContrast, formatHsl, hslToRgb, luminance, over, parseHsl, type Rgb } from './color.ts';
+import { contrast, formatColor, over, parseColor, type Rgb } from './color.ts';
 
 export type WallpaperTheme = {
   light: Record<string, string>;
   dark: Record<string, string>;
 };
 
-const cache = new Map<string, WallpaperTheme>();
+export type Tone = {
+  hue?: number;
+  chroma?: number;
+  neutral?: boolean;
+};
 
-function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  if (max === min) return [0, 0, l];
-  const d = max - min;
-  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  let h: number;
-  if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
-  else if (max === g) h = (b - r) / d + 2;
-  else h = (r - g) / d + 4;
-  return [h * 60, s, l];
+type Mode = 'light' | 'dark';
+
+/** Must match --sheet-alpha in styles/tokens.css. */
+export const SHEET_ALPHA = { light: 0.66, dark: 0.6 } as const;
+
+/** Minimum contrast (WCAG): 4.5 for body text; 3 for auxiliary text (indices, ticks, numbers) */
+export const CONTRAST_MIN: Record<string, number> = { fg: 4.5, 'fg-muted': 4.5, 'fg-faint': 3, accent: 4.5 };
+
+const NEUTRAL_HUE = 215;
+const ACCENT_CHROMA = { min: 28, max: 52, neutral: 14 };
+const SURFACE_CHROMA = { tinted: 6, neutral: 1.5 };
+const VARIANT_CHROMA = { tinted: 8, neutral: 2 };
+
+/** HCT tones per role. Contrast depends only on tone, so these clear the thresholds by construction; `enforce` handles busy wallpapers. */
+const TONES = {
+  light: { bg: 95, glass: 98, strong: 97, card: 99, code: 97, fg: 10, muted: 35, faint: 50, accent: 40, line: 30 },
+  dark: { bg: 8, glass: 15, strong: 10, card: 18, code: 6, fg: 90, muted: 70, faint: 55, accent: 75, line: 80 },
+} as const;
+
+const ALPHA = {
+  light: { veil: 0.18, glass: 0.62, strong: 0.82, card: 0.74, code: 0.8, border: 0.12, borderStrong: 0.22, soft: 0.12 },
+  dark: { veil: 0.28, glass: 0.55, strong: 0.82, card: 0.6, code: 0.75, border: 0.09, borderStrong: 0.18, soft: 0.16 },
+} as const;
+
+type Palettes = { surface: TonalPalette; variant: TonalPalette; accent: TonalPalette };
+
+const rgbOf = (argb: number): Rgb => [redFromArgb(argb), greenFromArgb(argb), blueFromArgb(argb)];
+
+function build(mode: Mode, p: Palettes, opaque: boolean): Record<string, string> {
+  const t = TONES[mode];
+  const a = opaque ? { ...ALPHA[mode], veil: 0, glass: 1, strong: 1, card: 1, code: 1 } : ALPHA[mode];
+  const surface = (tone: number, alpha = 1) => formatColor(rgbOf(p.surface.tone(tone)), alpha);
+  const variant = (tone: number, alpha = 1) => formatColor(rgbOf(p.variant.tone(tone)), alpha);
+  const accent = (alpha = 1) => formatColor(rgbOf(p.accent.tone(t.accent)), alpha);
+  return {
+    accent: accent(),
+    'accent-soft': accent(a.soft),
+    bg: surface(t.bg),
+    veil: surface(t.bg, a.veil),
+    glass: surface(t.glass, a.glass),
+    'glass-strong': surface(t.strong, a.strong),
+    card: surface(t.card, a.card),
+    border: variant(t.line, a.border),
+    'border-strong': variant(t.line, a.borderStrong),
+    fg: surface(t.fg),
+    'fg-muted': variant(t.muted),
+    'fg-faint': variant(t.faint),
+    'code-bg': surface(t.code, a.code),
+  };
 }
 
-async function dominant(file: string): Promise<{ hue: number; sat: number; achromatic: boolean }> {
+/** Colors that text actually sits on: the sheet over the wallpaper pixel, and a card on top of it. */
+export function surfaceLayers(
+  theme: Record<string, string>,
+  wallpaperPixel: Rgb,
+  sheetAlpha: number,
+  solid = false,
+): Rgb[] {
+  const layer = (key: string, under: Rgb): Rgb => {
+    const { rgb, a } = parseColor(theme[key]);
+    return over(rgb, a, under);
+  };
+  const base = parseColor(theme.bg).rgb;
+  const sheet = solid ? layer('glass-strong', base) : over(base, sheetAlpha, layer('veil', wallpaperPixel));
+  return [sheet, layer('card', sheet)];
+}
+
+const worstContrast = (rgb: Rgb, layers: Rgb[]) => Math.min(...layers.map((l) => contrast(rgb, l)));
+
+/** Moves the tone away from the surfaces (darker in light mode, lighter in dark mode) until the contrast is met. */
+function toneFor(palette: TonalPalette, base: number, layers: Rgb[], min: number, mode: Mode): number {
+  const step = mode === 'light' ? -0.5 : 0.5;
+  let tone = base;
+  while (tone > 0 && tone < 100 && worstContrast(rgbOf(palette.tone(tone)), layers) < min) tone += step;
+  return tone;
+}
+
+function enforce(mode: Mode, theme: Record<string, string>, p: Palettes, layers: Rgb[]) {
+  const t = TONES[mode];
+  const roles: [string, TonalPalette, number][] = [
+    ['fg', p.surface, t.fg],
+    ['fg-muted', p.variant, t.muted],
+    ['fg-faint', p.variant, t.faint],
+    ['accent', p.accent, t.accent],
+  ];
+  for (const [key, palette, base] of roles) {
+    const tone = toneFor(palette, base, layers, CONTRAST_MIN[key], mode);
+    if (tone === base) continue;
+    theme[key] = formatColor(rgbOf(palette.tone(tone)));
+    if (key === 'accent') theme['accent-soft'] = formatColor(rgbOf(palette.tone(tone)), ALPHA[mode].soft);
+  }
+}
+
+function palettes(hue: number, chroma: number, neutral: boolean): Palettes {
+  const k = neutral ? 'neutral' : 'tinted';
+  return {
+    surface: TonalPalette.fromHueAndChroma(hue, SURFACE_CHROMA[k]),
+    variant: TonalPalette.fromHueAndChroma(hue, VARIANT_CHROMA[k]),
+    accent: TonalPalette.fromHueAndChroma(hue, chroma),
+  };
+}
+
+const cache = new Map<string, WallpaperTheme>();
+
+type Seed = { hue: number; chroma: number };
+
+/** The best theme color of the image, or null when it has no usable color (grayscale). */
+async function seedOf(file: string): Promise<Seed | null> {
   const { data } = await sharp(file)
-    .resize(64, 64, { fit: 'cover' })
+    .resize(96, 96, { fit: 'cover' })
     .removeAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
-
-  const BINS = 24;
-  const weight = new Array<number>(BINS).fill(0);
-  const satSum = new Array<number>(BINS).fill(0);
-  const hueSum = new Array<number>(BINS).fill(0);
-
-  for (let i = 0; i < data.length; i += 3) {
-    const [h, s, l] = rgbToHsl(data[i], data[i + 1], data[i + 2]);
-    if (l < 0.12 || l > 0.9) continue;
-    const w = s * s * (1 - Math.abs(2 * l - 1));
-    const bin = Math.floor((h / 360) * BINS) % BINS;
-    weight[bin] += w;
-    satSum[bin] += s * w;
-    hueSum[bin] += h * w;
-  }
-
-  let best = 0;
-  for (let i = 1; i < BINS; i++) if (weight[i] > weight[best]) best = i;
-  // Almost no colored pixels: a black-and-white or grayscale image has no hue to extract and none may be invented.
-  // Falling back to warm orange here once produced a fully brown UI for a pure black wallpaper.
-  const total = weight.reduce((a, b) => a + b, 0);
-  const achromatic = total < 0.01 * (data.length / 3);
-  if (weight[best] === 0) return { hue: 215, sat: 0.14, achromatic: true };
-  return { hue: hueSum[best] / weight[best], sat: satSum[best] / weight[best], achromatic };
+  const argbs: number[] = [];
+  for (let i = 0; i < data.length; i += 3) argbs.push(argbFromRgb(data[i], data[i + 1], data[i + 2]));
+  const [best] = Score.score(QuantizerCelebi.quantize(argbs, 128), { desired: 1, fallbackColorARGB: 0, filter: true });
+  if (!best) return null;
+  const hct = Hct.fromInt(best);
+  return { hue: hct.hue, chroma: hct.chroma };
 }
 
-async function percentile(file: string, pick: number): Promise<Rgb> {
+/** The wallpaper pixel at the given lightness percentile, which the translucent sheet is checked against. */
+export async function percentile(file: string, pick: number): Promise<Rgb> {
   const { data } = await sharp(file)
     .resize(64, 64, { fit: 'cover' })
     .blur(0.5)
     .removeAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
-  const px: Rgb[] = [];
-  for (let i = 0; i < data.length; i += 3) px.push([data[i], data[i + 1], data[i + 2]]);
-  px.sort((a, b) => luminance(a) - luminance(b));
-  return px[Math.min(px.length - 1, Math.max(0, Math.round(px.length * pick)))];
-}
-
-/** Must match --sheet-alpha in styles/tokens.css. */
-export const SHEET_ALPHA = { light: 0.66, dark: 0.6 } as const;
-
-export function surfaceLayers(theme: Record<string, string>, wallpaperPixel: Rgb, sheetAlpha: number): Rgb[] {
-  const layer = (key: string, under: Rgb): Rgb => {
-    const c = parseHsl(theme[key]);
-    return over(hslToRgb(c), c.a, under);
-  };
-  const base = hslToRgb(parseHsl(theme.bg));
-  const sheet = over(base, sheetAlpha, layer('veil', wallpaperPixel));
-  return [sheet, layer('card', sheet)];
-}
-
-/** Minimum contrast (WCAG): 4.5 for body text; 3 for auxiliary text (indices, ticks, numbers) */
-export const CONTRAST_MIN: Record<string, number> = { fg: 4.5, 'fg-muted': 4.5, 'fg-faint': 3, accent: 4.5 };
-
-export const adjustments: { src: string; mode: 'light' | 'dark'; key: string; from: number; to: number }[] = [];
-
-function enforce(src: string, mode: 'light' | 'dark', theme: Record<string, string>, pixel: Rgb) {
-  const layers = surfaceLayers(theme, pixel, SHEET_ALPHA[mode]);
-  for (const [key, min] of Object.entries(CONTRAST_MIN)) {
-    const before = parseHsl(theme[key]);
-    const after = ensureContrast(before, layers, min);
-    if (after.l === before.l) continue;
-    theme[key] = formatHsl(after);
-    adjustments.push({ src, mode, key, from: before.l, to: after.l });
-    if (key === 'accent') theme['accent-soft'] = formatHsl({ ...after, a: parseHsl(theme['accent-soft']).a });
+  const px: { rgb: Rgb; tone: number }[] = [];
+  for (let i = 0; i < data.length; i += 3) {
+    const rgb: Rgb = [data[i], data[i + 1], data[i + 2]];
+    px.push({ rgb, tone: Hct.fromInt(argbFromRgb(...rgb)).tone });
   }
+  px.sort((a, b) => a.tone - b.tone);
+  return px[Math.min(px.length - 1, Math.max(0, Math.round(px.length * pick)))].rgb;
 }
 
-export type Tone = {
-  hue?: number;
-  sat?: number;
-  neutral?: boolean;
-};
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
 export async function wallpaperTheme(src: string, tone: Tone = {}): Promise<WallpaperTheme> {
   const hit = cache.get(src);
   if (hit) return hit;
 
   const file = join(process.cwd(), 'public', src.replace(/^\//, ''));
-  const found = await dominant(file);
-  const neutral = tone.neutral ?? found.achromatic;
-  const h = Math.round(tone.hue ?? found.hue);
-  const s = Math.round(
-    tone.sat ?? (found.achromatic ? found.sat * 100 : Math.min(0.72, Math.max(0.42, found.sat)) * 100),
-  );
+  const seed = await seedOf(file);
+  const neutral = tone.neutral ?? seed === null;
+  const hue = Math.round(tone.hue ?? seed?.hue ?? NEUTRAL_HUE);
+  const chroma =
+    tone.chroma ?? (neutral ? ACCENT_CHROMA.neutral : clamp(seed!.chroma, ACCENT_CHROMA.min, ACCENT_CHROMA.max));
+  const p = palettes(hue, chroma, neutral);
 
-  const st = neutral ? 5 : Math.round(Math.min(46, Math.max(22, s * 0.6)));
-  const da = Math.min(s + 8, 80);
+  const light = build('light', p, false);
+  const dark = build('dark', p, false);
+  enforce('light', light, p, surfaceLayers(light, await percentile(file, 0.05), SHEET_ALPHA.light));
+  enforce('dark', dark, p, surfaceLayers(dark, await percentile(file, 0.95), SHEET_ALPHA.dark));
 
-  const k = neutral ? 0.18 : 1;
-  const c = (n: number) => Math.round(n * k);
-
-  const theme: WallpaperTheme = {
-    light: {
-      accent: `hsl(${h} ${s}% 42%)`,
-      'accent-soft': `hsl(${h} ${s}% 42% / 0.12)`,
-      bg: `hsl(${h} ${st}% 94%)`,
-      veil: `hsl(${h} ${st}% 94% / 0.18)`,
-      glass: `hsl(${h} ${st + c(6)}% 97% / 0.62)`,
-      'glass-strong': `hsl(${h} ${st + c(4)}% 96% / 0.82)`,
-      card: `hsl(${h} ${st + c(6)}% 98% / 0.74)`,
-      border: `hsl(${h} ${c(28)}% 28% / 0.12)`,
-      'border-strong': `hsl(${h} ${c(28)}% 28% / 0.22)`,
-      fg: `hsl(${h} ${c(30)}% 13%)`,
-      'fg-muted': `hsl(${h} ${c(14)}% 38%)`,
-      'fg-faint': `hsl(${h} ${c(10)}% 58%)`,
-      'code-bg': `hsl(${h} ${st + c(6)}% 97% / 0.8)`,
-    },
-    dark: {
-      accent: `hsl(${h} ${da}% 68%)`,
-      'accent-soft': `hsl(${h} ${da}% 68% / 0.16)`,
-      bg: `hsl(${h} ${c(26)}% 8%)`,
-      veil: `hsl(${h} ${c(26)}% 7% / 0.28)`,
-      glass: `hsl(${h} ${c(22)}% 15% / 0.55)`,
-      'glass-strong': `hsl(${h} ${c(24)}% 10% / 0.82)`,
-      card: `hsl(${h} ${c(22)}% 18% / 0.6)`,
-      border: `hsl(${h} ${c(40)}% 82% / 0.09)`,
-      'border-strong': `hsl(${h} ${c(40)}% 82% / 0.18)`,
-      fg: `hsl(${h} ${c(28)}% 90%)`,
-      'fg-muted': `hsl(${h} ${c(12)}% 68%)`,
-      'fg-faint': `hsl(${h} ${c(9)}% 48%)`,
-      'code-bg': `hsl(${h} ${c(24)}% 7% / 0.75)`,
-    },
-  };
-  enforce(src, 'light', theme.light, await percentile(file, 0.05));
-  enforce(src, 'dark', theme.dark, await percentile(file, 0.95));
-
+  const theme = { light, dark };
   cache.set(src, theme);
+  return theme;
+}
+
+/** A plain-color theme without a wallpaper: every surface is opaque, so only the sheet and the card matter. */
+export function solidTheme(id: string, tone: Tone = {}): WallpaperTheme {
+  const hit = cache.get(id);
+  if (hit) return hit;
+
+  const p = palettes(tone.hue ?? NEUTRAL_HUE, tone.chroma ?? ACCENT_CHROMA.neutral, tone.neutral ?? true);
+  const light = build('light', p, true);
+  const dark = build('dark', p, true);
+  enforce('light', light, p, surfaceLayers(light, parseColor(light.bg).rgb, 1, true));
+  enforce('dark', dark, p, surfaceLayers(dark, parseColor(dark.bg).rgb, 1, true));
+
+  const theme = { light, dark };
+  cache.set(id, theme);
   return theme;
 }

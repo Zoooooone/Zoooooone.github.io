@@ -1,31 +1,37 @@
 /*
- * data-opaque: opaque panels without blur (reduce-transparency or data-lite).
+ * data-opaque: opaque panels without blur (reduce-transparency or data-lite); data-plain is the solid reading theme.
  * data-lite: set by the head script on low-power devices.
  */
-html[data-opaque] .glass,
-html[data-opaque] .topbar,
-html[data-opaque] .pl-panel,
-html[data-opaque] .cmdk-panel,
-html[data-opaque] .gallery figcaption {
+:is(html[data-opaque], html[data-plain]) .glass,
+:is(html[data-opaque], html[data-plain]) .topbar,
+:is(html[data-opaque], html[data-plain]) .pl-panel,
+:is(html[data-opaque], html[data-plain]) .cmdk-panel,
+:is(html[data-opaque], html[data-plain]) .gallery figcaption {
   background: linear-gradient(var(--glass-strong), var(--glass-strong)), var(--bg);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-html[data-opaque] .glass {
+:is(html[data-opaque], html[data-plain]) .glass {
   background: linear-gradient(var(--glass), var(--glass)), var(--bg);
 }
-html[data-opaque] .sheet {
+:is(html[data-opaque], html[data-plain]) .sheet {
   background: linear-gradient(var(--glass-strong), var(--glass-strong)), var(--bg);
 }
-html[data-opaque] .cmdk-backdrop,
-html[data-opaque] .lightbox,
-html[data-opaque] .lb-tools {
+:is(html[data-opaque], html[data-plain]) .cmdk-backdrop,
+:is(html[data-opaque], html[data-plain]) .lightbox,
+:is(html[data-opaque], html[data-plain]) .lb-tools {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 html[data-lite] .bg-a,
 html[data-lite] .bg-b {
   filter: none;
+}
+html[data-plain] :is(.topbar, .pl-panel, .cmdk-panel, .gallery figcaption, .sheet) {
+  background: var(--glass-strong);
+}
+html[data-plain] .glass {
+  background: var(--glass);
 }
 @media (prefers-contrast: more) {
   :root,

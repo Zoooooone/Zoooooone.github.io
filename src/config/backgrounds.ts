@@ -4,13 +4,21 @@ export type Background = {
   src: string | null;
   /** Focal point as CSS background-position, e.g. 'center 30%'. Portrait images only show a band on landscape screens; this picks which band. */
   position?: string;
-  tone?: { hue?: number; sat?: number; neutral?: boolean };
+  tone?: { hue?: number; chroma?: number; neutral?: boolean };
   en?: string;
   subject?: string;
   credit?: string;
 };
 
 export const backgrounds: Background[] = [
+  {
+    id: 'graphite',
+    name: '石墨',
+    en: 'Graphite',
+    subject: '纯色阅读主题',
+    src: null,
+    tone: { hue: 235, chroma: 12, neutral: true },
+  },
   // 2683x4498 portrait: only a horizontal band shows on landscape; 'center 24%' lands it on the head, face and shoulders
   {
     id: 'shattered-light',
@@ -73,7 +81,7 @@ export const backgrounds: Background[] = [
     subject: '终末地 · 明日方舟：终末地',
     src: '/assets/img/wallpapers/silent-endfield.jpg',
     position: 'center',
-    tone: { hue: 42, sat: 58 },
+    tone: { hue: 42, chroma: 44 },
     credit: 'Arknights: Endfield © Hypergryph / GRYPHLINE · via Wallhaven',
   },
 ];

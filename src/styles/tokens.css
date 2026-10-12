@@ -1,105 +1,24 @@
-@property --bg {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #f6f1e9;
-}
-@property --veil {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(248, 242, 232, 0.5);
-}
-@property --glass {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(255, 252, 246, 0.62);
-}
-@property --glass-strong {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(255, 251, 244, 0.84);
-}
-@property --card {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(255, 253, 249, 0.78);
-}
-@property --border {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(70, 48, 24, 0.11);
-}
-@property --border-strong {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(70, 48, 24, 0.2);
-}
-@property --fg {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #2a241e;
-}
-@property --fg-muted {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #75685b;
-}
-@property --fg-faint {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #8f8376;
-}
-@property --accent {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #b8562f;
-}
-@property --accent-soft {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(184, 86, 47, 0.12);
-}
-@property --code-bg {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(255, 252, 246, 0.8);
-}
 :root {
   color-scheme: light;
-  transition:
-    --bg 0.9s ease,
-    --veil 0.9s ease,
-    --glass 0.9s ease,
-    --glass-strong 0.9s ease,
-    --card 0.9s ease,
-    --border 0.9s ease,
-    --border-strong 0.9s ease,
-    --fg 0.9s ease,
-    --fg-muted 0.9s ease,
-    --fg-faint 0.9s ease,
-    --accent 0.9s ease,
-    --accent-soft 0.9s ease,
-    --code-bg 0.9s ease;
-
-  --bg: var(--wp-bg-l, #f6f1e9);
-  --bg-dots: rgba(90, 60, 30, 0.1);
-  --veil: var(--wp-veil-l, rgba(248, 242, 232, 0.5));
+  --bg: var(--wp-bg-l, #f3f0f0);
+  --veil: var(--wp-veil-l, rgb(243 240 240 / 0));
   --bg-blur: 0.3125rem;
   --sheet-alpha: 0.66; /* Sheet opacity; must match SHEET_ALPHA in src/lib/theme/palette.ts */
-  --glass: var(--wp-glass-l, rgba(255, 252, 246, 0.62));
-  --glass-strong: var(--wp-glass-strong-l, rgba(255, 251, 244, 0.84));
-  --card: var(--wp-card-l, rgba(255, 253, 249, 0.78));
-  --border: var(--wp-border-l, rgba(70, 48, 24, 0.11));
-  --border-strong: var(--wp-border-strong-l, rgba(70, 48, 24, 0.2));
-  --fg: var(--wp-fg-l, #2a241e);
-  --fg-muted: var(--wp-fg-muted-l, #75685b);
-  --fg-faint: var(--wp-fg-faint-l, #8f8376);
-  --accent: var(--wp-accent-l, #b8562f);
-  --accent-soft: var(--wp-accent-soft-l, rgba(184, 86, 47, 0.12));
-  --code-bg: var(--wp-code-bg-l, rgba(255, 252, 246, 0.8));
+  --glass: var(--wp-glass-l, #fbf9f9);
+  --glass-strong: var(--wp-glass-strong-l, #f8f6f6);
+  --card: var(--wp-card-l, #fefcfc);
+  --border: var(--wp-border-l, rgb(70 71 72 / 0.12));
+  --border-strong: var(--wp-border-strong-l, rgb(70 71 72 / 0.22));
+  --fg: var(--wp-fg-l, #1b1c1c);
+  --fg-muted: var(--wp-fg-muted-l, #525253);
+  --fg-faint: var(--wp-fg-faint-l, #777778);
+  --accent: var(--wp-accent-l, #536069);
+  --accent-soft: var(--wp-accent-soft-l, rgb(83 96 105 / 0.12));
+  --code-bg: var(--wp-code-bg-l, #f8f6f6);
   --sage: #6c8c70;
   --amber: #d39a3c;
-  --shadow: 0 1px 0.125rem rgba(60, 40, 20, 0.05), 0 0.5rem 1.5rem -0.75rem rgba(60, 40, 20, 0.18);
-  --shadow-hover: 0 0.125rem 0.25rem rgba(60, 40, 20, 0.06), 0 1.125rem 2.25rem -0.875rem rgba(60, 40, 20, 0.28);
+  --shadow: 0 1px 0.125rem rgba(20, 22, 26, 0.05), 0 0.5rem 1.5rem -0.75rem rgba(20, 22, 26, 0.18);
+  --shadow-hover: 0 0.125rem 0.25rem rgba(20, 22, 26, 0.06), 0 1.125rem 2.25rem -0.875rem rgba(20, 22, 26, 0.28);
   --font-sans: 'Inter Variable', 'Noto Sans SC Variable', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   --font-mono:
     'JetBrains Mono Variable', 'Noto Sans SC Variable', 'PingFang SC', 'Microsoft YaHei', ui-monospace, Consolas,
@@ -139,21 +58,20 @@
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: var(--wp-bg-d, #181411);
-  --bg-dots: rgba(255, 230, 200, 0.07);
-  --veil: var(--wp-veil-d, rgba(18, 14, 11, 0.58));
+  --bg: var(--wp-bg-d, #171818);
+  --veil: var(--wp-veil-d, rgb(23 24 24 / 0));
   --sheet-alpha: 0.6;
-  --glass: var(--wp-glass-d, rgba(42, 34, 28, 0.55));
-  --glass-strong: var(--wp-glass-strong-d, rgba(28, 22, 18, 0.82));
-  --card: var(--wp-card-d, rgba(46, 38, 31, 0.62));
-  --border: var(--wp-border-d, rgba(255, 232, 205, 0.09));
-  --border-strong: var(--wp-border-strong-d, rgba(255, 232, 205, 0.18));
-  --fg: var(--wp-fg-d, #ece3d6);
-  --fg-muted: var(--wp-fg-muted-d, #a99d8e);
-  --fg-faint: var(--wp-fg-faint-d, #75695d);
-  --accent: var(--wp-accent-d, #e9945f);
-  --accent-soft: var(--wp-accent-soft-d, rgba(233, 148, 95, 0.16));
-  --code-bg: var(--wp-code-bg-d, rgba(24, 19, 16, 0.75));
+  --glass: var(--wp-glass-d, #252626);
+  --glass-strong: var(--wp-glass-strong-d, #1b1c1c);
+  --card: var(--wp-card-d, #2c2c2d);
+  --border: var(--wp-border-d, rgb(199 198 199 / 0.09));
+  --border-strong: var(--wp-border-strong-d, rgb(199 198 199 / 0.18));
+  --fg: var(--wp-fg-d, #e4e2e2);
+  --fg-muted: var(--wp-fg-muted-d, #acabac);
+  --fg-faint: var(--wp-fg-faint-d, #848384);
+  --accent: var(--wp-accent-d, #adbbc4);
+  --accent-soft: var(--wp-accent-soft-d, rgb(173 187 196 / 0.16));
+  --code-bg: var(--wp-code-bg-d, #131314);
   --sage: #8fb093;
   --amber: #e2b55a;
   --shadow: 0 1px 0.125rem rgba(0, 0, 0, 0.3), 0 0.5rem 1.5rem -0.75rem rgba(0, 0, 0, 0.5);

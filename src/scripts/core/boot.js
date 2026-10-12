@@ -46,10 +46,9 @@
 
     try {
       var theme = localStorage.getItem('theme');
-      if (!theme) theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.dataset.theme = theme;
+      root.dataset.theme = theme === 'light' ? 'light' : 'dark';
     } catch (e) {
-      root.dataset.theme = 'light';
+      root.dataset.theme = 'dark';
     }
 
     var index = 0;
@@ -73,6 +72,16 @@
   window.__applyDocState();
   if (!window.__docStateBound) {
     window.__docStateBound = true;
+    // Carry the current <html> attributes into the new document so a swap never resets the theme to the server defaults.
+    document.addEventListener('astro:before-swap', function (e) {
+      var next = e.newDocument.documentElement;
+      Array.prototype.slice.call(next.attributes).forEach(function (a) {
+        next.removeAttribute(a.name);
+      });
+      Array.prototype.slice.call(root.attributes).forEach(function (a) {
+        next.setAttribute(a.name, a.value);
+      });
+    });
     document.addEventListener('astro:after-swap', function () {
       window.__applyDocState();
     });

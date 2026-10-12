@@ -1,24 +1,21 @@
 export type Rgb = [number, number, number];
-export type Hsl = { h: number; s: number; l: number; a: number };
+export type Rgba = { rgb: Rgb; a: number };
 
-export function parseHsl(value: string): Hsl {
-  const m = value.match(/hsl\(\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%(?:\s*\/\s*([\d.]+))?\s*\)/);
+export function parseColor(value: string): Rgba {
+  const hex = value.match(/^#([0-9a-f]{6})$/i);
+  if (hex) {
+    const n = parseInt(hex[1], 16);
+    return { rgb: [(n >> 16) & 255, (n >> 8) & 255, n & 255], a: 1 };
+  }
+  const m = value.match(/^rgb\(\s*(\d+)\s+(\d+)\s+(\d+)(?:\s*\/\s*([\d.]+))?\s*\)$/);
   if (!m) throw new Error(`Cannot parse color: ${value}`);
-  return { h: +m[1], s: +m[2], l: +m[3], a: m[4] === undefined ? 1 : +m[4] };
+  return { rgb: [+m[1], +m[2], +m[3]], a: m[4] === undefined ? 1 : +m[4] };
 }
 
-export function formatHsl({ h, s, l, a }: Hsl): string {
-  const num = (n: number) => String(Math.round(n * 10) / 10);
-  return `hsl(${num(h)} ${num(s)}% ${num(l)}%${a < 1 ? ` / ${Math.round(a * 100) / 100}` : ''})`;
-}
-
-export function hslToRgb({ h, s, l }: Hsl): Rgb {
-  const S = s / 100;
-  const L = l / 100;
-  const k = (n: number) => (n + h / 30) % 12;
-  const a = S * Math.min(L, 1 - L);
-  const f = (n: number) => L - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-  return [f(0) * 255, f(8) * 255, f(4) * 255];
+export function formatColor([r, g, b]: Rgb, a = 1): string {
+  const c = [r, g, b].map((v) => Math.round(Math.min(255, Math.max(0, v))));
+  if (a >= 1) return `#${c.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+  return `rgb(${c.join(' ')} / ${Math.round(a * 100) / 100})`;
 }
 
 export function over(fg: Rgb, alpha: number, bg: Rgb): Rgb {
@@ -37,16 +34,4 @@ export function contrast(a: Rgb, b: Rgb): number {
   const la = luminance(a);
   const lb = luminance(b);
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
-}
-
-export function ensureContrast(fg: Hsl, backgrounds: Rgb[], min: number): Hsl {
-  const worst = (l: number) => Math.min(...backgrounds.map((bg) => contrast(hslToRgb({ ...fg, l }), bg)));
-  if (worst(fg.l) >= min) return fg;
-
-  const avg = backgrounds.reduce((s, bg) => s + luminance(bg), 0) / backgrounds.length;
-  const dir = avg > 0.4 ? -1 : 1;
-  let l = fg.l;
-  while (l > 0 && l < 100 && worst(l) < min) l += dir * 0.5;
-  l = Math.max(0, Math.min(100, l));
-  return { ...fg, l };
 }
