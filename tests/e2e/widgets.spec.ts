@@ -43,6 +43,11 @@ test.describe('lightbox', () => {
     await first.click();
     await expect(page.locator('.lightbox')).toBeVisible();
 
+    // A click that lands before the image is laid out counts as a click outside it and closes the lightbox.
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll('.lb-img')].some((img) => img.getBoundingClientRect().width > 100),
+    );
+
     const level = page.locator('.lb-level');
     const counter = page.locator('.lightbox .cap .counter');
     const stage = (await page.locator('.lb-stage').boundingBox())!;
@@ -67,7 +72,7 @@ test.describe('music player', () => {
     await page.goto('/');
     await ready(page);
     const title = page.locator('#player .pl-title');
-    await expect(title).not.toHaveText('');
+    await expect(title).not.toHaveText('—');
     const first = (await title.textContent())!;
 
     await page.locator('#player .pl-next').click();
@@ -103,6 +108,7 @@ test.describe('music player', () => {
   test('the playlist panel lists every track, picks one and closes with Escape', async ({ page }) => {
     await page.goto('/');
     await ready(page);
+    await expect(page.locator('#player .pl-title')).not.toHaveText('—');
     const panel = page.locator('#pl-panel');
     await expect(panel).toBeHidden();
 

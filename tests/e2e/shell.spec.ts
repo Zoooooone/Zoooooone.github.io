@@ -16,6 +16,58 @@ test.describe('app shell', () => {
     await expect(page.locator('#rail')).toBeVisible();
   });
 
+  test('a first visit gets the dark graphite reading theme, whatever the system prefers', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto('/');
+    await ready(page);
+    const html = page.locator('html');
+    await expect(html).toHaveAttribute('data-theme', 'dark');
+    await expect(html).toHaveAttribute('data-plain', '');
+    await expect(html).toHaveAttribute('data-bg', '0');
+  });
+
+  test('the theme attributes are never reset while navigating', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    await page.evaluate(() => {
+      const lost: string[] = [];
+      new MutationObserver((records) => {
+        for (const r of records) {
+          const now = document.documentElement.getAttribute(r.attributeName!);
+          if (r.oldValue !== null && now === null) lost.push(r.attributeName!);
+        }
+      }).observe(document.documentElement, { attributes: true, attributeOldValue: true });
+      (window as unknown as { __lost: string[] }).__lost = lost;
+    });
+    await navigate(page, '/archives/');
+    const lost = await page.evaluate(() => (window as unknown as { __lost: string[] }).__lost);
+    expect(lost).toEqual([]);
+  });
+
+  test('switching the wallpaper right after a page change leaves no transition behind', async ({ page }) => {
+    await page.goto('/posts/waline/');
+    await ready(page);
+    await page.locator('.rail a[href="/archives/"]').first().click();
+    await page.locator('#bg-toggle').click();
+    await page.waitForURL((u) => u.pathname === '/archives/');
+    await ready(page);
+    const html = page.locator('html');
+    await expect(html).not.toHaveAttribute('data-switching', '');
+    await expect(html).not.toHaveAttribute('data-astro-transition', /.+/);
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            document
+              .getAnimations()
+              .filter((a) => ((a.effect as KeyframeEffect)?.pseudoElement ?? '').startsWith('::view-transition'))
+              .length,
+        ),
+      )
+      .toBe(0);
+    expect(await page.evaluate(() => localStorage.getItem('bg'))).not.toBeNull();
+  });
+
   test('theme and wallpaper survive client-side navigation and reloads', async ({ page }) => {
     await page.goto('/');
     await ready(page);
