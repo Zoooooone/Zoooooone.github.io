@@ -80,4 +80,6 @@
 :root {
   --cut: 0.875rem;
   --cut-s: 0.5rem;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --bar-bottom: calc(0.75rem + var(--safe-b));
 }

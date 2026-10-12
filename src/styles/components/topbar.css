@@ -62,13 +62,28 @@
     position: fixed;
     left: 4.25rem;
     right: 0.75rem;
-    bottom: 0.75rem;
+    bottom: var(--bar-bottom);
     z-index: 45;
     width: auto;
     margin: 0;
     gap: 0.5rem;
     padding: 0.625rem 0.5rem 0.4375rem;
     background: linear-gradient(var(--glass-strong), var(--glass-strong)), var(--bg);
+    transition: transform 0.3s var(--ease);
+  }
+  html[data-bar-hidden] .frame.topbar {
+    transform: translateY(calc(100% + var(--bar-bottom) + 0.5rem));
+  }
+  .frame.topbar:has(.player:not([data-started])) {
+    right: auto;
+  }
+  html[data-player-sheet] .frame.topbar {
+    left: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.875rem;
+  }
+  html[data-player-sheet] .tb-search {
+    display: none;
   }
   .tb-search {
     flex: none;

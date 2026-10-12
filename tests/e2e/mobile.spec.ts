@@ -35,3 +35,40 @@ test.describe('narrow screens', () => {
     await expect(page.locator('html')).not.toHaveClass(/nav-open/);
   });
 });
+
+test.describe('bottom bar', () => {
+  test('hides while scrolling down and returns when scrolling up', async ({ page }) => {
+    await page.goto('/posts/waline/');
+    await ready(page);
+    const html = page.locator('html');
+    await expect(html).not.toHaveAttribute('data-bar-hidden', '');
+
+    await page.evaluate(() => window.scrollTo(0, 900));
+    await expect(html).toHaveAttribute('data-bar-hidden', '');
+    await expect
+      .poll(() => page.locator('.topbar').evaluate((el) => el.getBoundingClientRect().top >= window.innerHeight))
+      .toBe(true);
+
+    await page.evaluate(() => window.scrollTo(0, 700));
+    await expect(html).not.toHaveAttribute('data-bar-hidden', '');
+  });
+
+  test('shows only the play button until something has played, then a pill that opens a sheet', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('.topbar .pl-cover')).toBeHidden();
+    await expect(page.locator('.topbar .pl-play')).toBeVisible();
+
+    await page.evaluate(() => document.getElementById('player')!.setAttribute('data-started', '1'));
+    await expect(page.locator('.topbar .pl-cover')).toBeVisible();
+
+    const html = page.locator('html');
+    await page.locator('.topbar .pl-expand').click();
+    await expect(html).toHaveAttribute('data-player-sheet', '');
+    await expect(page.locator('.topbar .pl-next')).toBeVisible();
+    await expect(page.locator('.topbar .pl-bar')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(html).not.toHaveAttribute('data-player-sheet', '');
+  });
+});

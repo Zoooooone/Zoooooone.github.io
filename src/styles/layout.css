@@ -15,7 +15,7 @@
 @media (max-width: 860px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
-    padding: 0.5rem 0.5rem 4.5rem;
+    padding: 0.5rem 0.5rem calc(4.5rem + var(--safe-b));
   }
 }
 .sheet-foot {

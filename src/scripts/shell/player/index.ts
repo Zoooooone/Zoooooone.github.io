@@ -158,6 +158,7 @@ function init(el: HTMLElement) {
   bar.addEventListener('pointercancel', () => (seeking = false));
 
   audio.addEventListener('play', () => {
+    el.dataset.started = '1';
     el.classList.add('playing');
     btnPlay.setAttribute('aria-label', '暂停');
   });

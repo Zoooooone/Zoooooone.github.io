@@ -354,6 +354,9 @@
     display: none;
   }
 }
+.pl-expand {
+  display: none;
+}
 @media (max-width: 860px) {
   .player {
     flex: 1;
@@ -361,9 +364,15 @@
   }
   .pl-meta {
     flex: 1;
+    cursor: pointer;
+  }
+  .pl-cover {
+    cursor: pointer;
   }
   .pl-ctl .pl-prev,
+  .pl-ctl .pl-next,
   .pl-ctl .pl-mode,
+  .pl-ctl .pl-listbtn,
   .pl-eq,
   .pl-lyric {
     display: none;
@@ -374,6 +383,21 @@
   }
   .pl-play {
     width: 2.75rem !important;
+  }
+  .pl-ctl .pl-expand {
+    display: grid;
+  }
+  .pl-expand svg {
+    transition: transform 0.25s var(--ease);
+  }
+  .pl-expand[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+  }
+  .player:not([data-started]) {
+    flex: none;
+  }
+  .player:not([data-started]) :is(.pl-cover, .pl-meta, .pl-track, .pl-expand) {
+    display: none;
   }
   .pl-track {
     display: block;
@@ -401,10 +425,60 @@
   }
   .pl-panel {
     top: auto;
-    bottom: 4.5rem;
+    bottom: calc(4.5rem + var(--safe-b));
     left: 0.75rem;
     right: 0.75rem;
     width: auto;
+  }
+  html[data-player-sheet] .player {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  html[data-player-sheet] .pl-cover {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+  html[data-player-sheet] .pl-title {
+    font-size: var(--text-md);
+  }
+  html[data-player-sheet] .pl-track {
+    position: static;
+    order: 2;
+    display: flex;
+    flex: 1 1 100%;
+  }
+  html[data-player-sheet] .pl-track .mono-label {
+    display: block;
+  }
+  html[data-player-sheet] .pl-bar {
+    flex: 1;
+    width: auto;
+    height: 1.125rem;
+  }
+  html[data-player-sheet] .pl-bar::before {
+    top: 0.5rem;
+  }
+  html[data-player-sheet] .pl-fill {
+    top: 0.4375rem;
+    height: 0.25rem;
+  }
+  html[data-player-sheet] .pl-ctl {
+    order: 3;
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+  html[data-player-sheet] .pl-ctl :is(.pl-prev, .pl-next, .pl-mode, .pl-listbtn) {
+    display: grid;
+  }
+  html[data-player-sheet] .pl-ctl button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  html[data-player-sheet] .pl-panel {
+    bottom: calc(12.5rem + var(--safe-b));
+  }
+  html[data-player-sheet] .pl-list {
+    max-height: min(34vh, 14rem);
   }
 }
 .pl-volume {
