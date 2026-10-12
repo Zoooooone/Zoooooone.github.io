@@ -118,3 +118,15 @@
     scroll-behavior: auto;
   }
 }
+html[data-switching] *,
+html[data-switching] *::before,
+html[data-switching] *::after {
+  transition:
+    background-color 0.9s ease,
+    border-color 0.9s ease,
+    box-shadow 0.9s ease !important;
+}
+html[data-switching] .bg-a,
+html[data-switching] .bg-b {
+  transition: opacity 0.9s ease !important;
+}

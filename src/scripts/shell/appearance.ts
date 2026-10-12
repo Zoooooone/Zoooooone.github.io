@@ -15,10 +15,20 @@ const remember = (key: string, value: string) => {
   } catch {}
 };
 
+// Colors switch at once; data-switching lets only surfaces and the wallpaper fade (see motion.css).
+let switchTimer = 0;
+const switching = (change: () => void) => {
+  root.setAttribute('data-switching', '');
+  change();
+  clearTimeout(switchTimer);
+  switchTimer = window.setTimeout(() => root.removeAttribute('data-switching'), 1000);
+};
+
+let theme = root.dataset.theme === 'light' ? 'light' : 'dark';
 document.getElementById('theme-toggle')!.addEventListener('click', () => {
-  const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-  root.dataset.theme = next;
-  remember('theme', next);
+  theme = theme === 'dark' ? 'light' : 'dark';
+  remember('theme', theme);
+  switching(() => (root.dataset.theme = theme));
 });
 
 const layers = [document.querySelector<HTMLElement>('.bg-a')!, document.querySelector<HTMLElement>('.bg-b')!];
@@ -42,17 +52,19 @@ let current = parseInt(root.dataset.bg || '0', 10);
 let front = 0;
 
 const show = (i: number) => {
-  const w = wallpapers[i];
-  const next = layers[1 - front];
-  paintLayer(next, w);
-  next.classList.add('on');
-  layers[front].classList.remove('on');
-  front = 1 - front;
-  if (w.src) root.removeAttribute('data-plain');
-  else root.setAttribute('data-plain', '');
-  window.__applyWallpaperTheme(i);
-  describe(i);
   remember('bg', String(i));
+  switching(() => {
+    const w = wallpapers[i];
+    const next = layers[1 - front];
+    paintLayer(next, w);
+    next.classList.add('on');
+    layers[front].classList.remove('on');
+    front = 1 - front;
+    if (w.src) root.removeAttribute('data-plain');
+    else root.setAttribute('data-plain', '');
+    window.__applyWallpaperTheme(i);
+    describe(i);
+  });
 };
 
 paintLayer(layers[0], wallpapers[current]);
