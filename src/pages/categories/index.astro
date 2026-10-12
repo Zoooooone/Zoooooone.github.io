@@ -1,22 +1,97 @@
 ---
-import Base from '../../layouts/Base.astro';
-import { getPosts, groupBy } from '../../lib/posts';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHead from '@/components/ui/PageHead.astro';
+import { getPosts, groupBy } from '@/lib/posts';
 
-const groups = groupBy(await getPosts(), 'categories');
+const posts = await getPosts();
+const flat = groupBy(posts, 'categories');
+const bySlug = new Map(flat.map((g) => [g.name, g]));
+
+const tree = new Map<string, Map<string, number>>();
+for (const p of posts) {
+  const [parent, child] = p.data.categories;
+  if (!parent) continue;
+  const kids = tree.get(parent) ?? new Map<string, number>();
+  if (child) kids.set(child, (kids.get(child) ?? 0) + 1);
+  tree.set(parent, kids);
+}
+const parents = [...tree.entries()].sort(
+  (a, b) => (bySlug.get(b[0])?.posts.length ?? 0) - (bySlug.get(a[0])?.posts.length ?? 0),
+);
+const total = posts.length;
+const collapsible = parents.filter(([, kids]) => kids.size > 0).length;
+
+let n = 0;
 ---
 
-<Base title="Categories">
-  <h1 class="page-title">Categories</h1>
-  <p class="page-desc">{groups.length} 个分类</p>
-  <ul class="chips">
-    {
-      groups.map((g) => (
-        <li>
-          <a class="chip" href={`/categories/${g.slug}/`}>
-            {g.name} <span>{g.posts.length}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
-</Base>
+<BaseLayout title="Categories">
+  <PageHead
+    label="CATEGORIES · 分类"
+    title="分类"
+    meta={`${flat.length} CATEGORIES · ${total} DOCUMENTS`}
+    mark={flat.length}
+  />
+
+  {collapsible > 0 && (
+    <div class="dir-tools">
+      <button type="button" class="filter" id="dir-toggle-all" data-state="open">
+        全部收起
+      </button>
+    </div>
+  )}
+
+  <div class="dir">
+    {parents.map(([parent, kids]) => {
+      const g = bySlug.get(parent)!;
+      const hasKids = kids.size > 0;
+      return (
+        <section class="dir-group" data-open="true">
+          <div class="dir-head">
+            <a class="dir-row dir-parent" data-reveal href={`/categories/${g.slug}/`}>
+              <span class="no">C-{String(++n).padStart(2, '0')}</span>
+              <span class="name">{g.name}</span>
+              <span class="bar" style={`--w:${(g.posts.length / total) * 100}%`}></span>
+              <span class="count">{g.posts.length}</span>
+            </a>
+            {hasKids && (
+              <button
+                type="button"
+                class="dir-toggle"
+                aria-expanded="true"
+                aria-label={`展开或收起 ${g.name} 的子分类`}
+                title="展开 / 收起"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            )}
+          </div>
+          {hasKids && (
+            <div class="dir-children">
+              <div class="dir-children-inner">
+                {[...kids.entries()]
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([child, count], ci) => {
+                    const c = bySlug.get(child)!;
+                    return (
+                      <a class="dir-row dir-child" href={`/categories/${c.slug}/`}>
+                        <span class="no">└ {String(ci + 1).padStart(2, '0')}</span>
+                        <span class="name">{child}</span>
+                        <span class="bar" style={`--w:${(count / total) * 100}%`}></span>
+                        <span class="count">{count}</span>
+                      </a>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+        </section>
+      );
+    })}
+  </div>
+</BaseLayout>
+
+<script>
+  import '@/scripts/pages/categories-folding';
+</script>

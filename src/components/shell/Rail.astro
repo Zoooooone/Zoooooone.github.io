@@ -1,0 +1,53 @@
+---
+import { site } from '@/config';
+import { icons } from '@/lib/icons';
+import AppearanceControls from './AppearanceControls.astro';
+
+const path = Astro.url.pathname;
+
+const nav = [
+  { href: '/', label: 'Posts', zh: '文章' },
+  { href: '/categories/', label: 'Categories', zh: '分类' },
+  { href: '/tags/', label: 'Tags', zh: '标签' },
+  { href: '/archives/', label: 'Archives', zh: '归档' },
+  { href: '/changelog/', label: 'Changelog', zh: '日志' },
+  { href: '/about/', label: 'About', zh: '关于' },
+];
+
+const isActive = (href: string) => (href === '/' ? path === '/' || path.startsWith('/posts/') : path.startsWith(href));
+---
+
+<aside class="rail glass wipe" id="rail" style="--i:0" aria-label="site" transition:persist="rail">
+  <a class="rail-brand" href="/" aria-label={site.title}>
+    <img src={site.avatarSmall} alt="" width="38" height="38" />
+    <span>
+      <b>{site.title}</b>
+      <small>notes &amp; records</small>
+    </span>
+  </a>
+  <nav class="rail-nav">
+    {nav.map((n, i) => (
+      <a href={n.href} aria-current={isActive(n.href) ? 'page' : undefined} title={n.label}>
+        <span class="n">{String(i + 1).padStart(2, '0')}</span>
+        <span>{n.label}</span>
+        <small>{n.zh}</small>
+      </a>
+    ))}
+  </nav>
+  <div class="rail-label">Links</div>
+  <div class="rail-social">
+    {site.links.map((l) => (
+      <a href={l.href} rel="noopener" target="_blank">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          {(icons[l.icon] ?? []).map((d) => (
+            <path d={d} />
+          ))}
+        </svg>
+        <span>{l.label}</span>
+      </a>
+    ))}
+  </div>
+  <div class="rail-foot">
+    <AppearanceControls />
+  </div>
+</aside>

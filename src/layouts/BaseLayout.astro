@@ -1,0 +1,80 @@
+---
+import '@/styles/index.css';
+import { ClientRouter } from 'astro:transitions';
+import { site } from '@/config';
+import { loadWallpapers } from '@/lib/theme/wallpapers';
+import { sweep } from '@/lib/transitions';
+import BackgroundLayers from '@/components/shell/BackgroundLayers.astro';
+import CommandPalette from '@/components/shell/CommandPalette.astro';
+import HeadBoot from '@/components/shell/HeadBoot.astro';
+import MobileMenu from '@/components/shell/MobileMenu.astro';
+import PlaylistPanel from '@/components/shell/PlaylistPanel.astro';
+import Rail from '@/components/shell/Rail.astro';
+import SeoMeta from '@/components/shell/SeoMeta.astro';
+import SiteFooter from '@/components/shell/SiteFooter.astro';
+import Topbar from '@/components/shell/Topbar.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  published?: Date;
+  noindex?: boolean;
+}
+
+const { title, description = site.tagline, image, type = 'website', published, noindex = false } = Astro.props;
+const pageTitle = title ? `${title} · ${site.title}` : site.title;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(image ?? site.avatar, Astro.site).href;
+const wallpapers = await loadWallpapers();
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <SeoMeta
+      pageTitle={pageTitle}
+      description={description}
+      canonical={canonical}
+      ogImage={ogImage}
+      type={type}
+      published={published}
+      noindex={noindex}
+      hasImage={Boolean(image)}
+    />
+    <slot name="head" />
+    <ClientRouter />
+    <HeadBoot wallpapers={wallpapers} />
+  </head>
+  <body>
+    <BackgroundLayers />
+    <MobileMenu />
+
+    <div class="layout">
+      <Rail />
+      <div class="content">
+        <Topbar />
+        <main class="sheet" transition:animate={sweep}>
+          <slot />
+          <SiteFooter />
+        </main>
+      </div>
+    </div>
+
+    <PlaylistPanel />
+    <CommandPalette />
+
+    <script>
+      import '@/scripts/shell/appearance';
+      import '@/scripts/shell/command-palette';
+      import '@/scripts/shell/player';
+      import '@/scripts/shell/page-chrome';
+      import '@/scripts/effects/reveal';
+      import '@/scripts/shell/clock';
+      import '@/scripts/post/code-copy';
+      import '@/scripts/effects/scramble';
+      import '@/scripts/shell/drawer';
+    </script>
+  </body>
+</html>

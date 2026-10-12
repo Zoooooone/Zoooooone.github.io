@@ -1,22 +1,29 @@
 ---
-import Base from '../../layouts/Base.astro';
-import { getPosts, groupBy } from '../../lib/posts';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHead from '@/components/ui/PageHead.astro';
+import { getPosts, groupBy } from '@/lib/posts';
 
-const groups = groupBy(await getPosts(), 'tags');
+const posts = await getPosts();
+const groups = groupBy(posts, 'tags');
+const max = Math.max(...groups.map((g) => g.posts.length));
 ---
 
-<Base title="Tags">
-  <h1 class="page-title">Tags</h1>
-  <p class="page-desc">{groups.length} 个标签</p>
-  <ul class="chips">
-    {
-      groups.map((g) => (
-        <li>
-          <a class="chip" href={`/tags/${g.slug}/`}>
-            {g.name} <span>{g.posts.length}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
-</Base>
+<BaseLayout title="Tags">
+  <PageHead
+    label="TAGS · 标签"
+    title="标签"
+    meta={`${groups.length} TAGS · ${posts.length} DOCUMENTS`}
+    mark={groups.length}
+  />
+
+  <div class="tag-grid">
+    {groups.map((g, i) => (
+      <a class="dir-row" data-reveal href={`/tags/${g.slug}/`}>
+        <span class="no">T-{String(i + 1).padStart(2, '0')}</span>
+        <span class="name">{g.name}</span>
+        <span class="bar" style={`--w:${(g.posts.length / max) * 100}%`}></span>
+        <span class="count">{g.posts.length}</span>
+      </a>
+    ))}
+  </div>
+</BaseLayout>

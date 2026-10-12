@@ -1,0 +1,29 @@
+---
+interface Props {
+  label: string;
+  title: string;
+  meta?: string;
+  mark?: string | number;
+}
+
+const { label, title, meta, mark } = Astro.props;
+---
+
+<header class="page-head">
+  {mark !== undefined && (
+    <div class="watermark" aria-hidden="true" data-count={typeof mark === 'number' ? mark : undefined}>
+      {mark}
+    </div>
+  )}
+  <p class="mono-label wipe" style="--i:0">
+    {label}
+  </p>
+  <h1 class="wipe" style="--i:1">
+    {title}
+  </h1>
+  {meta && (
+    <p class="page-meta wipe" style="--i:2">
+      {meta}
+    </p>
+  )}
+</header>

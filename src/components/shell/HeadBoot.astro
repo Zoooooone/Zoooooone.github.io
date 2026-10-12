@@ -1,0 +1,15 @@
+---
+// Wallpaper data for the client plus the pre-paint boot script. The data element must come first:
+// boot.js reads it synchronously.
+import bootSource from '@/scripts/core/boot.js?raw';
+import type { Wallpaper } from '@/lib/theme/wallpapers';
+
+interface Props {
+  wallpapers: Wallpaper[];
+}
+
+const json = JSON.stringify(Astro.props.wallpapers).replaceAll('<', '\u003c');
+---
+
+<script is:inline type="application/json" id="wallpapers-data" set:html={json} />
+<script is:inline set:html={bootSource} />

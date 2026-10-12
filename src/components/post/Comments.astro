@@ -1,0 +1,16 @@
+---
+import { waline } from '@/config';
+---
+
+<section class="comments" data-waline data-server={waline.serverURL} aria-label="评论">
+  <header class="comments-head">
+    <h2>
+      评论<small>COMMENTS</small>
+    </h2>
+  </header>
+  <div id="waline"></div>
+</section>
+
+<script>
+  import '@/scripts/comments/waline';
+</script>

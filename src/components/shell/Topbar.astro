@@ -1,0 +1,15 @@
+---
+import Player from './Player.astro';
+---
+
+<header class="topbar frame wipe" style="--i:1" transition:persist="topbar">
+  <button type="button" id="open-search" class="tb-search" title="搜索（Ctrl+K）">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="11" cy="11" r="6.5"></circle>
+      <path d="m20 20-4.2-4.2"></path>
+    </svg>
+    <span>搜索文章、标签、正文…</span>
+    <kbd>Ctrl K</kbd>
+  </button>
+  <Player />
+</header>

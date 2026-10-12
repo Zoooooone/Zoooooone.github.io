@@ -1,0 +1,73 @@
+.pl-list button,
+.tracklist button,
+.link-list a,
+.pager a,
+.rail-nav a {
+  position: relative;
+}
+:is(.row a, .dir-row, .cmdk-item, .pl-list button, .tracklist button, .link-list a, .pager a, .rail-nav a)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  --k: 0.5rem;
+  background:
+    linear-gradient(var(--accent), var(--accent)) top right / var(--k) 1px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) top right / 1px var(--k) no-repeat,
+    linear-gradient(var(--accent), var(--accent)) bottom right / var(--k) 1px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) bottom right / 1px var(--k) no-repeat;
+  transform: translateX(0.375rem);
+  transition:
+    opacity 0.2s var(--ease),
+    transform 0.25s var(--ease);
+}
+:is(.row a, .dir-row, .cmdk-item, .pl-list button, .tracklist button, .link-list a, .pager a, .rail-nav a):is(
+    :hover,
+    :focus-visible
+  )::after,
+.cmdk-item.on::after,
+.pl-list li.on button::after,
+.rail-nav a[aria-current='page']::after {
+  opacity: 1;
+  transform: none;
+}
+:is(
+  .filter,
+  .go,
+  .pl-ctl button,
+  .lb-tools button,
+  .rail-btn,
+  .tb-search,
+  .dir-toggle,
+  .lightbox .prev,
+  .lightbox .next
+):active {
+  transform: translateY(0.0625rem) scale(0.985);
+  filter: brightness(1.18);
+  transition-duration: 0.04s;
+}
+:is(.row a, .dir-row, .cmdk-item, .pl-list button, .tracklist button, .link-list a, .pager a):active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  transition-duration: 0.04s;
+}
+/* Focus: regular elements use an outer outline; chamfered (clip-path) elements would have it clipped, so they use an inset ring instead */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 0.125rem solid var(--accent);
+  outline-offset: 0.125rem;
+}
+:is(
+  .filter,
+  .go,
+  .tb-search,
+  .pl-play,
+  .pager a,
+  .lb-tools button,
+  .lightbox .prev,
+  .lightbox .next,
+  #waline .wl-btn
+):focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 0.125rem var(--accent);
+}

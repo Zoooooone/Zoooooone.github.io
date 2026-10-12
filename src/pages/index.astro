@@ -1,13 +1,196 @@
 ---
-import Base from '../layouts/Base.astro';
-import PostList from '../components/PostList.astro';
-import { getPosts } from '../lib/posts';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import IndexRows from '@/components/list/IndexRows.astro';
+import CoverImage from '@/components/ui/CoverImage.astro';
+import { site } from '@/config';
+import { coverLayout } from '@/lib/assets/cover';
+import { coverOf, excerptOf, formatDate, getPosts, groupBy, kindOf, monthlyActivity, slugify } from '@/lib/posts';
 
-const posts = await getPosts();
+const all = await getPosts();
+const byDate = [...all].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const latest = byDate[0];
+
+const numberOf = new Map([...byDate].reverse().map((p, i) => [p.id, i + 1]));
+const pad = (n: number) => String(n).padStart(3, '0');
+
+const categories = groupBy(all, 'categories').length;
+const tags = groupBy(all, 'tags').length;
+
+const earliest = byDate.at(-1)!.data.date;
+const now = new Date();
+const spanMonths = (now.getFullYear() - earliest.getFullYear()) * 12 + now.getMonth() - earliest.getMonth() + 1;
+const activity = monthlyActivity(all, Math.min(Math.max(spanMonths, 12), 48));
+const max = Math.max(1, ...activity.map((a) => a.count));
+const activeMonths = activity.filter((a) => a.count > 0).length;
+
+const kindLabel = { tech: '技术笔记', travel: '游记', life: '随笔' } as const;
+const filters = [
+  { key: 'all', label: '全部', count: all.length },
+  ...['Study notes', 'Daily life', 'Travels'].map((name) => ({
+    key: slugify(name),
+    label: { 'Study notes': '技术笔记', 'Daily life': '日常', Travels: '游记' }[name]!,
+    count: all.filter((p) => p.data.categories.includes(name)).length,
+  })),
+];
+
+const latestCover = coverOf(latest);
+const latestFrame = await coverLayout(latestCover, latest.data.image_fit);
+
+const pinned = byDate.filter((p) => p.data.pin && p.id !== latest.id);
+const pinnedFrames = await Promise.all(pinned.map((p) => coverLayout(coverOf(p), p.data.image_fit)));
+const listPosts = [...byDate.filter((p) => p.data.pin), ...byDate.filter((p) => !p.data.pin)];
 ---
 
-<Base>
-  <h1 class="page-title">Posts</h1>
-  <p class="page-desc">{posts.length} 篇 · Daily life records and study notes.</p>
-  <PostList posts={posts} />
-</Base>
+<BaseLayout>
+  <header class="hero">
+    <div class="watermark" aria-hidden="true" data-count={all.length}>
+      {all.length}
+    </div>
+
+    <div class="hero-main">
+      <div class="hero-top wipe" style="--i:0">
+        <span class="mono-label">HOME</span>
+        <span class="clock mono-label" data-clock={site.clock.timeZone}>
+          <i class="led" aria-hidden="true"></i>
+          {site.clock.label} <b>--:--:--</b>
+        </span>
+      </div>
+      <h1 class="hero-title wipe" style="--i:1">
+        {site.author}
+        <em>'s blog</em>
+      </h1>
+      <p class="hero-sub wipe" style="--i:2">
+        {site.bio}
+      </p>
+      <blockquote class="hero-quote wipe" style="--i:3">
+        {site.quote.text}
+        <cite>— {site.quote.by}</cite>
+      </blockquote>
+    </div>
+
+    <aside class="status frame wipe" style="--i:2" aria-label="状态">
+      <div class="panel-head">
+        <span class="idx">01</span>
+        <span class="grow">STATUS</span>
+        <i class="led" aria-hidden="true"></i>
+      </div>
+      <dl>
+        {site.now.map((n) => (
+          <div>
+            <dt>{n.label}</dt>
+            <dd>{n.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <div class="sub-label mono-label">
+        <span>ACTIVITY</span>
+        <span>{activeMonths} MONTHS</span>
+      </div>
+      <div class="bars" style={`--n:${activity.length}`} role="img" aria-label="每月文章数">
+        {activity.map((a) => (
+          <i
+            class:list={{ on: a.count > 0 }}
+            style={`--h:${a.count ? 30 + (a.count / max) * 70 : 8}%`}
+            title={`${a.label} · ${a.count} 篇`}
+          />
+        ))}
+      </div>
+      <div class="bars-axis mono-label">
+        <span>{activity[0].label}</span>
+        <span>{activity.at(-1)!.label}</span>
+      </div>
+      <div class="counters">
+        <div>
+          <b data-count={all.length}>{all.length}</b>
+          <span>POSTS</span>
+        </div>
+        <div>
+          <b data-count={categories}>{categories}</b>
+          <span>CATEGORIES</span>
+        </div>
+        <div>
+          <b data-count={tags}>{tags}</b>
+          <span>TAGS</span>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <section class="featured-row">
+    <a class="latest frame wipe" style="--i:4" href={`/posts/${latest.id}/`}>
+      <div class="panel-head flush">
+        <span class="idx">NEW</span>
+        <span class="grow">LATEST · NO.{pad(numberOf.get(latest.id)!)}</span>
+        <span>{kindLabel[kindOf(latest)]}</span>
+      </div>
+      <div class="latest-main">
+        {latestCover && (
+          <div class="latest-img">
+            <CoverImage src={latestCover} layout={latestFrame} position={latest.data.image_position} eager />
+          </div>
+        )}
+        <div class="latest-body">
+          <h2>{latest.data.title}</h2>
+          <p>{excerptOf(latest, 110)}</p>
+          <div class="card-foot">
+            <time datetime={latest.data.date.toISOString()}>{formatDate(latest.data.date)}</time>
+            <span class="go">READ ▸</span>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    {pinned.length > 0 && (
+      <div class="pinned-col">
+        {pinned.map((p, i) => {
+          const cover = coverOf(p);
+          const frame = pinnedFrames[i];
+          return (
+            <a class="pinned frame wipe" style={`--i:${5 + i}`} href={`/posts/${p.id}/`}>
+              <div class="panel-head flush">
+                <span class="idx">PIN</span>
+                <span class="grow">PINNED · NO.{pad(numberOf.get(p.id)!)}</span>
+              </div>
+              {cover && (
+                <div class="pinned-img">
+                  <CoverImage src={cover} layout={frame} position={p.data.image_position} width={800} />
+                </div>
+              )}
+              <div class="pinned-body">
+                <h3>{p.data.title}</h3>
+                <p>{excerptOf(p, 80)}</p>
+                <div class="card-foot">
+                  <time datetime={p.data.date.toISOString()}>{formatDate(p.data.date)}</time>
+                  <span class="go">READ ▸</span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </section>
+
+  <section class="index">
+    <header class="index-head" data-reveal="wipe">
+      <h2>
+        全部文章<small>ALL POSTS · {all.length}</small>
+      </h2>
+      <ul class="filters">
+        {filters.map((f) => (
+          <li>
+            <button class="filter" type="button" data-filter={f.key} aria-pressed={f.key === 'all' ? 'true' : 'false'}>
+              {f.label}
+              <span>{f.count}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </header>
+    <IndexRows posts={listPosts} />
+  </section>
+</BaseLayout>
+
+<script>
+  import '@/scripts/pages/home-filters';
+</script>

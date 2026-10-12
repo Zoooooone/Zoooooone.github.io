@@ -1,0 +1,166 @@
+/* --wp-<name>-l / -d are injected per wallpaper; the values on the right are the defaults for a plain background. */
+@property --bg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #f6f1e9;
+}
+@property --veil {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(248, 242, 232, 0.5);
+}
+@property --glass {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(255, 252, 246, 0.62);
+}
+@property --glass-strong {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(255, 251, 244, 0.84);
+}
+@property --card {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(255, 253, 249, 0.78);
+}
+@property --border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(70, 48, 24, 0.11);
+}
+@property --border-strong {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(70, 48, 24, 0.2);
+}
+@property --fg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2a241e;
+}
+@property --fg-muted {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #75685b;
+}
+@property --fg-faint {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #8f8376;
+}
+@property --accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #b8562f;
+}
+@property --accent-soft {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(184, 86, 47, 0.12);
+}
+@property --code-bg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(255, 252, 246, 0.8);
+}
+:root {
+  color-scheme: light;
+  transition:
+    --bg 0.9s ease,
+    --veil 0.9s ease,
+    --glass 0.9s ease,
+    --glass-strong 0.9s ease,
+    --card 0.9s ease,
+    --border 0.9s ease,
+    --border-strong 0.9s ease,
+    --fg 0.9s ease,
+    --fg-muted 0.9s ease,
+    --fg-faint 0.9s ease,
+    --accent 0.9s ease,
+    --accent-soft 0.9s ease,
+    --code-bg 0.9s ease;
+
+  --bg: var(--wp-bg-l, #f6f1e9);
+  --bg-dots: rgba(90, 60, 30, 0.1);
+  --veil: var(--wp-veil-l, rgba(248, 242, 232, 0.5));
+  --bg-blur: 0.3125rem;
+  --sheet-alpha: 0.66; /* Sheet opacity; must match SHEET_ALPHA in src/lib/theme/palette.ts */
+  --glass: var(--wp-glass-l, rgba(255, 252, 246, 0.62));
+  --glass-strong: var(--wp-glass-strong-l, rgba(255, 251, 244, 0.84));
+  --card: var(--wp-card-l, rgba(255, 253, 249, 0.78));
+  --border: var(--wp-border-l, rgba(70, 48, 24, 0.11));
+  --border-strong: var(--wp-border-strong-l, rgba(70, 48, 24, 0.2));
+  --fg: var(--wp-fg-l, #2a241e);
+  --fg-muted: var(--wp-fg-muted-l, #75685b);
+  --fg-faint: var(--wp-fg-faint-l, #8f8376);
+  --accent: var(--wp-accent-l, #b8562f);
+  --accent-soft: var(--wp-accent-soft-l, rgba(184, 86, 47, 0.12));
+  --code-bg: var(--wp-code-bg-l, rgba(255, 252, 246, 0.8));
+  --sage: #6c8c70;
+  --amber: #d39a3c;
+  --shadow: 0 1px 0.125rem rgba(60, 40, 20, 0.05), 0 0.5rem 1.5rem -0.75rem rgba(60, 40, 20, 0.18);
+  --shadow-hover: 0 0.125rem 0.25rem rgba(60, 40, 20, 0.06), 0 1.125rem 2.25rem -0.875rem rgba(60, 40, 20, 0.28);
+  --font-sans: 'Inter Variable', 'Noto Sans SC Variable', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', 'Noto Sans SC Variable', 'PingFang SC', 'Microsoft YaHei', ui-monospace, Consolas,
+    monospace;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --radius: 1rem;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-md: 0.875rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: clamp(1.75rem, 3.4vw, 2.5rem);
+  --text-4xl: clamp(2.25rem, 5vw, 3.75rem);
+  --text-display: clamp(3rem, 7.2vw, 6rem);
+  --text-giant: clamp(6rem, 16vw, 12.5rem);
+  --text-year: 3.375rem;
+  --text-code: 0.87em;
+  --mark-s: 5.625rem;
+  --mark-m: 7.5rem;
+  --mark-l: 9.375rem;
+  --mark-xl: 11.75rem;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-black: 800;
+
+  --tracking-tighter: -0.04em;
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.06em;
+  --tracking-label: 0.12em;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: var(--wp-bg-d, #181411);
+  --bg-dots: rgba(255, 230, 200, 0.07);
+  --veil: var(--wp-veil-d, rgba(18, 14, 11, 0.58));
+  --sheet-alpha: 0.6;
+  --glass: var(--wp-glass-d, rgba(42, 34, 28, 0.55));
+  --glass-strong: var(--wp-glass-strong-d, rgba(28, 22, 18, 0.82));
+  --card: var(--wp-card-d, rgba(46, 38, 31, 0.62));
+  --border: var(--wp-border-d, rgba(255, 232, 205, 0.09));
+  --border-strong: var(--wp-border-strong-d, rgba(255, 232, 205, 0.18));
+  --fg: var(--wp-fg-d, #ece3d6);
+  --fg-muted: var(--wp-fg-muted-d, #a99d8e);
+  --fg-faint: var(--wp-fg-faint-d, #75695d);
+  --accent: var(--wp-accent-d, #e9945f);
+  --accent-soft: var(--wp-accent-soft-d, rgba(233, 148, 95, 0.16));
+  --code-bg: var(--wp-code-bg-d, rgba(24, 19, 16, 0.75));
+  --sage: #8fb093;
+  --amber: #e2b55a;
+  --shadow: 0 1px 0.125rem rgba(0, 0, 0, 0.3), 0 0.5rem 1.5rem -0.75rem rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.35), 0 1.125rem 2.25rem -0.875rem rgba(0, 0, 0, 0.65);
+}
+:root {
+  --cut: 0.875rem;
+  --cut-s: 0.5rem;
+}

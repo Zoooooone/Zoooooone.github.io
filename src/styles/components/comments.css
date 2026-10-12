@@ -1,0 +1,83 @@
+.comments {
+  max-width: 47.5rem;
+  margin-top: 4rem;
+}
+.comments-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  margin-bottom: 0.875rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-strong);
+}
+.comments-head h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--fw-black);
+  letter-spacing: var(--tracking-tight);
+}
+.comments-head small {
+  margin-left: 0.625rem;
+  font: var(--fw-medium) var(--text-2xs) var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  color: var(--fg-faint);
+}
+#waline {
+  --waline-font-size: var(--text-md);
+  --waline-white: var(--card);
+  --waline-light-grey: var(--fg-faint);
+  --waline-dark-grey: var(--fg-muted);
+  --waline-color: var(--fg);
+  --waline-bgcolor: var(--card);
+  --waline-bgcolor-light: var(--glass);
+  --waline-bgcolor-hover: var(--accent-soft);
+  --waline-border-color: var(--border-strong);
+  --waline-disable-bgcolor: var(--glass);
+  --waline-disable-color: var(--fg-faint);
+  --waline-code-bgcolor: var(--code-bg);
+  --waline-bq-color: var(--accent-soft);
+  --waline-theme-color: var(--accent);
+  --waline-active-color: var(--accent);
+  --waline-info-bgcolor: var(--glass);
+  --waline-info-color: var(--fg-faint);
+  --waline-info-font-size: var(--text-xs);
+  --waline-border: 1px solid var(--border-strong);
+  --waline-avatar-size: 2.6rem;
+  --waline-m-avatar-size: calc(var(--waline-avatar-size) * 6 / 7);
+  --waline-badge-color: var(--accent);
+  --waline-badge-font-size: 0.75em;
+  color: var(--fg);
+}
+#waline .wl-panel,
+#waline .wl-card,
+#waline .wl-editor,
+#waline .wl-btn,
+#waline .wl-input,
+#waline .wl-avatar img,
+#waline .wl-popup,
+#waline .wl-gif-popup img {
+  border-radius: 0;
+}
+#waline .wl-panel {
+  background: var(--card);
+}
+#waline .wl-btn {
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 0.5rem) 100%, 0 100%);
+  padding-right: 1.25rem;
+}
+#waline .wl-btn.primary {
+  color: var(--bg);
+}
+#waline .wl-card {
+  border-bottom: 1px solid var(--border);
+}
+#waline,
+#waline * {
+  font-family: var(--font-sans);
+}
+#waline code,
+#waline pre,
+#waline kbd {
+  font-family: var(--font-mono);
+}

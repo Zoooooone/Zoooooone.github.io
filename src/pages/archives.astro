@@ -1,15 +1,36 @@
 ---
-import Base from '../layouts/Base.astro';
-import PostList from '../components/PostList.astro';
-import { getPosts } from '../lib/posts';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHead from '@/components/ui/PageHead.astro';
+import IndexRows from '@/components/list/IndexRows.astro';
+import { getPosts } from '@/lib/posts';
 
 const posts = await getPosts();
-// 归档严格按时间倒序，不受 pin 影响
 posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const years: { year: number; items: typeof posts }[] = [];
+for (const p of posts) {
+  const y = p.data.date.getFullYear();
+  const last = years.at(-1);
+  if (last?.year === y) last.items.push(p);
+  else years.push({ year: y, items: [p] });
+}
 ---
 
-<Base title="Archives">
-  <h1 class="page-title">Archives</h1>
-  <p class="page-desc">按时间倒序</p>
-  <PostList posts={posts} />
-</Base>
+<BaseLayout title="Archives">
+  <PageHead
+    label="ARCHIVES · 归档"
+    title="归档"
+    meta={`${posts.length} DOCUMENTS · ${years.length} YEARS`}
+    mark={years.length}
+  />
+
+  {years.map((y) => (
+    <section class="year-block">
+      <div class="year-head">
+        <h2>{y.year}</h2>
+        <span class="mono-label">{y.items.length} DOCUMENTS</span>
+      </div>
+      <IndexRows posts={y.items} shortDate />
+    </section>
+  ))}
+</BaseLayout>

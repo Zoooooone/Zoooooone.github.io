@@ -1,0 +1,24 @@
+---
+---
+
+<div class="cmdk" id="cmdk" hidden transition:persist="cmdk">
+  <div class="cmdk-backdrop"></div>
+  <div class="cmdk-panel frame" role="dialog" aria-modal="true" aria-label="搜索">
+    <div class="cmdk-input">
+      <span class="mono-label">SEARCH</span>
+      <input
+        type="text"
+        placeholder="搜索文章标题、标签、正文，或输入命令…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="搜索"
+      />
+      <kbd>ESC</kbd>
+    </div>
+    <ul class="cmdk-list" role="listbox"></ul>
+    <div class="cmdk-foot">
+      <span class="mono-label cmdk-status">COMMANDS</span>
+      <span class="mono-label">↑↓ 选择 · ↵ 打开 · ESC 关闭</span>
+    </div>
+  </div>
+</div>

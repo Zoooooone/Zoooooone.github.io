@@ -1,0 +1,128 @@
+html[data-plain] body {
+  background-image: radial-gradient(var(--bg-dots) 1px, transparent 1px);
+  background-size: 1.375rem 1.375rem;
+  background-attachment: fixed;
+}
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+.bg-a,
+.bg-b {
+  position: absolute;
+  inset: -0.75rem;
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  filter: blur(var(--bg-blur));
+  transform: none;
+  transition: opacity 0.9s var(--ease);
+}
+.bg-a.on,
+.bg-b.on {
+  opacity: 1;
+}
+.bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--veil);
+  transition: background 0.3s;
+}
+html[data-plain] .bg::after {
+  background: transparent;
+}
+.bg-a:not([style]) {
+  background-image: var(--bg-image, none);
+  opacity: 1;
+}
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  width: 100%;
+  height: 0.1875rem;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+.ruler {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  width: 0.875rem;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom, var(--fg-faint) 0 1px, transparent 1px 3rem) right top / 0.625rem 100%
+      no-repeat,
+    repeating-linear-gradient(to bottom, var(--border-strong) 0 1px, transparent 1px 0.75rem) right top / 0.3125rem 100%
+      no-repeat;
+}
+.ruler-mark {
+  position: absolute;
+  right: 0;
+  top: calc(var(--p, 0) * (100% - 2px));
+  width: 0.875rem;
+  height: 2px;
+  background: var(--accent);
+}
+.ruler-mark b {
+  position: absolute;
+  right: 1.0625rem;
+  top: 50%;
+  padding: 0 0.5rem 0 0.375rem;
+  transform: translateY(-50%);
+  background: var(--accent);
+  color: var(--bg);
+  font: var(--fw-semibold) var(--text-2xs)/1.125rem var(--font-mono);
+  letter-spacing: var(--tracking-wide);
+  font-variant-numeric: tabular-nums;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 0.3125rem) 100%, 0 100%);
+}
+@media (max-width: 860px) {
+  .ruler {
+    display: none;
+  }
+}
+.fx {
+  --fx-grid: color-mix(in srgb, var(--accent) 11%, transparent);
+  --fx-line: rgba(255, 255, 255, 0.028);
+  --fx-vig: rgba(0, 0, 0, 0.22);
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 100% at 50% 45%, transparent 55%, var(--fx-vig) 100%),
+    repeating-linear-gradient(to bottom, var(--fx-line) 0 1px, transparent 1px 3px),
+    linear-gradient(var(--fx-grid) 1px, transparent 1px) 0 0 / 4rem 4rem,
+    linear-gradient(90deg, var(--fx-grid) 1px, transparent 1px) 0 0 / 4rem 4rem;
+}
+.fx::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 180px 180px;
+}
+:root:not([data-theme='dark']) .fx {
+  --fx-line: rgba(0, 0, 0, 0.03);
+  --fx-vig: rgba(60, 40, 20, 0.14);
+}
+html[data-plain] .fx {
+  --fx-grid: transparent;
+}
+html[data-fx='off'] .fx {
+  display: none;
+}
+.bg-a:not([style]),
+.bg-b:not([style]) {
+  background-position: var(--bg-position, center);
+}

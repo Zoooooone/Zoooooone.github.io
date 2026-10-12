@@ -1,0 +1,16 @@
+---
+// Fixed layers behind and above the page. They live outside the clipped panels so that
+// `position: fixed` is not affected by clip-path / backdrop-filter ancestors, and they persist across navigations.
+---
+
+<div class="bg" aria-hidden="true" transition:persist="bg">
+  <div class="bg-a"></div>
+  <div class="bg-b"></div>
+</div>
+<div class="fx" aria-hidden="true" transition:persist="fx"></div>
+<div class="progress" id="progress" aria-hidden="true" transition:persist="progress"></div>
+<div class="ruler" id="ruler" aria-hidden="true" transition:persist="ruler">
+  <i class="ruler-mark">
+    <b>0%</b>
+  </i>
+</div>

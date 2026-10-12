@@ -1,0 +1,26 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHead from '@/components/ui/PageHead.astro';
+---
+
+<BaseLayout title="Verification" noindex>
+  <PageHead label="VERIFICATION · 验证" title="作者验证" meta="BLOGGER ACCESS" />
+
+  <section class="verify">
+    <p class="mono-label">STATUS</p>
+    <div class="badge" id="badge" data-state="unknown">
+      <i></i>
+      <span id="badge-text">CHECKING…</span>
+    </div>
+    <p class="verify-hint">
+      验证通过后，这台浏览器的访问不会被计入文章浏览量。验证信息只保存在本地 Cookie 里，有效期一年。
+    </p>
+    <button class="go" type="button" id="verify-btn">
+      VERIFY ▸
+    </button>
+  </section>
+</BaseLayout>
+
+<script>
+  import '@/scripts/pages/verification';
+</script>

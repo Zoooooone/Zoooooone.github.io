@@ -2,7 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-// 旧站（Jekyll）的文章 URL 是 /posts/<文件名去掉日期前缀>/，这里保持一致。
+// The old Jekyll URL was /posts/<file name without the date prefix>/; kept identical here.
 const stripDatePrefix = (entry: string) =>
   entry
     .split('/')
@@ -18,7 +18,7 @@ const posts = defineCollection({
   }),
   schema: z.object({
     title: z.string(),
-    // Jekyll 的日期格式形如 "2023-08-29 21:28:00 +0900"
+    // Jekyll date format, e.g. "2023-08-29 21:28:00 +0900"
     date: z.preprocess((v) => {
       if (typeof v !== 'string') return v;
       const m = v.trim().match(/^(\d{4}-\d{2}-\d{2})[ T](\d{1,2}):(\d{2}):(\d{2})\s*([+-]\d{2}):?(\d{2})$/);
@@ -32,6 +32,8 @@ const posts = defineCollection({
     mermaid: z.boolean().default(false),
     pin: z.boolean().default(false),
     image: z.union([z.string(), z.object({ path: z.string(), alt: z.string().optional() })]).optional(),
+    image_position: z.string().optional(),
+    image_fit: z.enum(['cover', 'contain']).optional(),
     img_path: z.string().nullish(),
   }),
 });

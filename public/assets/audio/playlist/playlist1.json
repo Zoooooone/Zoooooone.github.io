@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Nuit Silencieuse",
+    "artist": "Days",
+    "url": "nuit-silencieuse.mp3",
+    "cover": "/assets/img/audio-cover/nuit-silencieuse.jpg",
+    "lrc": "/assets/audio/lrc/nuit-silencieuse.lrc"
+  },
+  {
+    "name": "No differences ＜a0v＞ -Instrumental-",
+    "artist": "澤野弘之",
+    "url": "no-differences.mp3",
+    "cover": "/assets/img/audio-cover/no-differances.jpg",
+    "lrc": "/assets/audio/lrc/no-differances.lrc"
+  },
+  {
+    "name": "κ",
+    "artist": "α·Pav",
+    "url": "kappa.mp3",
+    "cover": "/assets/img/audio-cover/κ.jpg",
+    "lrc": "/assets/audio/lrc/κ.lrc"
+  },
+  {
+    "name": "Towards the Light",
+    "artist": "Jacoo",
+    "url": "towards-the-light.mp3",
+    "cover": "/assets/img/audio-cover/towards-the-light.jpg",
+    "lrc": "/assets/audio/lrc/towards-the-light.lrc"
+  },
+  {
+    "name": "日落大道",
+    "artist": "梁博",
+    "url": "sunset-avenue.mp3",
+    "cover": "/assets/img/audio-cover/日落大道.jpg",
+    "lrc": "/assets/audio/lrc/日落大道.lrc"
+  },
+  {
+    "name": "Tremble (Original Mix)",
+    "artist": "Vicetone",
+    "url": "tremble.mp3",
+    "cover": "/assets/img/audio-cover/tremble.jpg",
+    "lrc": "/assets/audio/lrc/tremble.lrc"
+  },
+  {
+    "name": "Bangarang",
+    "artist": "Skrillex,Sirah",
+    "url": "bangarang.mp3",
+    "cover": "/assets/img/audio-cover/bangarang.jpg",
+    "lrc": "/assets/audio/lrc/bangarang.lrc"
+  },
+  {
+    "name": "杀死那个石家庄人",
+    "artist": "万能青年旅店",
+    "url": "kill-the-shijiazhuang-man.mp3",
+    "cover": "/assets/img/audio-cover/杀死那个石家庄人.jpeg",
+    "lrc": "/assets/audio/lrc/杀死那个石家庄人.lrc"
+  },
+  {
+    "name": "The Process",
+    "artist": "LAKEY INSPIRED",
+    "url": "the-process.mp3",
+    "cover": "/assets/img/audio-cover/the-process.jpeg",
+    "lrc": "/assets/audio/lrc/the-process.lrc"
+  },
+  {
+    "name": "在你的身边（伴奏）",
+    "artist": "盛哲",
+    "url": "by-your-side-inst.mp3",
+    "cover": "/assets/img/audio-cover/在你的身边.png",
+    "lrc": "/assets/audio/lrc/在你的身边.lrc"
+  }
+]

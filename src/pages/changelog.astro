@@ -1,0 +1,53 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHead from '@/components/ui/PageHead.astro';
+
+const entries = [
+  {
+    ver: 'v2.0',
+    date: '2026-10',
+    title: '全新站点：Astro 重构',
+    items: [
+      '从 Jekyll + Chirpy 迁移到 Astro，文章仍用 Markdown 书写，所有文章 / 分类 / 标签的 URL 保持不变。',
+      '全新的界面：切角面板、角标、编号索引、等宽标签，去掉全部圆角卡片。',
+      '背景壁纸可切换，整套配色（面板、卡片、边框、文字、强调色）随壁纸色相联动，浅色与深色各一套。',
+      '游记页采用大图瀑布流和带信息条的灯箱；技术笔记保持文档风，带目录与阅读进度线。',
+      '全文搜索命令面板（Ctrl+K），同时支持页面跳转、切换壁纸和深浅色。',
+      '自动生成 WebP 缩略图，首屏与画廊体积明显下降；正文图片懒加载。',
+      '继续沿用 Waline 评论与浏览量，历史数据保留。',
+      '新增 RSS（/feed.xml）、sitemap（/sitemap.xml）、社交分享与结构化数据。',
+    ],
+  },
+  {
+    ver: 'v1.x',
+    date: '2023-05 — 2025-10',
+    title: 'Jekyll + Chirpy 时期',
+    items: [
+      '基于 Chirpy 主题，自定义了悬停效果、颜色、图库、音乐播放器与 Waline 评论。',
+      '接入过 Umami 统计与阅读时长埋点，后因成本原因停用。',
+      '完整历史记录见 GitHub 仓库的提交日志。',
+    ],
+  },
+];
+---
+
+<BaseLayout title="Changelog">
+  <PageHead label="CHANGELOG · 更新日志" title="更新日志" meta="SITE HISTORY" />
+
+  <div class="changelog">
+    {entries.map((e, i) => (
+      <section class="entry step-in" style={`--i:${i * 4}`}>
+        <header>
+          <span class="ver">{e.ver}</span>
+          <h2>{e.title}</h2>
+          <time class="mono-label">{e.date}</time>
+        </header>
+        <ul>
+          {e.items.map((it) => (
+            <li>{it}</li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</BaseLayout>

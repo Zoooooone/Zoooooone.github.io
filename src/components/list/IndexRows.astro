@@ -1,0 +1,29 @@
+---
+import { formatDate, getNumbering, pad3, slugify, type Post } from '@/lib/posts';
+
+interface Props {
+  posts: Post[];
+  shortDate?: boolean;
+}
+
+const { posts, shortDate = false } = Astro.props;
+const numbering = await getNumbering();
+---
+
+<ol class="rows">
+  {posts.map((post) => (
+    <li class="row" data-reveal data-cats={post.data.categories.map(slugify).join(' ')}>
+      <a href={`/posts/${post.id}/`}>
+        <span class="no">NO.{pad3(numbering.get(post.id) ?? 0)}</span>
+        <span class="title">
+          {post.data.pin && <em class="pin">PIN</em>}
+          {post.data.title}
+        </span>
+        <span class="tag">{post.data.categories.at(-1)}</span>
+        <time datetime={post.data.date.toISOString()}>
+          {shortDate ? formatDate(post.data.date).slice(5) : formatDate(post.data.date)}
+        </time>
+      </a>
+    </li>
+  ))}
+</ol>

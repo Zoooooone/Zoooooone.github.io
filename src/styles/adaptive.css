@@ -1,0 +1,41 @@
+/*
+ * data-opaque: opaque panels without blur (system reduce-transparency, or data-lite).
+ * data-lite: set by the head script on low-power devices; also drops the wallpaper blur.
+ */
+html[data-opaque] .glass,
+html[data-opaque] .topbar,
+html[data-opaque] .pl-panel,
+html[data-opaque] .cmdk-panel,
+html[data-opaque] .gallery figcaption {
+  background: linear-gradient(var(--glass-strong), var(--glass-strong)), var(--bg);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+html[data-opaque] .glass {
+  background: linear-gradient(var(--glass), var(--glass)), var(--bg);
+}
+html[data-opaque] .sheet {
+  background: linear-gradient(var(--glass-strong), var(--glass-strong)), var(--bg);
+}
+html[data-opaque] .cmdk-backdrop,
+html[data-opaque] .lightbox,
+html[data-opaque] .lb-tools {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+html[data-lite] .bg-a,
+html[data-lite] .bg-b {
+  filter: none;
+}
+@media (prefers-contrast: more) {
+  :root,
+  :root[data-theme='dark'] {
+    --fg-muted: var(--fg);
+    --fg-faint: var(--fg-muted);
+    --border: var(--border-strong);
+    --border-strong: color-mix(in srgb, var(--fg) 55%, transparent);
+  }
+}
+html[data-lite] .cover-bg {
+  display: none;
+}

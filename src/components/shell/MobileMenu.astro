@@ -1,0 +1,21 @@
+---
+// Narrow-screen drawer trigger and scrim. Kept outside the clipped panels so `position: fixed` works.
+---
+
+<button
+  type="button"
+  id="m-menu"
+  class="frame cut-s m-menu"
+  aria-label="打开菜单"
+  aria-controls="rail"
+  aria-expanded="false"
+  transition:persist="m-menu"
+>
+  <svg class="ic-open" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M4 7h16M4 12h16M4 17h10"></path>
+  </svg>
+  <svg class="ic-close" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6 6l12 12M18 6 6 18"></path>
+  </svg>
+</button>
+<div class="m-scrim" id="m-scrim" aria-hidden="true" transition:persist="m-scrim"></div>

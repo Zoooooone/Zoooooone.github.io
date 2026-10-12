@@ -1,12 +1,91 @@
 ---
-import Base from '../layouts/Base.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHead from '@/components/ui/PageHead.astro';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { site } from '@/config';
+import { icons } from '@/lib/icons';
+import * as si from 'simple-icons';
+
+const tracks: { name: string; artist: string }[] = JSON.parse(
+  readFileSync(join(process.cwd(), 'public/assets/audio/playlist/playlist1.json'), 'utf8'),
+);
+
+type Skill = { name: string; icon?: string };
+const skills: { group: string; items: Skill[] }[] = [
+  {
+    group: 'Languages & Markup',
+    items: [
+      { name: 'Python', icon: 'siPython' },
+      { name: 'JavaScript', icon: 'siJavascript' },
+      { name: 'C/C++', icon: 'siCplusplus' },
+      { name: 'HTML5', icon: 'siHtml5' },
+      { name: 'CSS3', icon: 'siCss' },
+      { name: 'LaTeX', icon: 'siLatex' },
+    ],
+  },
+  {
+    group: 'Machine Learning',
+    items: [
+      { name: 'PyTorch', icon: 'siPytorch' },
+      { name: 'TensorFlow', icon: 'siTensorflow' },
+      { name: 'scikit-learn', icon: 'siScikitlearn' },
+      { name: 'NumPy', icon: 'siNumpy' },
+      { name: 'pandas', icon: 'siPandas' },
+      { name: 'OpenCV', icon: 'siOpencv' },
+    ],
+  },
+  {
+    group: 'Engineering',
+    items: [
+      { name: 'FastAPI', icon: 'siFastapi' },
+      { name: 'React.js', icon: 'siReact' },
+      { name: 'Vite', icon: 'siVite' },
+      { name: 'Docker', icon: 'siDocker' },
+      { name: 'AWS' },
+      { name: 'Git', icon: 'siGit' },
+      { name: 'PostgreSQL', icon: 'siPostgresql' },
+    ],
+  },
+];
+const lookup = (k?: string) =>
+  k ? (si as unknown as Record<string, { path: string; hex: string } | undefined>)[k] : undefined;
+
+const links = [
+  {
+    name: 'GitHub',
+    href: 'https://github.com/Zoooooone',
+    desc: 'Open source projects and code portfolio',
+    stroke: 'github',
+  },
+  {
+    name: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/ziheng-chen-572356285/',
+    desc: 'Professional network and experience',
+    stroke: 'linkedin',
+  },
+  {
+    name: 'LeetCode',
+    href: 'https://leetcode.com/Zoooooone',
+    desc: 'Algorithm practice and problem solving',
+    fill: 'siLeetcode',
+  },
+];
 ---
 
-<Base title="About">
-  <h1 class="page-title">About</h1>
-  <p class="page-desc">关于 Zone</p>
+<BaseLayout title="About">
+  <PageHead label="ABOUT · 关于" title="About · 关于" meta="PROFILE" />
 
-  <div class="prose">
+  <div class="lang-tabs" role="tablist" aria-label="Language">
+    <button type="button" class="filter" data-lang="zh" aria-pressed="true">
+      中文
+    </button>
+    <button type="button" class="filter" data-lang="en" aria-pressed="false">
+      English
+    </button>
+  </div>
+
+  <div class="prose about" data-panel="zh" lang="zh-CN">
     <h2>个人标签</h2>
     <ul>
       <li>土生土长却不爱吃盐水鸭的假南京人</li>
@@ -22,9 +101,7 @@ import Base from '../layouts/Base.astro';
 
     <h2>一些爱好</h2>
     <h3>各种游戏</h3>
-    <p>
-      曾痴迷过一段时间受苦横版过关类型（诸如空洞、蔚蓝），如今热衷于开放世界自由探索（没错说的就是你原神）。
-    </p>
+    <p>曾痴迷过一段时间受苦横版过关类型（诸如空洞、蔚蓝），如今热衷于开放世界自由探索（没错说的就是你原神）。</p>
     <div id="gallery-1" class="gallery" data-src="/assets/src/about_me/games/info.json"></div>
 
     <h3>做饭</h3>
@@ -41,24 +118,51 @@ import Base from '../layouts/Base.astro';
       class="embed-video"
       src="https://player.bilibili.com/player.html?bvid=BV1d54y1Q7ts&autoplay=0"
       allowfullscreen
-      loading="lazy"></iframe>
-    <p><strong>为自己最喜欢的DJ Avicii 制作的缅怀向视频</strong></p>
+      loading="lazy"
+    ></iframe>
+    <p>
+      <strong>为自己最喜欢的DJ Avicii 制作的缅怀向视频</strong>
+    </p>
     <iframe
       class="embed-video"
       src="https://player.bilibili.com/player.html?bvid=BV12e411W7nc&autoplay=0"
       allowfullscreen
-      loading="lazy"></iframe>
-    <p><strong>你的名字 抒情向剪辑</strong></p>
+      loading="lazy"
+    ></iframe>
+    <p>
+      <strong>你的名字 抒情向剪辑</strong>
+    </p>
 
     <h3>音乐</h3>
     <p>网易云音乐9年骨灰级用户，最喜欢的事情之一是听节奏感强的音乐快走，然后每一步踩中鼓点。音乐品味变化：</p>
     <ul>
-      <li><strong>初高中时期：</strong> 节奏感强的电音、欧美流行乐</li>
-      <li><strong>日本考学期 + 本科前期：</strong> 杂食阶段，只要是觉得好听的无论流派语言</li>
-      <li><strong>疫情期 + 本科毕业年：</strong> 肝论文自闭阶段，治愈心灵的纯音乐赛高</li>
-      <li><strong>现在：</strong> 节奏感强的电音（压马路专用）、治愈心灵的纯音乐</li>
+      <li>
+        <strong>初高中时期：</strong> 节奏感强的电音、欧美流行乐
+      </li>
+      <li>
+        <strong>日本考学期 + 本科前期：</strong> 杂食阶段，只要是觉得好听的无论流派语言
+      </li>
+      <li>
+        <strong>疫情期 + 本科毕业年：</strong> 肝论文自闭阶段，治愈心灵的纯音乐赛高
+      </li>
+      <li>
+        <strong>现在：</strong> 节奏感强的电音（压马路专用）、治愈心灵的纯音乐
+      </li>
     </ul>
-    <!-- TODO: 高频歌单（APlayer），音乐播放器低优先级，稍后接入 -->
+    <p>
+      <strong>高频歌单</strong>（点击即可在顶部播放器中播放，换页也不会中断）
+    </p>
+    <ol class="tracklist">
+      {tracks.map((t, i) => (
+        <li>
+          <button type="button" data-track={i}>
+            <span class="n">{String(i + 1).padStart(2, '0')}</span>
+            <span class="nm">{t.name}</span>
+            <span class="ar">{t.artist}</span>
+          </button>
+        </li>
+      ))}
+    </ol>
 
     <h3>写代码</h3>
     <p>
@@ -69,7 +173,8 @@ import Base from '../layouts/Base.astro';
     <p>包括一些相较于以前现在没那么关注的，以及客观原因丢了挺久的爱好。</p>
     <ul>
       <li>
-        看足球。对12 ~ 18年间活跃的球星如数家珍，可惜如今熟悉的那些名字都逐渐淡出了舞台，新生代球员的名字渐渐叫不上来了，自己也快要达到作为足球运动员来说不再能被称为“小将”的年纪了。至于上场踢球，我想如果我把中学时期的生涯战绩说出来应该是相当重量级的：
+        看足球。对12 ~
+        18年间活跃的球星如数家珍，可惜如今熟悉的那些名字都逐渐淡出了舞台，新生代球员的名字渐渐叫不上来了，自己也快要达到作为足球运动员来说不再能被称为“小将”的年纪了。至于上场踢球，我想如果我把中学时期的生涯战绩说出来应该是相当重量级的：
         <ul>
           <li>司职中场，通过超远距离吊射攻破自家球门，帮助对手完成绝杀</li>
           <li>司职门将，被对方前锋开球后超远距离吊射攻破球门，帮助对手完成绝杀</li>
@@ -95,8 +200,227 @@ import Base from '../layouts/Base.astro';
       现阶段依旧有很多想要做的事情，也有很多想要得到的，如果说好听点的话那就是有很强的内驱力。好在行动力相比起以前也更强了，对过于理想化的完美主义（拖延症）也逐渐能识别并控制。当下的阶段性目标是追求工作能力上的快速成长，具体来说便是不断拓宽自己的技术栈，同时学习团队协作的方式，找到属于自己的工作节奏，并在有余力时鼓起勇气多和优秀的人交流。当然，还有继续保持定期地更新技术内容和随想。
     </p>
   </div>
-</Base>
+
+  <div class="prose about" data-panel="en" lang="en" hidden>
+    <h2>About Me</h2>
+    <p>
+      I'm <strong>Ziheng Chen</strong>, a Machine Learning Engineer at
+      <a href="https://exawizards.com/" rel="noopener">
+        ExaWizards Inc.
+      </a>
+      , specializing in full-cycle AI project development including data pipelines, model development, MLOps, and cloud
+      deployment on AWS. I'm passionate about building scalable, data-driven solutions and continuously expanding my
+      expertise in end-to-end system design. Beyond machine learning, I'm also exploring full-stack development to
+      broaden my engineering capabilities.
+    </p>
+
+    <h2>Education</h2>
+    <ul class="cv">
+      <li>
+        <span class="when">2012.9 ~ 2018.6</span>
+        <div>
+          <a href="http://www.nfls.com.cn/" rel="noopener">
+            Nanjing Foreign Language School (NFLS)
+          </a>
+        </div>
+      </li>
+      <li>
+        <span class="when">2019.4 ~ 2023.3</span>
+        <div>
+          <a href="https://www.u-tokyo.ac.jp/en/index.html" rel="noopener">
+            The University of Tokyo
+          </a>
+          <small>
+            Bachelor of Engineering,
+            <a href="http://www.kikaib.t.u-tokyo.ac.jp/" rel="noopener">
+              Mechano-Informatics
+            </a>
+          </small>
+        </div>
+      </li>
+      <li>
+        <span class="when">2023.4 ~ 2025.3</span>
+        <div>
+          <a href="https://www.u-tokyo.ac.jp/en/index.html" rel="noopener">
+            The University of Tokyo
+          </a>
+          <small>
+            Master of Engineering,
+            <a href="https://www.i.u-tokyo.ac.jp/" rel="noopener">
+              Information Science and Technology
+            </a>
+            ,
+            <a href="http://www.isi.imi.i.u-tokyo.ac.jp/?lang=en" rel="noopener">
+              ISI Lab
+            </a>
+          </small>
+        </div>
+      </li>
+    </ul>
+
+    <h2>Professional Experience</h2>
+    <ul class="cv">
+      <li>
+        <span class="when">Apr 2025 – Present</span>
+        <div>
+          <strong>Machine Learning Engineer</strong> ·{' '}
+          <a href="https://exawizards.com/" rel="noopener">
+            ExaWizards Inc.
+          </a>
+          <small>
+            Developing end-to-end AI solutions covering data engineering, model development, MLOps, and AWS cloud
+            deployment.
+          </small>
+        </div>
+      </li>
+      <li>
+        <span class="when">Apr 2023 – Apr 2025</span>
+        <div>
+          <strong>Teaching Assistant</strong> ·{' '}
+          <a href="https://www.u-tokyo.ac.jp/en/index.html" rel="noopener">
+            The University of Tokyo
+          </a>
+          <small>
+            Assisted in machine learning and programming courses, mentoring students in Python and deep learning
+            frameworks.
+          </small>
+        </div>
+      </li>
+      <li>
+        <span class="when">Dec 2023</span>
+        <div>
+          <strong>Data Scientist Intern</strong> ·
+          <a href="https://www.ibm.com/jp-ja/about/subsidiaries/ise" rel="noopener">
+            IBM Systems Engineering Co., Ltd.
+          </a>
+          <small>
+            Worked on machine learning projects using Python, gaining hands-on experience in data analysis and model
+            implementation.
+          </small>
+        </div>
+      </li>
+    </ul>
+
+    <h2>Research Focus</h2>
+    <dl class="kv">
+      <div>
+        <dt>Specialization</dt>
+        <dd>Machine Learning, Deep Learning</dd>
+      </div>
+      <div>
+        <dt>Research Areas</dt>
+        <dd>Multimodal Recognition, Computer Vision, Natural Language Processing, Audio Feature Extraction</dd>
+      </div>
+      <div>
+        <dt>Technical Skills</dt>
+        <dd>Python, PyTorch, TensorFlow, scikit-learn, OpenCV</dd>
+      </div>
+    </dl>
+
+    <h2>Technical Skills</h2>
+    <div class="skills">
+      {skills.map((g) => (
+        <section class="skill-group">
+          <h3>{g.group}</h3>
+          <ul>
+            {g.items.map((s) => {
+              const ico = lookup(s.icon);
+              return (
+                <li class="skill" style={ico ? `--brand:#${ico.hex}` : undefined}>
+                  {ico ? (
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d={ico.path} />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" class="stroke" aria-hidden="true">
+                      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z" />
+                    </svg>
+                  )}
+                  <span>{s.name}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
+    </div>
+
+    <h2>Professional Links</h2>
+    <ul class="link-list">
+      {links.map((l) => (
+        <li>
+          <a href={l.href} rel="noopener" target="_blank">
+            {l.stroke ? (
+              <svg viewBox="0 0 24 24" class="stroke" aria-hidden="true">
+                {(icons[l.stroke] ?? []).map((p) => (
+                  <path d={p} />
+                ))}
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d={lookup(l.fill)?.path} />
+              </svg>
+            )}
+            <strong>{l.name}</strong>
+            <span>{l.desc}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <h2>Interests &amp; Hobbies</h2>
+    <dl class="kv">
+      <div>
+        <dt>Coding &amp; Open Source</dt>
+        <dd>Contributing to technical communities and building personal projects</dd>
+      </div>
+      <div>
+        <dt>Content Creation</dt>
+        <dd>Video editing and technical tutorial creation</dd>
+      </div>
+      <div>
+        <dt>Music</dt>
+        <dd>Classical and acoustic guitar playing</dd>
+      </div>
+      <div>
+        <dt>Sports</dt>
+        <dd>Football enthusiast and occasional player</dd>
+      </div>
+      <div>
+        <dt>Cooking</dt>
+        <dd>Exploring international cuisines and culinary techniques</dd>
+      </div>
+      <div>
+        <dt>Gaming</dt>
+        <dd>Strategy and simulation games</dd>
+      </div>
+    </dl>
+
+    <h2>Contact</h2>
+    <dl class="kv">
+      <div>
+        <dt>Email</dt>
+        <dd>
+          <a href="mailto:opitz4546@gmail.com">opitz4546@gmail.com</a>
+        </dd>
+      </div>
+      <div>
+        <dt>Location</dt>
+        <dd>Tokyo, Japan</dd>
+      </div>
+      <div>
+        <dt>LinkedIn</dt>
+        <dd>
+          <a href={site.links[1].href} rel="noopener" target="_blank">
+            Connect with me
+          </a>
+        </dd>
+      </div>
+    </dl>
+  </div>
+</BaseLayout>
 
 <script>
-  import '../scripts/enhance';
+  import '@/scripts/post';
+  import '@/scripts/pages/about-lang';
 </script>

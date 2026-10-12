@@ -1,0 +1,23 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404" noindex>
+  <section class="notfound">
+    <p class="mono-label wipe" style="--i:0">
+      ERROR · NOT FOUND
+    </p>
+    <h1 class="wipe" style="--i:1">
+      404
+    </h1>
+    <p class="wipe" style="--i:2">
+      这个文档不在档案库里，可能已被移动或从未存在。
+    </p>
+    <p class="wipe" style="--i:3">
+      <a class="go" href="/">
+        RETURN ▸
+      </a>
+      <span class="mono-label hint">或按 Ctrl+K 搜索</span>
+    </p>
+  </section>
+</BaseLayout>

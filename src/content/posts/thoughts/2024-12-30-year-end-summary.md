@@ -6,7 +6,7 @@ tags: [thoughts, "2024", year-end summary]
 image: /assets/src/2024-year-end-summary/6.jpg
 ---
 
-<div id="aplayer" data-playlist="/assets/audio/playlist/playlist2.json"></div>
+<button type="button" class="go" data-track="9">▶ 播放：在你的身边（伴奏）· 盛哲</button>
 
 ## 前言
 

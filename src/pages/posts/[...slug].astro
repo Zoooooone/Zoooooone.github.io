@@ -1,8 +1,24 @@
 ---
 import { render } from 'astro:content';
 import 'katex/dist/katex.min.css';
-import Base from '../../layouts/Base.astro';
-import { getPosts, formatDate, slugify } from '../../lib/posts';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Comments from '@/components/post/Comments.astro';
+import CoverImage from '@/components/ui/CoverImage.astro';
+import { site } from '@/config';
+import { coverLayout } from '@/lib/assets/cover';
+import { thumb } from '@/lib/assets/thumb';
+import {
+  coverOf,
+  excerptOf,
+  formatDate,
+  getNeighbors,
+  getNumbering,
+  getPosts,
+  kindOf,
+  pad3,
+  readingMinutes,
+  slugify,
+} from '@/lib/posts';
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -10,34 +26,149 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const { title, date, categories, tags } = post.data;
+
+const kind = kindOf(post);
+const kindLabel = { tech: '技术笔记', travel: '游记', life: '随笔' }[kind];
+const cover = coverOf(post);
+const coverFrame = kind !== 'travel' ? await coverLayout(cover, post.data.image_fit) : undefined;
+const coverAlt = typeof post.data.image === 'object' ? (post.data.image.alt ?? '') : '';
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+const isTravel = kind === 'travel';
+
+const numbering = await getNumbering();
+const no = pad3(numbering.get(post.id) ?? 0);
+const minutes = readingMinutes(post);
+const { prev, next } = await getNeighbors(post.id);
+const noOf = (id: string) => pad3(numbering.get(id) ?? 0);
+
+const description = excerptOf(post, 150) || title;
+const ogImage = cover ? thumb(cover, 1600) : undefined;
+const canonical = new URL(`/posts/${post.id}/`, Astro.site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: date.toISOString(),
+  mainEntityOfPage: canonical,
+  author: { '@type': 'Person', name: site.author },
+  keywords: tags.join(', '),
+  ...(ogImage ? { image: new URL(ogImage, Astro.site).href } : {}),
+};
 ---
 
-<Base title={title}>
-  <article>
-    <header class="post-head">
-      <h1>{title}</h1>
-      <div class="meta">
-        <time datetime={date.toISOString()}>{formatDate(date)}</time>
-        {
-          categories.map((c) => (
-            <a href={`/categories/${slugify(c)}/`}>{c}</a>
-          ))
-        }
-        {
-          tags.map((t) => (
-            <a class="tag" href={`/tags/${slugify(t)}/`}>{t}</a>
-          ))
-        }
+<BaseLayout title={title} description={description} image={ogImage} type="article" published={date}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <article class:list={[isTravel ? 'travel' : 'doc-page']}>
+    {isTravel && cover && (
+      <figure class="travel-hero frame wipe">
+        <img
+          src={thumb(cover, 1600)}
+          alt=""
+          fetchpriority="high"
+          decoding="async"
+          style={`object-position:${post.data.image_position ?? 'center'}`}
+        />
+      </figure>
+    )}
+    <div class:list={[{ doc: !isTravel }]}>
+      <div>
+        <header class="post-head">
+          <p class="mono-label wipe" style="--i:0">
+            NO.{no} · {kindLabel} · {categories.at(-1)}
+          </p>
+          <h1 class="wipe" style="--i:1">
+            {title}
+          </h1>
+          <dl class="meta-bar wipe" style="--i:2">
+            <div>
+              <dt>DATE</dt>
+              <dd>
+                <time datetime={date.toISOString()}>{formatDate(date)}</time>
+              </dd>
+            </div>
+            <div>
+              <dt>READ</dt>
+              <dd>{minutes} MIN</dd>
+            </div>
+            <div>
+              <dt>VIEWS</dt>
+              <dd>
+                <span class="waline-pageview-count" data-path={`/posts/${post.id}/`}>
+                  –
+                </span>
+              </dd>
+            </div>
+            <div class="cats">
+              <dt>CATEGORY</dt>
+              <dd>
+                {categories.map((c) => (
+                  <a href={`/categories/${slugify(c)}/`}>{c}</a>
+                ))}
+              </dd>
+            </div>
+            {tags.length > 0 && (
+              <div class="tags">
+                <dt>TAGS</dt>
+                <dd>
+                  {tags.map((t) => (
+                    <a href={`/tags/${slugify(t)}/`}>{t}</a>
+                  ))}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </header>
+
+        {coverFrame && cover && (
+          <figure class:list={['post-cover', 'frame', 'cut-s', `fit-${coverFrame.fit}`]}>
+            <CoverImage src={cover} layout={coverFrame} position={post.data.image_position} alt={coverAlt} eager />
+          </figure>
+        )}
+
+        <div class="prose">
+          <Content />
+        </div>
+
+        <nav class="pager" aria-label="上一篇与下一篇">
+          {prev ? (
+            <a class="pager-prev" href={`/posts/${prev.id}/`}>
+              <span class="mono-label">◂ PREV · NO.{noOf(prev.id)}</span>
+              <b>{prev.data.title}</b>
+            </a>
+          ) : (
+            <span />
+          )}
+          {next ? (
+            <a class="pager-next" href={`/posts/${next.id}/`}>
+              <span class="mono-label">NEXT · NO.{noOf(next.id)} ▸</span>
+              <b>{next.data.title}</b>
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
+        <Comments />
+        <p class="back">
+          <a href="/">◂ 返回索引</a>
+        </p>
       </div>
-    </header>
-    <div class="prose">
-      <Content />
+      {!isTravel && toc.length > 1 && (
+        <nav class="toc" aria-label="目录">
+          <b>ON THIS PAGE</b>
+          {toc.map((h) => (
+            <a href={`#${h.slug}`} class={`d${h.depth}`} data-slug={h.slug}>
+              {h.text}
+            </a>
+          ))}
+        </nav>
+      )}
     </div>
   </article>
-</Base>
+</BaseLayout>
 
 <script>
-  import '../../scripts/enhance';
+  import '@/scripts/post';
 </script>

@@ -1,0 +1,120 @@
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.625rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.55s var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+.reveal {
+  transition:
+    opacity 0.6s var(--ease),
+    transform 0.6s var(--ease);
+}
+.reveal.pre {
+  opacity: 0;
+  transform: translateY(0.875rem);
+}
+.reveal.pre.in {
+  opacity: 1;
+  transform: none;
+}
+@keyframes led {
+  50% {
+    opacity: 0.35;
+  }
+}
+/*
+ * Wipe for text and plain blocks: the end state must be an explicit rectangle.
+ * It cannot use --panel-clip: custom properties inherit, and a heading inside .sheet would get the panel's 6-point chamfer,
+ * which cannot interpolate with the 4-point start frame (the animation turns into a half-way jump and clips glyph corners).
+ */
+@keyframes wipe {
+  from {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+  to {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+.wipe {
+  animation: wipe 0.7s cubic-bezier(0.7, 0, 0.2, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateX(-0.625rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.step-in {
+  animation: step-in 0.36s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 18ms + var(--base, 0.2s));
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@keyframes cmdk-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.625rem) scale(0.985);
+  }
+}
+/*
+ * Hidden state for entrances, effective before first paint (no show -> hide -> fade-in flicker).
+ * The head script adds .js to <html>; playing elements get .step-in / .wipe; elements scrolled past and fallback-revealed get .shown.
+ */
+.js [data-reveal]:not(.step-in):not(.wipe):not(.shown) {
+  opacity: 0;
+}
+.js [data-count]:not(.counted) {
+  visibility: hidden;
+}
+@keyframes sweep-in-fwd {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes sweep-out-fwd {
+  to {
+    opacity: 0;
+    transform: translateX(-1.25rem);
+  }
+}
+@keyframes sweep-in-back {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes sweep-out-back {
+  to {
+    opacity: 0;
+    transform: translateX(1.25rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

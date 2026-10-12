@@ -4,6 +4,7 @@ date: 2025-10-21 14:00:00 +0900
 categories: [Study notes, CI]
 tags: [code quality, tutorial, github actions, claude code, sonarqube]
 image: /assets/img/2025-10-21-code-quality-workflow/sonar_claude.jpg
+image_position: top
 ---
 
 ## 前言

@@ -1,0 +1,193 @@
+.dir-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr) minmax(3.75rem, 18%) 2.75rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6875rem 0.875rem 0.6875rem 1rem;
+  border-bottom: 1px solid var(--border);
+  transition:
+    background 0.2s var(--ease),
+    padding-left 0.3s var(--ease);
+}
+.dir-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0.1875rem;
+  background: var(--accent);
+  transform: scaleY(0);
+  transition: transform 0.25s var(--ease);
+}
+.dir-row:hover {
+  padding-left: 1.5rem;
+  background: var(--accent-soft);
+}
+.dir-row:hover::before {
+  transform: scaleY(1);
+}
+.dir-row .no {
+  font: var(--fw-semibold) var(--text-2xs) var(--font-mono);
+  letter-spacing: var(--tracking-wide);
+  color: var(--fg-faint);
+  transition: color 0.2s;
+}
+.dir-row:hover .no {
+  color: var(--accent);
+}
+.dir-row .name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-base);
+  font-weight: var(--fw-semibold);
+}
+.dir-row .bar {
+  position: relative;
+  height: 0.1875rem;
+  background: var(--border);
+}
+.dir-row .bar::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: max(var(--w), 0.1875rem);
+  background: var(--border-strong);
+  transform-origin: left;
+  transition: background 0.2s;
+}
+.dir-row:hover .bar::after {
+  background: var(--accent);
+}
+.dir-row .count {
+  font: var(--fw-semibold) var(--text-sm) var(--font-mono);
+  text-align: right;
+  color: var(--fg-muted);
+}
+.dir {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-top: 0;
+}
+.dir-group {
+  margin-top: 0.875rem;
+}
+.dir-parent .name {
+  font-size: var(--text-lg);
+  font-weight: var(--fw-black);
+  letter-spacing: var(--tracking-tight);
+}
+.dir-child {
+  padding-left: 1.875rem;
+}
+.dir-child .name {
+  font-size: var(--text-md);
+  font-weight: var(--fw-medium);
+  color: var(--fg-muted);
+}
+.dir-child:hover {
+  padding-left: 2.375rem;
+}
+.tag-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 2.5rem;
+  margin-top: 0.625rem;
+  border-top: 1px solid var(--border-strong);
+}
+.tag-grid .dir-row {
+  grid-template-columns: 3.25rem minmax(0, 1fr) minmax(2.5rem, 22%) 2.5rem;
+}
+.year-block {
+  margin-top: 2.125rem;
+}
+.year-head {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+.year-head h2 {
+  margin: 0;
+  font: var(--fw-black) var(--text-year)/1 var(--font-mono);
+  letter-spacing: var(--tracking-tighter);
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--fg);
+}
+@media (max-width: 520px) {
+  .timeline li {
+    grid-template-columns: 3rem minmax(0, 1fr);
+  }
+  .timeline .cat {
+    display: none;
+  }
+}
+@media (max-width: 860px) {
+  .tag-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.dir-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin: 1rem 0 0.25rem;
+}
+.dir-head {
+  position: relative;
+}
+.dir-parent {
+  padding-right: 3.25rem;
+}
+.dir-toggle {
+  all: unset;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  color: var(--fg-faint);
+  cursor: pointer;
+  transition:
+    color 0.2s var(--ease),
+    background 0.2s var(--ease);
+}
+.dir-toggle:hover,
+.dir-toggle:focus-visible {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.dir-toggle svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.3s var(--ease);
+}
+.dir-group[data-open='false'] .dir-toggle svg {
+  transform: rotate(-90deg);
+}
+.dir-children {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.35s var(--ease);
+}
+.dir-children-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+.dir-group[data-open='false'] .dir-children {
+  grid-template-rows: 0fr;
+}
+.dir-group[data-open='false'] .dir-children-inner {
+  visibility: hidden;
+  transition: visibility 0s 0.35s;
+}

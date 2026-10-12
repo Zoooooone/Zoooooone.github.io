@@ -1,7 +1,8 @@
 ---
-import Base from '../../layouts/Base.astro';
-import PostList from '../../components/PostList.astro';
-import { getPosts, groupBy } from '../../lib/posts';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHead from '@/components/ui/PageHead.astro';
+import IndexRows from '@/components/list/IndexRows.astro';
+import { getPosts, groupBy } from '@/lib/posts';
 
 export async function getStaticPaths() {
   const groups = groupBy(await getPosts(), 'tags');
@@ -9,10 +10,13 @@ export async function getStaticPaths() {
 }
 
 const { group } = Astro.props;
+const posts = [...group.posts].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
-<Base title={`#${group.name}`}>
-  <h1 class="page-title">#{group.name}</h1>
-  <p class="page-desc">Tag · {group.posts.length} 篇</p>
-  <PostList posts={group.posts} />
-</Base>
+<BaseLayout title={group.name}>
+  <PageHead label="TAG · 标签" title={group.name} meta={`${group.posts.length} DOCUMENTS`} mark={group.posts.length} />
+  <IndexRows posts={posts} />
+  <p class="back">
+    <a href="/tags/">◂ 返回标签</a>
+  </p>
+</BaseLayout>

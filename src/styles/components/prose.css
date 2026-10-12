@@ -1,0 +1,364 @@
+.prose {
+  overflow-wrap: anywhere;
+}
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  scroll-margin-top: 1.5rem;
+  margin: 2.1em 0 0.6em;
+  line-height: 1.4;
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-tight);
+}
+.prose h1 {
+  font-size: var(--text-2xl);
+}
+.prose h2 {
+  font-size: var(--text-xl);
+}
+.prose h3 {
+  font-size: var(--text-lg);
+}
+.prose h4 {
+  font-size: var(--text-base);
+}
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose p,
+.prose ul,
+.prose ol {
+  margin: 0.95em 0;
+}
+.prose li {
+  margin: 0.25em 0;
+}
+.prose li::marker {
+  color: var(--fg-faint);
+}
+.prose a {
+  color: var(--accent);
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.3s var(--ease);
+}
+.prose a:hover {
+  background-size: 100% 1px;
+}
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.625rem;
+}
+.prose img.custom-img {
+  display: block;
+  margin: 1.4em auto;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2.4em 0;
+}
+.prose table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--text-md);
+}
+.prose th,
+.prose td {
+  padding: 0.4375rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+}
+.prose th {
+  background: var(--glass);
+  font-weight: var(--fw-semibold);
+  text-align: left;
+}
+.prose :not(pre) > code {
+  padding: 0.14em 0.42em;
+  border-radius: 0.375rem;
+  background: var(--accent-soft);
+  color: var(--fg);
+  font: var(--text-code) var(--font-mono);
+}
+.prose pre {
+  overflow-x: auto;
+  margin: 1.3em 0;
+  padding: 0.9375rem 1.125rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--code-bg) !important;
+  font: var(--text-sm)/1.7 var(--font-mono);
+  box-shadow: var(--shadow);
+}
+.prose pre.astro-code span {
+  color: var(--shiki-light);
+}
+:root[data-theme='dark'] .prose pre.astro-code span {
+  color: var(--shiki-dark);
+}
+.prose blockquote {
+  margin: 1.3em 0;
+  padding: 0.125rem 1.125rem;
+  border-left: 0.125rem solid var(--border-strong);
+  color: var(--fg-muted);
+}
+.prose blockquote.prompt-tip,
+.prose blockquote.prompt-info {
+  padding: 0.625rem 1.125rem;
+  border: 1px solid var(--border);
+  border-left: 0.1875rem solid var(--accent);
+  border-radius: 0.75rem;
+  background: var(--glass);
+  color: var(--fg);
+}
+.prose blockquote.prompt-info {
+  border-left-color: var(--sage);
+}
+.prose blockquote p {
+  margin: 0.2em 0;
+}
+.prose blockquote.poem {
+  border: 0;
+  text-align: center;
+  color: var(--fg);
+}
+.prose .embed-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 1.4em 0;
+  border: 0;
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow);
+}
+.prose iframe {
+  max-width: 100%;
+  border: 0;
+  border-radius: 0.75rem;
+}
+.prose pre.mermaid {
+  background: transparent !important;
+  border: 0;
+  box-shadow: none;
+  text-align: center;
+}
+.prose .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+.prose pre,
+.prose pre code,
+.prose code,
+.prose kbd {
+  font-family: var(--font-mono);
+}
+.code-wrap {
+  position: relative;
+}
+.prose pre.astro-code {
+  overflow-x: auto;
+}
+/* The title bar is a sticky ::before: it stays pinned at the left while the code scrolls horizontally */
+.prose pre.astro-code::before {
+  content: attr(data-language);
+  position: sticky;
+  left: 0;
+  display: block;
+  box-sizing: border-box;
+  width: calc(100% + 2.25rem);
+  height: 1.875rem;
+  margin: -0.9375rem -1.125rem 0.75rem;
+  padding: 0 0.875rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--fg) 5%, transparent);
+  font: var(--fw-medium) var(--text-2xs)/1.875rem var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.prose pre.astro-code[data-language='plaintext']::before {
+  content: 'TEXT';
+}
+.code-copy {
+  all: unset;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0.0625rem;
+  right: 0.0625rem;
+  z-index: 2;
+  height: 1.8125rem;
+  padding: 0 0.75rem;
+  font: var(--fw-semibold) var(--text-2xs)/1.8125rem var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s var(--ease),
+    background 0.2s var(--ease);
+}
+.code-copy:hover,
+.code-copy:focus-visible {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.code-copy[data-state='ok'] {
+  color: var(--sage);
+}
+.code-copy[data-state='err'] {
+  color: var(--accent);
+}
+.prose blockquote.prompt-tip,
+.prose blockquote.prompt-info {
+  position: relative;
+  padding: 2rem 1.125rem 0.75rem 1.625rem;
+  border: 1px solid var(--border);
+  border-left: 0;
+  background: var(--card);
+  color: var(--fg);
+}
+.prose blockquote.prompt-tip::before,
+.prose blockquote.prompt-info::before {
+  content: 'TIP';
+  position: absolute;
+  top: 0.5rem;
+  left: 1.625rem;
+  font: var(--fw-semibold) var(--text-2xs)/1 var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  color: var(--accent);
+}
+.prose blockquote.prompt-info::before {
+  content: 'INFO';
+  color: var(--sage);
+}
+.prose blockquote.prompt-tip::after,
+.prose blockquote.prompt-info::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.625rem;
+  background: repeating-linear-gradient(-45deg, var(--accent) 0 0.25rem, transparent 0.25rem 0.5rem);
+  opacity: 0.85;
+}
+.prose blockquote.prompt-info::after {
+  background: repeating-linear-gradient(-45deg, var(--sage) 0 0.25rem, transparent 0.25rem 0.5rem);
+}
+.prose table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border-strong);
+  font-size: var(--text-sm);
+}
+.prose thead th {
+  padding: 0.5rem 0.875rem;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-bottom: 2px solid var(--accent);
+  border-right: 1px solid var(--border);
+  font: var(--fw-semibold) var(--text-2xs)/1.4 var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--fg);
+}
+.prose tbody td {
+  padding: 0.5rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.prose tbody tr:last-child td {
+  border-bottom: 0;
+}
+.prose th:last-child,
+.prose td:last-child {
+  border-right: 0;
+}
+.prose tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--fg) 3%, transparent);
+}
+.prose tbody tr {
+  transition: background 0.15s var(--ease);
+}
+.prose tbody tr:hover {
+  background: var(--accent-soft);
+}
+.prose figure.reg {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1.4em auto;
+}
+.prose figure.reg img.custom-img {
+  display: block;
+  margin: 0;
+}
+.prose figure.reg::before,
+.prose figure.reg::after {
+  content: '';
+  position: absolute;
+  inset: -0.375rem;
+  pointer-events: none;
+  --m: 0.75rem;
+}
+.prose figure.reg::before {
+  background:
+    linear-gradient(var(--accent), var(--accent)) top left / var(--m) 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) top left / 2px var(--m) no-repeat,
+    linear-gradient(var(--accent), var(--accent)) bottom right / var(--m) 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) bottom right / 2px var(--m) no-repeat;
+}
+.prose figure.reg::after {
+  background:
+    linear-gradient(var(--fg-faint), var(--fg-faint)) top right / var(--m) 1px no-repeat,
+    linear-gradient(var(--fg-faint), var(--fg-faint)) top right / 1px var(--m) no-repeat,
+    linear-gradient(var(--fg-faint), var(--fg-faint)) bottom left / var(--m) 1px no-repeat,
+    linear-gradient(var(--fg-faint), var(--fg-faint)) bottom left / 1px var(--m) no-repeat;
+}
+.doc-page .prose h2 {
+  position: relative;
+}
+.doc-page .prose h2::before {
+  content: '';
+  display: block;
+  width: 1.5rem;
+  height: 0.1875rem;
+  margin-bottom: 0.5rem;
+  background: var(--accent);
+}
+.prose img.zoomable {
+  cursor: zoom-in;
+}
+/*
+ * Light text on dark looks heavier, which erases the regular / bold difference: body text is lighter and dimmer;
+ * bold and headings keep full brightness at an explicit 700.
+ */
+.prose strong,
+.prose b {
+  font-weight: 700; /* Explicit: avoids `bolder` resolving to 400 relative to the lighter body weight */
+}
+:root[data-theme='dark'] .prose {
+  font-weight: 370;
+  color: color-mix(in srgb, var(--fg) 86%, var(--bg));
+}
+:root[data-theme='dark'] .prose :is(strong, b, h1, h2, h3, h4, h5, h6, th) {
+  color: var(--fg);
+}
+:root[data-theme='dark'] .prose a strong,
+:root[data-theme='dark'] .prose a b {
+  color: inherit;
+}
+:root[data-theme='dark'] .prose :is(h1, h2, h3, h4, h5, h6) {
+  font-weight: var(--fw-semibold);
+}
+:root[data-theme='dark'] .prose :is(th) {
+  font-weight: var(--fw-semibold);
+}

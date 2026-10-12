@@ -1,0 +1,176 @@
+html.lb-open {
+  overflow: hidden;
+}
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  background: rgba(10, 8, 6, 0.92);
+  color: #f2ebe0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s var(--ease);
+  touch-action: none;
+  user-select: none;
+}
+.lightbox.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.lb-stage {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  cursor: zoom-in;
+  touch-action: none;
+}
+.lightbox.zoomed .lb-stage {
+  cursor: grab;
+}
+.lightbox.dragging .lb-stage {
+  cursor: grabbing;
+}
+.lb-img {
+  grid-area: 1 / 1;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  will-change: transform, opacity;
+  box-shadow: 0 0.375rem 1.25rem rgba(0, 0, 0, 0.45);
+  -webkit-user-drag: none;
+}
+.lightbox .cap {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.875rem;
+  padding: 0.5rem 1rem 1rem;
+  font-size: var(--text-sm);
+  text-align: center;
+}
+.lightbox .cap .counter {
+  font: var(--fw-semibold) var(--text-xs) var(--font-mono);
+  letter-spacing: var(--tracking-wide);
+  color: var(--accent);
+}
+.lb-tools {
+  position: absolute;
+  top: 0.875rem;
+  right: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.25rem;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(0.75rem);
+  -webkit-backdrop-filter: blur(0.75rem);
+  clip-path: polygon(0 0, calc(100% - 0.5rem) 0, 100% 0.5rem, 100% 100%, 0.5rem 100%, 0 calc(100% - 0.5rem));
+}
+.lb-tools button,
+.lightbox .prev,
+.lightbox .next {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  min-width: 2.125rem;
+  height: 2.125rem;
+  padding: 0 0.5rem;
+  font: var(--fw-medium) var(--text-md) var(--font-mono);
+  color: #f2ebe0;
+  cursor: pointer;
+  transition:
+    background 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+.lb-tools button:hover,
+.lb-tools button:focus-visible,
+.lightbox .prev:hover,
+.lightbox .next:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--accent);
+}
+.lb-tools .lb-reset {
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
+}
+.lb-level {
+  min-width: 3rem;
+  text-align: center;
+  font: var(--fw-medium) var(--text-xs) var(--font-mono);
+  color: rgba(242, 235, 224, 0.7);
+}
+.lightbox .prev,
+.lightbox .next {
+  position: absolute;
+  top: 50%;
+  width: 2.75rem;
+  height: 3.5rem;
+  margin-top: -2.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 1.5rem;
+}
+.lightbox .prev {
+  left: 0.875rem;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0.5rem 100%, 0 calc(100% - 0.5rem));
+}
+.lightbox .next {
+  right: 0.875rem;
+  clip-path: polygon(0 0, calc(100% - 0.5rem) 0, 100% 0.5rem, 100% 100%, 0 100%);
+}
+@media (max-width: 640px) {
+  .lb-slide {
+    padding: 3.25rem 2.25rem 0.25rem;
+  }
+  .lightbox .prev,
+  .lightbox .next {
+    display: none;
+  }
+}
+.lb-track {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.lb-slide {
+  --x: 0px;
+  --s: 1;
+  --o: 1;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  /* Explicit single-cell track: max-height: 100% on the image only resolves against the slide height this way (portrait images do not break the stage) */
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  padding: 3.5rem clamp(4.5rem, 11vw, 9rem) 0.5rem;
+  transform: translate3d(var(--x), 0, 0) scale(var(--s));
+  opacity: var(--o);
+  will-change: transform, opacity;
+}
+.lb-slide.nb {
+  --s: 0.92;
+  --o: 0.4;
+}
+.lightbox.zoomed .lb-slide.nb {
+  opacity: 0 !important;
+}
+.lightbox.lb-snap .lb-track {
+  transition: transform 0.38s cubic-bezier(0.22, 0.9, 0.24, 1);
+}
+.lightbox.lb-snap .lb-slide {
+  transition:
+    opacity 0.38s cubic-bezier(0.22, 0.9, 0.24, 1),
+    transform 0.38s cubic-bezier(0.22, 0.9, 0.24, 1);
+}
+.lb-slide.nb .lb-img {
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  .lb-slide {
+    padding: 3.25rem 2.25rem 0.25rem;
+  }
+}

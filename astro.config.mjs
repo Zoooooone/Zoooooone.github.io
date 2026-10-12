@@ -1,16 +1,29 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { unified } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkExtras from './src/plugins/remark-extras.mjs';
 
-// https://astro.build/config
 export default defineConfig({
   site: 'https://zoooooone.github.io',
   trailingSlash: 'always',
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
+  redirects: {
+    '/page2/': '/',
+    '/page3/': '/',
+    '/page4/': '/',
+    '/page5/': '/',
+  },
+  vite: {
+    // mermaid is imported on demand in pages, so the dev server does not discover it up front. Without pre-bundling it,
+    // the first use triggers a re-optimize ("Outdated Optimize Dep") and diagrams do not render (dev only).
+    optimizeDeps: {
+      include: ['mermaid', 'katex', '@waline/client', '@waline/client/pageview'],
+    },
+  },
   markdown: {
-    remarkPlugins: [remarkMath, remarkExtras],
-    rehypePlugins: [rehypeKatex],
+    processor: unified({ remarkPlugins: [remarkMath, remarkExtras], rehypePlugins: [rehypeKatex] }),
     shikiConfig: {
       themes: { light: 'github-light', dark: 'github-dark-dimmed' },
       defaultColor: false,

@@ -1,0 +1,138 @@
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(1.25rem) saturate(1.45);
+  -webkit-backdrop-filter: blur(1.25rem) saturate(1.45);
+  box-shadow: var(--shadow);
+}
+.sheet {
+  --glass: var(--card);
+  width: 100%;
+  min-height: calc(100vh - 1.75rem);
+  padding: 2.5rem 2.75rem 4.5rem;
+  border-radius: 1.625rem;
+  /* Translucent so the wallpaper shows through. No backdrop-filter: on a panel this tall it is tiled
+     and shows a one-frame seam when the page transition starts. */
+  background: color-mix(in srgb, var(--bg) calc(var(--sheet-alpha) * 100%), transparent);
+  box-shadow: var(--shadow);
+}
+.frame,
+.sheet,
+.rail {
+  --c: var(--cut);
+  --hair: var(--border-strong);
+  --panel-clip: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c), 100% 100%, var(--c) 100%, 0 calc(100% - var(--c)));
+  clip-path: var(--panel-clip);
+}
+.cut-s {
+  --c: var(--cut-s);
+}
+.frame,
+.sheet {
+  position: relative;
+}
+.frame::before,
+.sheet::before,
+.rail::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  --m: 1.125rem;
+  background:
+    linear-gradient(var(--accent), var(--accent)) top left / var(--m) 0.125rem no-repeat,
+    linear-gradient(var(--accent), var(--accent)) top left / 0.125rem var(--m) no-repeat,
+    linear-gradient(var(--fg-faint), var(--fg-faint)) bottom right / var(--m) 1px no-repeat,
+    linear-gradient(var(--fg-faint), var(--fg-faint)) bottom right / 1px var(--m) no-repeat;
+  transition: background-size 0.35s var(--ease);
+}
+a.frame:hover::before,
+.frame:hover::before {
+  --m: 2.125rem;
+}
+.frame::after,
+.sheet::after,
+.rail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: var(--hair);
+  transition: background 0.25s var(--ease);
+  clip-path: polygon(
+    evenodd,
+    0 0,
+    calc(100% - var(--c)) 0,
+    100% var(--c),
+    100% 100%,
+    var(--c) 100%,
+    0 calc(100% - var(--c)),
+    0 0,
+    1px 1px,
+    calc(100% - var(--c) - 0.414px) 1px,
+    calc(100% - 1px) calc(var(--c) + 0.414px),
+    calc(100% - 1px) calc(100% - 1px),
+    calc(var(--c) + 0.414px) calc(100% - 1px),
+    1px calc(100% - var(--c) - 0.414px),
+    1px 1px
+  );
+}
+a.frame:hover::after,
+a.frame:focus-visible::after {
+  background: var(--accent);
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 2rem;
+  margin: -1rem -1.125rem 0.875rem;
+  padding: 0.4rem 1.125rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+  font: var(--fw-medium) var(--text-2xs)/1.4 var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.panel-head .idx {
+  color: var(--accent);
+}
+.panel-head .grow {
+  flex: 1;
+}
+.panel-head .led {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  background: var(--sage);
+  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--sage) 25%, transparent);
+  animation: led 2.4s steps(2, end) infinite;
+}
+/*
+ * The chamfered outline has 6 vertices, so the start frame needs 6 as well for point-by-point interpolation.
+ * A different vertex count degrades into a half-way jump that looks like no entrance animation at all.
+ */
+@keyframes wipe-panel {
+  from {
+    clip-path: polygon(0 0, 0 0, 0 0, 0 100%, 0 100%, 0 100%);
+  }
+  to {
+    clip-path: var(--panel-clip);
+  }
+}
+.frame.wipe,
+.sheet.wipe {
+  animation-name: wipe-panel;
+}
+@media (max-width: 860px) {
+  .sheet {
+    min-height: 0;
+    padding: 1.5rem 1rem 3.5rem;
+    border-radius: 1.25rem;
+  }
+}
+.panel-head.flush {
+  margin: 0;
+}

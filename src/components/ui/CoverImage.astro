@@ -1,0 +1,26 @@
+---
+import { thumb } from '@/lib/assets/thumb';
+import type { CoverLayout } from '@/lib/assets/cover';
+
+interface Props {
+  src: string;
+  layout: CoverLayout;
+  position?: string;
+  alt?: string;
+  width?: 800 | 1600;
+  eager?: boolean;
+}
+
+const { src, layout, position = 'center', alt = '', width = 1600, eager = false } = Astro.props;
+---
+
+<span class:list={['cover-img', `fit-${layout.fit}`]} style={`--pos:${position}`}>
+  {layout.fit === 'contain' && <i class="cover-bg" style={`background-image:url('${thumb(src, 800)}')`} />}
+  <img
+    src={thumb(src, width)}
+    alt={alt}
+    decoding="async"
+    loading={eager ? undefined : 'lazy'}
+    fetchpriority={eager ? 'high' : undefined}
+  />
+</span>

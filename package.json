@@ -6,18 +6,55 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
+    "thumbs": "node scripts/make-thumbs.mjs",
+    "dev": "node scripts/make-thumbs.mjs && astro dev",
+    "build": "node scripts/make-thumbs.mjs && node scripts/check-contrast.mjs && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:links": "node scripts/check-links.mjs",
+    "typecheck": "astro check",
+    "lint": "eslint . --max-warnings=0",
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "knip": "knip",
+    "verify": "pnpm format:check && pnpm lint && pnpm lint:css && pnpm typecheck && pnpm knip && pnpm build && pnpm check:links",
+    "prepare": "husky"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.2",
+    "@astrojs/rss": "^4.0.19",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/noto-sans-sc": "^5.3.0",
+    "@waline/client": "^3.16.0",
     "astro": "^7.3.8",
     "katex": "^0.19.0",
     "mermaid": "^12.1.0",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "unist-util-visit": "^5.1.0"
-  }
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "globals": "^17.13.0",
+    "husky": "^9.1.7",
+    "knip": "^6.41.0",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.1",
+    "sharp": "^0.35.5",
+    "simple-icons": "^16.34.0",
+    "stylelint": "^17.16.0",
+    "stylelint-config-recommended": "^18.0.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1"
+  },
+  "packageManager": "pnpm@12.11.2"
 }
