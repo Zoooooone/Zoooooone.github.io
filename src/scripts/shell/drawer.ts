@@ -1,9 +1,11 @@
+import { setScrollLock } from '@/scripts/core/scroll-lock';
+
 const root = document.documentElement;
 const btn = () => document.getElementById('m-menu');
 const isOpen = () => root.classList.contains('nav-open');
 
 function setOpen(open: boolean, restoreFocus = true) {
-  root.classList.toggle('nav-open', open);
+  setScrollLock('nav-open', open);
   const b = btn();
   b?.setAttribute('aria-expanded', String(open));
   b?.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');

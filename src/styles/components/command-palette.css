@@ -1,5 +1,6 @@
 html.cmdk-open {
   overflow: hidden;
+  padding-right: var(--scrollbar-w, 0);
 }
 .cmdk {
   position: fixed;

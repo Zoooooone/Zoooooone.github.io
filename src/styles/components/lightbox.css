@@ -1,5 +1,6 @@
 html.lb-open {
   overflow: hidden;
+  padding-right: var(--scrollbar-w, 0);
 }
 .lightbox {
   position: fixed;

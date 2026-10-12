@@ -267,6 +267,7 @@
   }
   html.nav-open {
     overflow: hidden;
+    padding-right: var(--scrollbar-w, 0);
   }
   .m-scrim {
     display: block;
