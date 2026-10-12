@@ -4,10 +4,6 @@
   "ignoreDependencies": [
     "@fontsource-variable/inter",
     "@fontsource-variable/jetbrains-mono",
-    "@fontsource-variable/noto-sans-sc",
-    "@astrojs/check",
-    "@commitlint/cli",
-    "husky",
-    "lint-staged"
+    "@fontsource-variable/noto-sans-sc"
   ]
 }

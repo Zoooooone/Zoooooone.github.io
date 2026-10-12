@@ -26,7 +26,7 @@ Astro 7 · TypeScript · 原生 CSS(不使用框架) · Waline · KaTeX · Merma
 ```bash
 pnpm install
 pnpm dev       # http://localhost:4321
-pnpm verify    # 格式、ESLint、类型检查、knip、构建与链接检查
+pnpm verify    # 格式、ESLint、类型检查、单元与浏览器测试、构建与链接检查
 ```
 
 ## 目录结构

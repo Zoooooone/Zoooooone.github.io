@@ -34,3 +34,7 @@ audio-upload/
 
 # editor settings
 .vscode/
+
+# test output
+test-results/
+playwright-report/

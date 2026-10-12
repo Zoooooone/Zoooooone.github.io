@@ -26,7 +26,7 @@ Requires Node.js 22.12 or later and pnpm.
 ```bash
 pnpm install
 pnpm dev       # http://localhost:4321
-pnpm verify    # format, lint, type-check, knip, build and link check
+pnpm verify    # format, lint, type-check, unit + browser tests, build and link check
 ```
 
 ## Project layout
