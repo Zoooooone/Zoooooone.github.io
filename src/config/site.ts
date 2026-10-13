@@ -2,7 +2,7 @@ export const site = {
   title: "Zone's blog",
   tagline: 'Daily life records and study notes.',
   author: 'Zone',
-  bio: '机器学习工程师 · 记录日常，也整理学习笔记',
+  bio: '全栈 AI 工程师 · 记录日常，也整理学习笔记',
   avatar: '/assets/img/favicons/android-chrome-512x512.png',
   avatarSmall: '/assets/img/favicons/android-chrome-192x192.png',
   github: 'https://github.com/Zoooooone',

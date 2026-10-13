@@ -171,3 +171,17 @@
     grid-column: 2;
   }
 }
+
+.about-details {
+  margin: 1.25rem 0;
+}
+.about-details > summary {
+  width: fit-content;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
+}
+.about-details > summary:hover,
+.about-details[open] > summary {
+  color: var(--fg);
+}

@@ -3,74 +3,112 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHead from '@/components/ui/PageHead.astro';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { site } from '@/config';
 import { icons } from '@/lib/icons';
-import * as si from 'simple-icons';
-import { newestFirst } from '@/scripts/shell/player/playlist';
+import { siLeetcode } from 'simple-icons';
+import { newestFirst, type Track } from '@/scripts/shell/player/playlist';
 
-const tracks: { name: string; artist: string }[] = newestFirst(
-  JSON.parse(readFileSync(join(process.cwd(), 'public/assets/audio/playlist/playlist1.json'), 'utf8')),
+const tracks = newestFirst(
+  JSON.parse(readFileSync(join(process.cwd(), 'public/assets/audio/playlist/playlist1.json'), 'utf8')) as Track[],
 );
 
-type Skill = { name: string; icon?: string };
-const skills: { group: string; items: Skill[] }[] = [
+const playableTracks = tracks.filter((track) => track.url);
+
+const panels = [
   {
-    group: 'Languages & Markup',
-    items: [
-      { name: 'Python', icon: 'siPython' },
-      { name: 'JavaScript', icon: 'siJavascript' },
-      { name: 'C/C++', icon: 'siCplusplus' },
-      { name: 'HTML5', icon: 'siHtml5' },
-      { name: 'CSS3', icon: 'siCss' },
-      { name: 'LaTeX', icon: 'siLatex' },
+    lang: 'zh',
+    locale: 'zh-CN',
+    about: '关于我',
+    intro: [
+      '我是 Zone，一个不太爱吃盐水鸭的南京人，现在在东京生活，是一名全栈 AI 工程师。',
+      '一个 INFJ，喜欢可爱的东西，平时玩原神、听音乐，也看短跑和足球。',
+      '这个博客放着不同阶段写下的东西。有些想法现在已经变了，有些喜欢的东西倒是一直没变。欢迎随便看看。',
     ],
+    games: '游戏',
+    gameGallery: '玩过的一些游戏',
+    music: '音乐',
+    videoHeading: '视频',
+    backgroundDetails: '教育与工作经历',
+    interests: [
+      '原神玩得比较多，高难挑战、音乐、剧情和世界观都喜欢。打高难会花不少时间排轴、练操作，也会把满意的录像剪成视频。',
+      '听了很多年的电子乐，最喜欢的电子音乐制作人是 Avicii。也听很多其他类型的音乐，原神 OST 的初级研究者，最近在系统整理曲目，找找不同曲子之间的联系。',
+    ],
+    playlist: '高频歌单',
+    playlistHint: '点击即可在顶部播放器中播放，换页也不会中断。',
+    pendingAudio: '音源待添加',
+    videos: ['Avicii 纪念剪辑', '原神爬塔：1 限定金到 20 层', '短跑混剪', '死亡搁浅：场景与音乐'],
+    sports: '看比赛',
+    races: [
+      '短跑主要看 100 米和 200 米，比赛之外也爱看技术分析、分段数据和选手人物志。北奥博尔特的 9.69 回头望月、东奥苏炳添的 9.83 一鸣惊人，是我最喜欢的两个瞬间。',
+      '2012 年开始看足球，一直是曼联球迷。',
+    ],
+    background: '经历与联系',
+    education: '教育',
+    experience: '工作经历',
+    present: '至今',
+    school: '南京外国语学校',
+    university: '东京大学',
+    bachelor: '本科 · 机械情报工学',
+    master: '硕士 · 智能机械情报学 · ISI Lab',
+    engineer: '全栈 AI 工程师',
+    assistant: '助教',
+    intern: '数据分析实习',
   },
   {
-    group: 'Machine Learning',
-    items: [
-      { name: 'PyTorch', icon: 'siPytorch' },
-      { name: 'TensorFlow', icon: 'siTensorflow' },
-      { name: 'scikit-learn', icon: 'siScikitlearn' },
-      { name: 'NumPy', icon: 'siNumpy' },
-      { name: 'pandas', icon: 'siPandas' },
-      { name: 'OpenCV', icon: 'siOpencv' },
+    lang: 'en',
+    locale: 'en',
+    about: 'About me',
+    intro: [
+      "I'm Zone, a Nanjing native who isn't particularly fond of salted duck. I now live in Tokyo and work as a full-stack AI engineer.",
+      'An INFJ who likes cute things. In my spare time, I play Genshin Impact, listen to music, and watch sprint races and football.',
+      "This blog has things I've written at different points in my life. Some of my views have changed; some of the things I like haven't. Feel free to look around.",
     ],
-  },
-  {
-    group: 'Engineering',
-    items: [
-      { name: 'FastAPI', icon: 'siFastapi' },
-      { name: 'React.js', icon: 'siReact' },
-      { name: 'Vite', icon: 'siVite' },
-      { name: 'Docker', icon: 'siDocker' },
-      { name: 'AWS' },
-      { name: 'Git', icon: 'siGit' },
-      { name: 'PostgreSQL', icon: 'siPostgresql' },
+    games: 'Games',
+    gameGallery: "Some games I've played",
+    music: 'Music',
+    videoHeading: 'Videos',
+    backgroundDetails: 'Education & work experience',
+    interests: [
+      "I play quite a bit of Genshin Impact and enjoy its combat challenges, music, story, and worldbuilding. For difficult challenges, I spend time planning rotations and practising execution, and sometimes edit recordings of runs I'm happy with into videos.",
+      "I've listened to electronic music for years, and Avicii is my favourite electronic music producer. I listen to plenty of other genres too. I'm a beginner at exploring Genshin's OSTs, and lately I've been organising the tracks and looking for connections between them.",
     ],
+    playlist: 'On repeat',
+    playlistHint: 'Click a track to play it in the player at the top. Playback continues when you change pages.',
+    pendingAudio: 'Audio coming soon',
+    videos: [
+      'Avicii tribute edit',
+      'Genshin tower challenge: floor 20 with one limited 5-star',
+      'Sprint montage',
+      'Death Stranding: scenes and music',
+    ],
+    sports: 'Watching sports',
+    races: [
+      "For sprinting, I mainly follow the 100 m and 200 m. I also enjoy technique breakdowns, split-time analysis, and profiles of athletes. Bolt looking back during his 9.69 in Beijing and Su Bingtian's breakthrough 9.83 in Tokyo are my two favourite moments.",
+      "I've watched football since 2012 and have been a Manchester United fan all along.",
+    ],
+    background: 'Background & contact',
+    education: 'Education',
+    experience: 'Work experience',
+    present: 'Present',
+    school: 'Nanjing Foreign Language School',
+    university: 'The University of Tokyo',
+    bachelor: 'Bachelor of Engineering · Mechano-Informatics',
+    master: 'Master of Engineering · Mechano-Informatics · ISI Lab',
+    engineer: 'Full-stack AI engineer',
+    assistant: 'Teaching Assistant',
+    intern: 'Data Analysis Intern',
   },
 ];
-const lookup = (k?: string) =>
-  k ? (si as unknown as Record<string, { path: string; hex: string } | undefined>)[k] : undefined;
-
+const videoIds = ['BV1d54y1Q7ts', 'BV1RdX9YUEK1', 'BV1ymeMekEs5', 'BV1REbtevEcC'];
 const links = [
-  {
-    name: 'GitHub',
-    href: 'https://github.com/Zoooooone',
-    desc: 'Open source projects and code portfolio',
-    stroke: 'github',
-  },
+  { name: 'GitHub', href: 'https://github.com/Zoooooone', icon: 'github', zh: '代码', en: 'Code' },
   {
     name: 'LinkedIn',
     href: 'https://www.linkedin.com/in/ziheng-chen-572356285/',
-    desc: 'Professional network and experience',
-    stroke: 'linkedin',
+    icon: 'linkedin',
+    zh: '经历',
+    en: 'Background',
   },
-  {
-    name: 'LeetCode',
-    href: 'https://leetcode.com/Zoooooone',
-    desc: 'Algorithm practice and problem solving',
-    fill: 'siLeetcode',
-  },
+  { name: 'LeetCode', href: 'https://leetcode.com/Zoooooone', icon: '', zh: '刷题', en: 'Practice' },
 ];
 ---
 
@@ -86,339 +124,151 @@ const links = [
     </button>
   </div>
 
-  <div class="prose about" data-panel="zh" lang="zh-CN">
-    <h2>个人标签</h2>
-    <ul>
-      <li>土生土长却不爱吃盐水鸭的假南京人</li>
-      <li>拥有漫长的12年日语学习经历，自我感觉日语比英语好的非典型留学生</li>
-      <li>本科在东京大学挣扎了4年，如今继续在本校挣扎着读研中</li>
-      <li>宅，但二次元浓度较低</li>
-      <li>万年不变 INFJ</li>
-      <li>完美主义（有时会过度）、高敏感、内耗大师，与这些特质带来的负面影响搏斗中</li>
-      <li>厌恶且畏惧冲突</li>
-      <li>意外地喜欢萌物</li>
-      <li>待补充 。。。</li>
-    </ul>
-
-    <h2>一些爱好</h2>
-    <h3>各种游戏</h3>
-    <p>曾痴迷过一段时间受苦横版过关类型（诸如空洞、蔚蓝），如今热衷于开放世界自由探索（没错说的就是你原神）。</p>
-    <div id="gallery-1" class="gallery" data-src="/assets/src/about_me/games/info.json"></div>
-
-    <h3>做饭</h3>
-    <p>
-      十分荣幸地从我厨艺高超的父母那里继承了一些天赋，从三年前的疫情初期我便开始了对于烹饪的探索。到如今，我完成了从手忙脚乱会把鸡蛋炒焦到可以变着花样把自己喂圆的蜕变。
-    </p>
-    <div id="gallery-2" class="gallery" data-src="/assets/src/about_me/foods/info.json"></div>
-
-    <h3>视频剪辑</h3>
-    <p>
-      一些三分钟热度，但也算是比较愉快的一次尝试，尽管现在再看曾经的作品会因为那些刻意的踩点而尴尬。如果要为自己停更而开脱的话，学业繁忙和抑制不住的完美主义倾向是很好的理由。
-    </p>
-    <iframe
-      class="embed-video"
-      src="https://player.bilibili.com/player.html?bvid=BV1d54y1Q7ts&autoplay=0"
-      allowfullscreen
-      loading="lazy"
-    ></iframe>
-    <p>
-      <strong>为自己最喜欢的DJ Avicii 制作的缅怀向视频</strong>
-    </p>
-    <iframe
-      class="embed-video"
-      src="https://player.bilibili.com/player.html?bvid=BV12e411W7nc&autoplay=0"
-      allowfullscreen
-      loading="lazy"
-    ></iframe>
-    <p>
-      <strong>你的名字 抒情向剪辑</strong>
-    </p>
-
-    <h3>音乐</h3>
-    <p>网易云音乐9年骨灰级用户，最喜欢的事情之一是听节奏感强的音乐快走，然后每一步踩中鼓点。音乐品味变化：</p>
-    <ul>
-      <li>
-        <strong>初高中时期：</strong> 节奏感强的电音、欧美流行乐
-      </li>
-      <li>
-        <strong>日本考学期 + 本科前期：</strong> 杂食阶段，只要是觉得好听的无论流派语言
-      </li>
-      <li>
-        <strong>疫情期 + 本科毕业年：</strong> 肝论文自闭阶段，治愈心灵的纯音乐赛高
-      </li>
-      <li>
-        <strong>现在：</strong> 节奏感强的电音（压马路专用）、治愈心灵的纯音乐
-      </li>
-    </ul>
-    <p>
-      <strong>高频歌单</strong>（点击即可在顶部播放器中播放，换页也不会中断）
-    </p>
-    <ol class="tracklist">
-      {tracks.map((t, i) => (
-        <li>
-          <button type="button" data-track={i}>
-            <span class="n">{String(i + 1).padStart(2, '0')}</span>
-            <span class="nm">{t.name}</span>
-            <span class="ar">{t.artist}</span>
-          </button>
-        </li>
+  {panels.map((p) => (
+    <div class="prose about" data-panel={p.lang} lang={p.locale} hidden={p.lang === 'en'}>
+      <h2>{p.about}</h2>
+      {p.intro.map((paragraph) => (
+        <p>{paragraph}</p>
       ))}
-    </ol>
 
-    <h3>写代码</h3>
-    <p>
-      会的语言不多，技术力也非常有待加强。这半年来接触了Leetcode以及技术博客，最初的目的自然是比较功利的，但不知不觉也坚持了一段时间，发现自己的确乐在其中，也确实学到了不少，算是一件比较令人高兴的事情。
-    </p>
+      <h2>{p.games}</h2>
+      <p>{p.interests[0]}</p>
+      <details class="about-details">
+        <summary>{p.gameGallery}</summary>
+        <div id={`about-games-${p.lang}`} class="gallery" data-src="/assets/src/about_me/games/info.json" />
+      </details>
 
-    <h3>一些其他的爱好</h3>
-    <p>包括一些相较于以前现在没那么关注的，以及客观原因丢了挺久的爱好。</p>
-    <ul>
-      <li>
-        看足球。对12 ~
-        18年间活跃的球星如数家珍，可惜如今熟悉的那些名字都逐渐淡出了舞台，新生代球员的名字渐渐叫不上来了，自己也快要达到作为足球运动员来说不再能被称为“小将”的年纪了。至于上场踢球，我想如果我把中学时期的生涯战绩说出来应该是相当重量级的：
-        <ul>
-          <li>司职中场，通过超远距离吊射攻破自家球门，帮助对手完成绝杀</li>
-          <li>司职门将，被对方前锋开球后超远距离吊射攻破球门，帮助对手完成绝杀</li>
-          <li>司职左后卫，全场仅1次触球</li>
+      <h2>{p.music}</h2>
+      <p>{p.interests[1]}</p>
+      <h3>{p.playlist}</h3>
+      <p>{p.playlistHint}</p>
+      <ol class="tracklist">
+        {tracks.map((t, i) => (
+          <li>
+            <button type="button" data-track={t.url ? playableTracks.indexOf(t) : undefined} disabled={!t.url}>
+              <span class="n">{String(i + 1).padStart(2, '0')}</span>
+              <span class="nm">{t.name}</span>
+              <span class="ar">{t.url ? t.artist : p.pendingAudio}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <h2>{p.sports}</h2>
+      {p.races.map((paragraph) => (
+        <p>{paragraph}</p>
+      ))}
+
+      <h2>{p.videoHeading}</h2>
+      {videoIds.map((id, i) => (
+        <>
+          <h3>{p.videos[i]}</h3>
+          <iframe
+            class="embed-video"
+            title={p.videos[i]}
+            src={`https://player.bilibili.com/player.html?bvid=${id}&autoplay=0`}
+            allowfullscreen
+            loading="lazy"
+          />
+        </>
+      ))}
+
+      <h2>{p.background}</h2>
+      <details class="about-details">
+        <summary>{p.backgroundDetails}</summary>
+        <h3>{p.education}</h3>
+        <ul class="cv">
+          <li>
+            <span class="when">2012.9 – 2018.6</span>
+            <div>
+              <a href="http://www.nfls.com.cn/" rel="noopener">
+                {p.school}
+              </a>
+            </div>
+          </li>
+          <li>
+            <span class="when">2019.4 – 2023.3</span>
+            <div>
+              <a href="https://www.u-tokyo.ac.jp/en/index.html" rel="noopener">
+                {p.university}
+              </a>
+              <small>
+                <a href="http://www.kikaib.t.u-tokyo.ac.jp/" rel="noopener">
+                  {p.bachelor}
+                </a>
+              </small>
+            </div>
+          </li>
+          <li>
+            <span class="when">2023.4 – 2025.3</span>
+            <div>
+              <a href="https://www.u-tokyo.ac.jp/en/index.html" rel="noopener">
+                {p.university}
+              </a>
+              <small>
+                <a href="http://www.isi.imi.i.u-tokyo.ac.jp/?lang=en" rel="noopener">
+                  {p.master}
+                </a>
+              </small>
+            </div>
+          </li>
         </ul>
-      </li>
-      <li>
-        弹吉他。曾经会弹古典吉他，也跟着网上教学视频依葫芦画瓢学了一点民谣，但自从留学后住宿条件不允许的缘故被迫荒废了。曾经忍受了不少痛苦磨出来的老茧也慢慢消退了下去，是好事也是坏事。
-      </li>
-    </ul>
-
-    <h2>关于未来</h2>
-    <h3>2024.1.1</h3>
-    <p>
-      说实话还是有些许迷茫与担忧，但很快找工作流程就要正式启动了，答案应该会在为之准备与进行的过程中不断迭代并最终得以收束吧。当然，找工作结束并不是一个句号，希望自己可以不断地吸取新知识，不懈地精进自己的技术。如果有空闲的精力也希望打破一些生活习惯上的定式，可以是阅读，也可以是走出去尝试一些新事物，以增进对于这个世界的理解。
-    </p>
-    <h3>2024.10.1</h3>
-    <p>
-      眼前首要的任务是完成毕业研究，给自己的学生时代画上一个句号。之后虽说还没有特别细致的规划，但大体有几个想要努力的方向。一是尽快适应社会人的身份并在工作中拓展并精进专业技能。二是尝试一些不一样的生活方式，这个比较宽泛，可以是一些新的兴趣爱好，新的人际关系之类。三是持续学习如何与自己相处，这个对我来说非常重要但也很不容易。总体来说都是相对长期的目标，不需要设定太多苛刻的时限要求，只需要明晰这些方向并一点点执行，这样不至于太过迷茫。
-    </p>
-    <h3>2025.5.24</h3>
-    <p>
-      现阶段依旧有很多想要做的事情，也有很多想要得到的，如果说好听点的话那就是有很强的内驱力。好在行动力相比起以前也更强了，对过于理想化的完美主义（拖延症）也逐渐能识别并控制。当下的阶段性目标是追求工作能力上的快速成长，具体来说便是不断拓宽自己的技术栈，同时学习团队协作的方式，找到属于自己的工作节奏，并在有余力时鼓起勇气多和优秀的人交流。当然，还有继续保持定期地更新技术内容和随想。
-    </p>
-  </div>
-
-  <div class="prose about" data-panel="en" lang="en" hidden>
-    <h2>About Me</h2>
-    <p>
-      I'm <strong>Ziheng Chen</strong>, a Machine Learning Engineer at
-      <a href="https://exawizards.com/" rel="noopener">
-        ExaWizards Inc.
-      </a>
-      , specializing in full-cycle AI project development including data pipelines, model development, MLOps, and cloud
-      deployment on AWS. I'm passionate about building scalable, data-driven solutions and continuously expanding my
-      expertise in end-to-end system design. Beyond machine learning, I'm also exploring full-stack development to
-      broaden my engineering capabilities.
-    </p>
-
-    <h2>Education</h2>
-    <ul class="cv">
-      <li>
-        <span class="when">2012.9 ~ 2018.6</span>
-        <div>
-          <a href="http://www.nfls.com.cn/" rel="noopener">
-            Nanjing Foreign Language School (NFLS)
-          </a>
-        </div>
-      </li>
-      <li>
-        <span class="when">2019.4 ~ 2023.3</span>
-        <div>
-          <a href="https://www.u-tokyo.ac.jp/en/index.html" rel="noopener">
-            The University of Tokyo
-          </a>
-          <small>
-            Bachelor of Engineering,
-            <a href="http://www.kikaib.t.u-tokyo.ac.jp/" rel="noopener">
-              Mechano-Informatics
+        <h3>{p.experience}</h3>
+        <ul class="cv">
+          <li>
+            <span class="when">2025.4 – {p.present}</span>
+            <div>
+              <a href="https://exawizards.com/" rel="noopener">
+                ExaWizards Inc.
+              </a>
+              <small>{p.engineer}</small>
+            </div>
+          </li>
+          <li>
+            <span class="when">2023.4 – 2025.4</span>
+            <div>
+              <a href="https://www.u-tokyo.ac.jp/en/index.html" rel="noopener">
+                {p.university}
+              </a>
+              <small>{p.assistant}</small>
+            </div>
+          </li>
+          <li>
+            <span class="when">2023.12</span>
+            <div>
+              <a href="https://www.ibm.com/jp-ja/about/subsidiaries/ise" rel="noopener">
+                IBM Systems Engineering Co., Ltd.
+              </a>
+              <small>{p.intern}</small>
+            </div>
+          </li>
+        </ul>
+      </details>
+      <ul class="link-list">
+        {links.map((link) => (
+          <li>
+            <a href={link.href} rel="noopener" target="_blank">
+              {link.icon ? (
+                <svg viewBox="0 0 24 24" class="stroke" aria-hidden="true">
+                  {(icons[link.icon] ?? []).map((path) => (
+                    <path d={path} />
+                  ))}
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d={siLeetcode.path} />
+                </svg>
+              )}
+              <strong>{link.name}</strong>
+              <span>{p.lang === 'zh' ? link.zh : link.en}</span>
             </a>
-          </small>
-        </div>
-      </li>
-      <li>
-        <span class="when">2023.4 ~ 2025.3</span>
-        <div>
-          <a href="https://www.u-tokyo.ac.jp/en/index.html" rel="noopener">
-            The University of Tokyo
-          </a>
-          <small>
-            Master of Engineering,
-            <a href="https://www.i.u-tokyo.ac.jp/" rel="noopener">
-              Information Science and Technology
-            </a>
-            ,
-            <a href="http://www.isi.imi.i.u-tokyo.ac.jp/?lang=en" rel="noopener">
-              ISI Lab
-            </a>
-          </small>
-        </div>
-      </li>
-    </ul>
-
-    <h2>Professional Experience</h2>
-    <ul class="cv">
-      <li>
-        <span class="when">Apr 2025 – Present</span>
-        <div>
-          <strong>Machine Learning Engineer</strong> ·{' '}
-          <a href="https://exawizards.com/" rel="noopener">
-            ExaWizards Inc.
-          </a>
-          <small>
-            Developing end-to-end AI solutions covering data engineering, model development, MLOps, and AWS cloud
-            deployment.
-          </small>
-        </div>
-      </li>
-      <li>
-        <span class="when">Apr 2023 – Apr 2025</span>
-        <div>
-          <strong>Teaching Assistant</strong> ·{' '}
-          <a href="https://www.u-tokyo.ac.jp/en/index.html" rel="noopener">
-            The University of Tokyo
-          </a>
-          <small>
-            Assisted in machine learning and programming courses, mentoring students in Python and deep learning
-            frameworks.
-          </small>
-        </div>
-      </li>
-      <li>
-        <span class="when">Dec 2023</span>
-        <div>
-          <strong>Data Scientist Intern</strong> ·
-          <a href="https://www.ibm.com/jp-ja/about/subsidiaries/ise" rel="noopener">
-            IBM Systems Engineering Co., Ltd.
-          </a>
-          <small>
-            Worked on machine learning projects using Python, gaining hands-on experience in data analysis and model
-            implementation.
-          </small>
-        </div>
-      </li>
-    </ul>
-
-    <h2>Research Focus</h2>
-    <dl class="kv">
-      <div>
-        <dt>Specialization</dt>
-        <dd>Machine Learning, Deep Learning</dd>
-      </div>
-      <div>
-        <dt>Research Areas</dt>
-        <dd>Multimodal Recognition, Computer Vision, Natural Language Processing, Audio Feature Extraction</dd>
-      </div>
-      <div>
-        <dt>Technical Skills</dt>
-        <dd>Python, PyTorch, TensorFlow, scikit-learn, OpenCV</dd>
-      </div>
-    </dl>
-
-    <h2>Technical Skills</h2>
-    <div class="skills">
-      {skills.map((g) => (
-        <section class="skill-group">
-          <h3>{g.group}</h3>
-          <ul>
-            {g.items.map((s) => {
-              const ico = lookup(s.icon);
-              return (
-                <li class="skill" style={ico ? `--brand:#${ico.hex}` : undefined}>
-                  {ico ? (
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d={ico.path} />
-                    </svg>
-                  ) : (
-                    <svg viewBox="0 0 24 24" class="stroke" aria-hidden="true">
-                      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z" />
-                    </svg>
-                  )}
-                  <span>{s.name}</span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+          </li>
+        ))}
+      </ul>
+      <p>
+        <a href="mailto:opitz4546@gmail.com">opitz4546@gmail.com</a>
+      </p>
     </div>
-
-    <h2>Professional Links</h2>
-    <ul class="link-list">
-      {links.map((l) => (
-        <li>
-          <a href={l.href} rel="noopener" target="_blank">
-            {l.stroke ? (
-              <svg viewBox="0 0 24 24" class="stroke" aria-hidden="true">
-                {(icons[l.stroke] ?? []).map((p) => (
-                  <path d={p} />
-                ))}
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d={lookup(l.fill)?.path} />
-              </svg>
-            )}
-            <strong>{l.name}</strong>
-            <span>{l.desc}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
-
-    <h2>Interests &amp; Hobbies</h2>
-    <dl class="kv">
-      <div>
-        <dt>Coding &amp; Open Source</dt>
-        <dd>Contributing to technical communities and building personal projects</dd>
-      </div>
-      <div>
-        <dt>Content Creation</dt>
-        <dd>Video editing and technical tutorial creation</dd>
-      </div>
-      <div>
-        <dt>Music</dt>
-        <dd>Classical and acoustic guitar playing</dd>
-      </div>
-      <div>
-        <dt>Sports</dt>
-        <dd>Football enthusiast and occasional player</dd>
-      </div>
-      <div>
-        <dt>Cooking</dt>
-        <dd>Exploring international cuisines and culinary techniques</dd>
-      </div>
-      <div>
-        <dt>Gaming</dt>
-        <dd>Strategy and simulation games</dd>
-      </div>
-    </dl>
-
-    <h2>Contact</h2>
-    <dl class="kv">
-      <div>
-        <dt>Email</dt>
-        <dd>
-          <a href="mailto:opitz4546@gmail.com">opitz4546@gmail.com</a>
-        </dd>
-      </div>
-      <div>
-        <dt>Location</dt>
-        <dd>Tokyo, Japan</dd>
-      </div>
-      <div>
-        <dt>LinkedIn</dt>
-        <dd>
-          <a href={site.links[1].href} rel="noopener" target="_blank">
-            Connect with me
-          </a>
-        </dd>
-      </div>
-    </dl>
-  </div>
+  ))}
 </BaseLayout>
 
 <script>
