@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { lyricIndexAt, parseLrc } from '@/scripts/shell/player/lrc';
 import { formatTime, isMode, nextMode, pickNext, trackUrl } from '@/scripts/shell/player/playlist';
+import { parseSaved } from '@/scripts/shell/player/store';
 
 describe('parseLrc', () => {
   it('reads timestamps and text, sorted by time', () => {
@@ -77,5 +78,27 @@ describe('playlist helpers', () => {
     expect(formatTime(0)).toBe('0:00');
     expect(formatTime(65.9)).toBe('1:05');
     expect(formatTime(Infinity)).toBe('0:00');
+  });
+});
+
+describe('parseSaved', () => {
+  it('keeps valid values', () => {
+    expect(parseSaved({ i: 3, t: 12.5, v: 0.4, m: 'shuffle' })).toEqual({ i: 3, t: 12.5, v: 0.4, m: 'shuffle' });
+  });
+
+  it('returns nothing for values that are not objects', () => {
+    for (const raw of [null, undefined, 7, 'x', true, []]) expect(parseSaved(raw)).toEqual({});
+  });
+
+  it('drops values of the wrong type or out of range', () => {
+    const saved = parseSaved({ i: -1, t: Number.NaN, v: 2, m: 'loop' });
+    expect(saved).toEqual({});
+    expect(parseSaved({ i: 1.5, t: -3, v: -0.1 })).toEqual({});
+    expect(parseSaved({ i: '2', t: '5', v: '0.5' })).toEqual({});
+  });
+
+  it('accepts the edges of the volume range', () => {
+    expect(parseSaved({ v: 0 })).toEqual({ v: 0 });
+    expect(parseSaved({ v: 1 })).toEqual({ v: 1 });
   });
 });

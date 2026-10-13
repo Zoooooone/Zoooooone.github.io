@@ -21,8 +21,15 @@ if (root && input && list) {
 
   const loadIndex = () => {
     loading ??= fetch('/search.json')
-      .then((r) => r.json() as Promise<Doc[]>)
-      .then((d) => (docs = d));
+      .then((r) => {
+        if (!r.ok) throw new Error(`search index: ${r.status}`);
+        return r.json() as Promise<Doc[]>;
+      })
+      .then((d) => (docs = d))
+      .catch((e) => {
+        loading = null;
+        throw e;
+      });
     return loading;
   };
 

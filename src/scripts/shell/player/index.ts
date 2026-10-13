@@ -59,7 +59,14 @@ function init(el: HTMLElement) {
     });
   };
 
-  const load = async (i: number, { play = false, at = 0 } = {}) => {
+  const fetchLyrics = async (t: Track & { lrc: string }) => {
+    try {
+      const text = await (await fetch(encodeURI(t.lrc))).text();
+      if (tracks[index] === t) lyrics = parseLrc(text);
+    } catch {}
+  };
+
+  const load = (i: number, { play = false, at = 0 } = {}) => {
     if (!tracks.length) return;
     index = (i + tracks.length) % tracks.length;
     const t = tracks[index];
@@ -80,13 +87,8 @@ function init(el: HTMLElement) {
     setMedia(t);
     save();
 
-    if (t.lrc) {
-      try {
-        const text = await (await fetch(encodeURI(t.lrc))).text();
-        if (tracks[index] === t) lyrics = parseLrc(text);
-      } catch {}
-    }
     if (play) void audio.play().catch(() => {});
+    if (t.lrc) void fetchLyrics({ ...t, lrc: t.lrc });
   };
 
   const panel = createPanel({

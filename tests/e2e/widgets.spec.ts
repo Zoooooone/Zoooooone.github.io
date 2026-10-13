@@ -68,6 +68,35 @@ test.describe('lightbox', () => {
 });
 
 test.describe('music player', () => {
+  test('a stored value that is not an object does not break the player', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('player', 'null'));
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).not.toHaveText('—');
+  });
+
+  test('playback starts without waiting for the lyrics', async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as unknown as { __plays: number };
+      w.__plays = 0;
+      HTMLMediaElement.prototype.play = function () {
+        w.__plays++;
+        return Promise.resolve();
+      };
+    });
+    await page.route('**/assets/audio/lrc/**', (route) =>
+      new Promise<void>((r) => setTimeout(r, 3000)).then(() => route.abort()),
+    );
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).not.toHaveText('—');
+
+    await page.locator('#player .pl-next').click();
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __plays: number }).__plays), { timeout: 1500 })
+      .toBeGreaterThan(0);
+  });
+
   test('loads the playlist, switches tracks and remembers the choice', async ({ page }) => {
     await page.goto('/');
     await ready(page);
@@ -127,6 +156,26 @@ test.describe('music player', () => {
 });
 
 test.describe('command palette', () => {
+  test('loads the search index again after a failed request', async ({ page }) => {
+    let failing = true;
+    await page.route('**/search.json', (route) =>
+      failing ? route.fulfill({ status: 500, body: 'no' }) : route.continue(),
+    );
+    await page.goto('/about/');
+    await ready(page);
+
+    await page.keyboard.press('Control+K');
+    await page.locator('#cmdk input').fill('waline');
+    await expect(page.locator('#cmdk .cmdk-status')).toHaveText('索引加载失败');
+
+    failing = false;
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Control+K');
+    await page.locator('#cmdk input').fill('waline');
+    await expect(page.locator('#cmdk .cmdk-status')).toHaveText(/RESULTS/);
+    await expect(page.locator('#cmdk .cmdk-item').first()).toBeVisible();
+  });
+
   test('lists the latest posts before typing and navigates with the keyboard', async ({ page }) => {
     await page.goto('/');
     await ready(page);
