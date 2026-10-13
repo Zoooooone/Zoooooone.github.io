@@ -37,7 +37,7 @@ image: /assets/img/2025-08-16-neon-migration/neon.png
 ### 2.创建数据库
 
 - 点击界面左侧菜单中的`SQL Editor`
-  <img src="/assets/img/2025-08-16-neon-migration/create.png" class="custom-img" alt="" />
+  <img src="/assets/img/2025-08-16-neon-migration/create.png" class="custom-img" alt="Neon 控制台的 SQL Editor 页面：当前分支为 development，历史记录中有创建表和启用向量扩展的语句" />
 - （可选）创建pgvector扩展
   ```sql
   CREATE EXTENSION IF NOT EXISTS vector;
@@ -92,9 +92,9 @@ pg_dump -h localhost -U <local_user> -d <local_db> \
 ### 4.将导出的数据导入到Neon数据库
 
 - 打开Neon的控制台，点击`Connect`
-  <img src="/assets/img/2025-08-16-neon-migration/connect.png" class="custom-img" alt="" />
+  <img src="/assets/img/2025-08-16-neon-migration/connect.png" class="custom-img" alt="Neon 的 Project Dashboard：右上角和“Connect to your database”卡片中都有 Connect 按钮" />
 - 选择`psql`，复制连接字符串
-  <img src="/assets/img/2025-08-16-neon-migration/connect-string.png" class="custom-img" alt="" />
+  <img src="/assets/img/2025-08-16-neon-migration/connect-string.png" class="custom-img" alt="Neon 的连接面板：选择 psql，显示 postgresql 连接字符串，密码已隐藏，可点击 Show password 或 Copy snippet" />
 - 在本地终端粘贴复制的连接字符串，并运行（下方命令仅为示例）
   ```bash
   psql "postgres://<neon_user>:<pwd>@<neon_host>/<neon_db>?sslmode=require&channel_binding=require"

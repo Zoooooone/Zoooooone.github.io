@@ -30,7 +30,7 @@ tags: [aws, terraform]
 - **存储**: 外部数据库 (PostgreSQL on Neon)
 - **日志与监控**: AWS CloudWatch
 
-<img src="/assets/img/2025-08-28-daily_fetch_aws/fetch.svg" class="custom-img" alt="" />
+<img src="/assets/img/2025-08-28-daily_fetch_aws/fetch.svg" class="custom-img" alt="AWS 架构图：EventBridge 触发定时任务，在 VPC 公有子网内的 Fargate 中运行，从 ECR 拉取容器镜像，把日志发送到 CloudWatch，并连接 PostgreSQL 服务器" />
 
 在每天的指定时刻，AWS EventBridge会触发一个事件，进而启动 AWS ECS中的容器任务。该任务会执行数据拉取的逻辑，并将结果存储到外部数据库中。同时，任务的执行日志和监控信息会发送到 AWS CloudWatch的日志组中。
 

@@ -240,15 +240,15 @@ Claude API 按 token 数量计费，主流模型价格如下（[官方定价](ht
 
 - 这是某次PR的SonarQube报告截图，通过SonarQube的质量报告，可以直观了解代码质量指标和趋势。
 
-  <img src="/assets/img/2025-10-21-code-quality-workflow/sonarqube.png" class="custom-img" alt="" />
+  <img src="/assets/img/2025-10-21-code-quality-workflow/sonarqube.png" class="custom-img" alt="GitHub PR 中 SonarQube Cloud 机器人的评论：Quality Gate passed，14 个新问题、0 个安全热点，新代码覆盖率和重复率均为 0.0%" />
 
   可以进一步查看具体的issue详情，SonarQube会指出代码中的潜在问题，例：
 
-  <img src="/assets/img/2025-10-21-code-quality-workflow/sonarqube_detail.png" class="custom-img" alt="" />
+  <img src="/assets/img/2025-10-21-code-quality-workflow/sonarqube_detail.png" class="custom-img" alt="SonarQube 的问题详情：一条可维护性问题（Medium），提示用 menu、ol 或 ul 代替 list role 以保证可访问性" />
 
 - 这是某次PR中Claude Code自动生成的审查评论，指出了当前代码中的潜在问题并能够提供改进建议。
 
-  <img src="/assets/img/2025-10-21-code-quality-workflow/claude.png" class="custom-img" alt="" />
+  <img src="/assets/img/2025-10-21-code-quality-workflow/claude.png" class="custom-img" alt="Claude Code 在 PR 中留下的审查评论：指出用 f-string 拼接 SQL 存在注入风险，建议改用 SQLAlchemy 的参数化查询" />
 
 ## 总结
 

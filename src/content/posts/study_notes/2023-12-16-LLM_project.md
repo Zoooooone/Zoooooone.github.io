@@ -127,7 +127,7 @@ print(response.content)
 
 项目开发流程示意图如下: 
 
-<img src="/assets/img/2023-12-16-LLM_project/dev_flow.svg" class="custom-img"/>
+<img alt="项目开发流程图：设计（明确需求、设计功能）、数据库搭建（整理文档、文本向量化、导入 Chroma 向量库）、核心功能实现（Prompt Engineering、流式回复、历史记录保存）、核心功能优化（捕捉 Bad Case、优化 Prompt）、前后端搭建（确认前端框架、文档上传、UI 设计）、部署测试与上线，最后进入迭代优化" src="/assets/img/2023-12-16-LLM_project/dev_flow.svg" class="custom-img"/>
 
 ### 项目框架
 

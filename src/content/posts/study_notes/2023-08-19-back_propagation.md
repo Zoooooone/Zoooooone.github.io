@@ -27,7 +27,7 @@ $$
 ## 双层神经网络
 ### 输出层为单个神经元
 <div style="text-align: center">
-<img src="/assets/img/2023-08-19-back_propagation/NN_2layers_1out.svg" class="custom-img"/>
+<img alt="单层神经网络示意图：输入 x1、x2……xn 分别经权重 w1、w2……wn 汇入神经元 u，再经函数 f 得到输出 ŷ" src="/assets/img/2023-08-19-back_propagation/NN_2layers_1out.svg" class="custom-img"/>
 </div>
 
 我们先用最简单的一个例子来探讨误差的反向传播是如何实现的。如上图所示，这是一个输入层有n个节点，输出层只有1个节点的双层神经网络。前向传播的过程如下: 
@@ -108,7 +108,7 @@ $$
 
 ### 输出层为多个神经元
 <div style="text-align: center">
-<img src="/assets/img/2023-08-19-back_propagation/NN_2layers_multi_out.svg" class="custom-img"/>
+<img alt="两层神经网络示意图：输入层的 m 个节点与输出层的 n 个节点两两相连，连接权重为 w_ji，输出层经函数 f 得到各个输出 ŷ" src="/assets/img/2023-08-19-back_propagation/NN_2layers_multi_out.svg" class="custom-img"/>
 </div>
 
 如上图所示，此时输出层的神经元节点个数从1个增加到了n个，那么对于权值矩阵中的权重下标我们这样定义: **前一层的节点$i$与后一层的节点$j$所对应的权重为**$\omega_{ji}$，也即$\mathbf{\omega_{后一层下标\to前一层下标}}$。那么对于这个权重，我们可以依照上一节的内容推导出它的更新方式，具体步骤如下：<br>
@@ -248,7 +248,7 @@ $$
 ## 三层神经网络
 在上述内容的基础上，我们可以尝试把神经网络从双层增加到三层了，也即**输入层、隐藏层和输出层**。其示意图如下。
 <div style="text-align: center">
-<img src="/assets/img/2023-08-19-back_propagation/NN_3layers.svg" class="custom-img"/>
+<img alt="三层神经网络示意图：输入层、隐藏层、输出层依次全连接，权重分别为 w_ji 和 w_kj，隐藏层经函数 f、输出层经函数 g 得到输出 ŷ" src="/assets/img/2023-08-19-back_propagation/NN_3layers.svg" class="custom-img"/>
 </div>
 
 ### 相关计算量定义
