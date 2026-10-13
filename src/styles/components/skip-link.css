@@ -1,0 +1,18 @@
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+  color: var(--fg);
+  font: var(--fw-medium) var(--text-sm) var(--font-sans);
+  transform: translateY(calc(-100% - 1rem));
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+main[tabindex='-1']:focus {
+  outline: none;
+}

@@ -1,3 +1,4 @@
+import { enterModal } from '@/scripts/core/modal';
 import { setScrollLock } from '@/scripts/core/scroll-lock';
 import { attachGestures } from './gestures';
 import { clamp, neighborDistances, panLimits, zoomAround, type Size } from './geometry';
@@ -187,9 +188,15 @@ export function createLightbox(cleanups: Array<() => void>) {
     }, SNAP_MS + 20);
   };
 
+  box.inert = true;
+  let leave: (() => void) | null = null;
+
   const close = () => {
     box.classList.remove('open');
+    box.inert = true;
     setScrollLock('lb-open', false);
+    leave?.();
+    leave = null;
   };
 
   attachGestures({
@@ -244,6 +251,7 @@ export function createLightbox(cleanups: Array<() => void>) {
     document.removeEventListener('keydown', onKey);
     window.removeEventListener('resize', onResize);
     setScrollLock('lb-open', false);
+    leave?.();
     box.remove();
   });
 
@@ -271,8 +279,11 @@ export function createLightbox(cleanups: Array<() => void>) {
       caption();
       upgradeToOriginal(s.cur, s.items[s.at]);
 
+      leave ??= enterModal(box);
+      box.inert = false;
       box.classList.add('open');
       setScrollLock('lb-open', true);
+      box.querySelector<HTMLElement>('.lb-close')?.focus({ preventScroll: true });
       if (!reduced()) {
         s.cur.img.animate(
           [

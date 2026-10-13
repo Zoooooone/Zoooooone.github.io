@@ -35,6 +35,8 @@ export function renderItems(list: HTMLElement, items: Item[], active: number, te
     const li = document.createElement('li');
     li.className = `cmdk-item${i === active ? ' on' : ''}`;
     li.setAttribute('role', 'option');
+    li.id = `cmdk-opt-${i}`;
+    li.setAttribute('aria-selected', String(i === active));
     li.dataset.i = String(i);
 
     const k = document.createElement('span');

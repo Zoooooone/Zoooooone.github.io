@@ -11,9 +11,22 @@ export function runProseImages(cleanups: Cleanup[]) {
   imgs.forEach((img, i) => {
     img.classList.add('zoomable');
     const open = () => lightbox.open(items, i);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      open();
+    };
+    img.tabIndex = 0;
+    img.setAttribute('role', 'button');
+    img.setAttribute('aria-label', img.alt ? `放大查看：${img.alt}` : '放大查看图片');
     img.addEventListener('click', open);
+    img.addEventListener('keydown', onKey);
     cleanups.push(() => {
       img.removeEventListener('click', open);
+      img.removeEventListener('keydown', onKey);
+      img.removeAttribute('tabindex');
+      img.removeAttribute('role');
+      img.removeAttribute('aria-label');
       img.classList.remove('zoomable');
     });
   });

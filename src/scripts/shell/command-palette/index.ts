@@ -1,4 +1,5 @@
 import { navigate } from 'astro:transitions/client';
+import { enterModal } from '@/scripts/core/modal';
 import { setScrollLock } from '@/scripts/core/scroll-lock';
 import { createCommands, docItem, G_LATEST, G_POSTS, matchCommands, type Item } from './commands';
 import { renderItems } from './render';
@@ -33,7 +34,11 @@ if (root && input && list) {
     return loading;
   };
 
-  const render = (terms: string[]) => renderItems(list, items, active, terms);
+  const render = (terms: string[]) => {
+    renderItems(list, items, active, terms);
+    if (active >= 0) input.setAttribute('aria-activedescendant', `cmdk-opt-${active}`);
+    else input.removeAttribute('aria-activedescendant');
+  };
   const openPost = (d: Doc) => () => go(`/posts/${d.id}/`);
 
   const update = async () => {
@@ -68,7 +73,10 @@ if (root && input && list) {
     render(terms);
   };
 
+  let leave: (() => void) | null = null;
+
   const open = () => {
+    leave ??= enterModal(root.querySelector<HTMLElement>('.cmdk-panel')!);
     root.hidden = false;
     setScrollLock('cmdk-open', true);
     input.value = '';
@@ -78,6 +86,8 @@ if (root && input && list) {
   const close = () => {
     root.hidden = true;
     setScrollLock('cmdk-open', false);
+    leave?.();
+    leave = null;
   };
 
   const choose = (i: number) => {
@@ -113,8 +123,12 @@ if (root && input && list) {
     if (!li) return;
     const i = Number(li.dataset.i);
     if (i === active) return;
-    list.querySelector('.on')?.classList.remove('on');
+    const previous = list.querySelector('.on');
+    previous?.classList.remove('on');
+    previous?.setAttribute('aria-selected', 'false');
     li.classList.add('on');
+    li.setAttribute('aria-selected', 'true');
+    input.setAttribute('aria-activedescendant', li.id);
     active = i;
   });
 

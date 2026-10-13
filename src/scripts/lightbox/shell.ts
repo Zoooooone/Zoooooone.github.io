@@ -15,6 +15,7 @@ export function createShell(): LightboxShell {
   box.className = 'lightbox';
   box.setAttribute('role', 'dialog');
   box.setAttribute('aria-modal', 'true');
+  box.setAttribute('aria-label', '图片查看');
   box.innerHTML = `
     <div class="lb-stage"><div class="lb-track"></div></div>
     <div class="cap"></div>

@@ -43,7 +43,16 @@ export async function runGalleries(cleanups: Cleanup[], isStale: () => boolean) 
           c.textContent = text;
           fig.append(c);
         }
-        fig.addEventListener('click', () => lightbox.open(items, i));
+        fig.tabIndex = 0;
+        fig.setAttribute('role', 'button');
+        fig.setAttribute('aria-label', `放大查看：${text || `第 ${i + 1} 张`}`);
+        const open = () => lightbox.open(items, i);
+        fig.addEventListener('click', open);
+        fig.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
+          open();
+        });
         el.append(fig);
       });
     } catch {

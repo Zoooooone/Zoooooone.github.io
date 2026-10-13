@@ -19,6 +19,7 @@
 @import './components/cover.css' layer(components);
 @import './components/comments.css' layer(components);
 @import './components/prose.css' layer(components);
+@import './components/skip-link.css' layer(components);
 @import './pages/post.css' layer(pages);
 @import './pages/home.css' layer(pages);
 @import './pages/lists.css' layer(pages);

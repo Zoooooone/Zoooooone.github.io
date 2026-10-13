@@ -12,12 +12,18 @@
         autocomplete="off"
         spellcheck="false"
         aria-label="搜索"
+        role="combobox"
+        aria-expanded="true"
+        aria-controls="cmdk-list"
+        aria-autocomplete="list"
       />
       <kbd>ESC</kbd>
     </div>
-    <ul class="cmdk-list" role="listbox"></ul>
+    <ul class="cmdk-list" id="cmdk-list" role="listbox" aria-label="搜索结果"></ul>
     <div class="cmdk-foot">
-      <span class="mono-label cmdk-status">COMMANDS</span>
+      <span class="mono-label cmdk-status" aria-live="polite">
+        COMMANDS
+      </span>
       <span class="mono-label">↑↓ 选择 · ↵ 打开 · ESC 关闭</span>
     </div>
   </div>
