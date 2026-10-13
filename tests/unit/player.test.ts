@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lyricIndexAt, parseLrc } from '@/scripts/shell/player/lrc';
+import { loadLyrics, lyricIndexAt, parseLrc } from '@/scripts/shell/player/lrc';
 import { formatTime, isMode, nextMode, pickNext, trackUrl } from '@/scripts/shell/player/playlist';
 import { parseSaved } from '@/scripts/shell/player/store';
 
@@ -100,5 +100,44 @@ describe('parseSaved', () => {
   it('accepts the edges of the volume range', () => {
     expect(parseSaved({ v: 0 })).toEqual({ v: 0 });
     expect(parseSaved({ v: 1 })).toEqual({ v: 1 });
+  });
+});
+
+describe('loadLyrics', () => {
+  const reply = (text: string, ok = true) => (async () => ({ ok, text: async () => text }) as Response) as typeof fetch;
+
+  it('returns the parsed lyrics while the track is still current', async () => {
+    const lyrics = await loadLyrics('/a.lrc', () => true, reply('[00:01.00]one\n[00:02.00]two'));
+    expect(lyrics).toEqual([
+      { t: 1, text: 'one' },
+      { t: 2, text: 'two' },
+    ]);
+  });
+
+  it('drops lyrics that arrive after the track has changed', async () => {
+    let current = true;
+    const fetcher = (async () => {
+      current = false;
+      return { ok: true, text: async () => '[00:01.00]late' } as Response;
+    }) as typeof fetch;
+    expect(await loadLyrics('/a.lrc', () => current, fetcher)).toBeNull();
+  });
+
+  it('gives nothing for a missing file or a failed request', async () => {
+    expect(await loadLyrics('/a.lrc', () => true, reply('not found', false))).toBeNull();
+    const failing = (async () => {
+      throw new Error('offline');
+    }) as typeof fetch;
+    expect(await loadLyrics('/a.lrc', () => true, failing)).toBeNull();
+  });
+
+  it('encodes the address it requests', async () => {
+    let requested = '';
+    const fetcher = (async (input: RequestInfo | URL) => {
+      requested = String(input);
+      return { ok: true, text: async () => '' } as Response;
+    }) as typeof fetch;
+    await loadLyrics('/audio/κ song.lrc', () => true, fetcher);
+    expect(requested).toBe(encodeURI('/audio/κ song.lrc'));
   });
 });

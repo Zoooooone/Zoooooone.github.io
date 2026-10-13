@@ -1,6 +1,6 @@
 import { audioBase } from '@/config/site';
 import { thumb } from '@/lib/assets/thumb';
-import { lyricIndexAt, parseLrc, type Lyric } from './lrc';
+import { loadLyrics, lyricIndexAt, type Lyric } from './lrc';
 import { createPanel } from './panel';
 import { formatTime, isMode, nextMode, pickNext, trackUrl, type Mode, type Track } from './playlist';
 import { readSaved, writeSaved } from './store';
@@ -59,13 +59,6 @@ function init(el: HTMLElement) {
     });
   };
 
-  const fetchLyrics = async (t: Track & { lrc: string }) => {
-    try {
-      const text = await (await fetch(encodeURI(t.lrc))).text();
-      if (tracks[index] === t) lyrics = parseLrc(text);
-    } catch {}
-  };
-
   const load = (i: number, { play = false, at = 0 } = {}) => {
     if (!tracks.length) return;
     index = (i + tracks.length) % tracks.length;
@@ -88,7 +81,11 @@ function init(el: HTMLElement) {
     save();
 
     if (play) void audio.play().catch(() => {});
-    if (t.lrc) void fetchLyrics({ ...t, lrc: t.lrc });
+    if (t.lrc) {
+      void loadLyrics(t.lrc, () => tracks[index] === t).then((found) => {
+        if (found) lyrics = found;
+      });
+    }
   };
 
   const panel = createPanel({

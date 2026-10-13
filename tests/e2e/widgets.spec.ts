@@ -75,6 +75,31 @@ test.describe('music player', () => {
     await expect(page.locator('#player .pl-title')).not.toHaveText('—');
   });
 
+  test('the lyrics of the current track are shown once they arrive', async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(HTMLMediaElement.prototype, 'currentTime', {
+        get: () => 2,
+        set: () => {},
+        configurable: true,
+      });
+    });
+    await page.route('**/assets/audio/lrc/**', (route) =>
+      route.fulfill({ contentType: 'text/plain', body: '[00:01.00]first line\n[00:05.00]second line' }),
+    );
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).not.toHaveText('—');
+
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          document.querySelector('#player audio')!.dispatchEvent(new Event('timeupdate'));
+          return document.querySelector('#player .pl-lyric')!.textContent;
+        }),
+      )
+      .toBe('first line');
+  });
+
   test('playback starts without waiting for the lyrics', async ({ page }) => {
     await page.addInitScript(() => {
       const w = window as unknown as { __plays: number };
