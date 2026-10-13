@@ -72,3 +72,37 @@ test.describe('bottom bar', () => {
     await expect(html).not.toHaveAttribute('data-player-sheet', '');
   });
 });
+
+test.describe('volume on phones', () => {
+  const startPlayer = (page: import('@playwright/test').Page) =>
+    page.evaluate(() => document.getElementById('player')!.setAttribute('data-started', '1'));
+
+  test('the bar has a mute button and the sheet a slider', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('.topbar .pl-mute')).toBeHidden();
+    await startPlayer(page);
+    await expect(page.locator('.topbar .pl-mute')).toBeVisible();
+    await expect(page.locator('.topbar .pl-vol-top')).toBeHidden();
+
+    await page.locator('.topbar .pl-expand').click();
+    await expect(page.locator('.topbar .pl-vol-top')).toBeVisible();
+    await page.locator('.topbar .pl-vol-top').fill('0.3');
+    expect(await page.evaluate(() => document.querySelector('audio')!.volume)).toBeCloseTo(0.3, 1);
+  });
+
+  test('where the volume cannot be set, only the mute button remains', async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(HTMLMediaElement.prototype, 'volume', { get: () => 1, set: () => {}, configurable: true });
+    });
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('html')).toHaveAttribute('data-volume-fixed', '');
+    await startPlayer(page);
+    await expect(page.locator('.topbar .pl-mute')).toBeVisible();
+
+    await page.locator('.topbar .pl-expand').click();
+    await expect(page.locator('.topbar .pl-vol-top')).toBeHidden();
+    await expect(page.locator('.topbar .pl-next')).toBeVisible();
+  });
+});

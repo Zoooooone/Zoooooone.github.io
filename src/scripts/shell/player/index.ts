@@ -4,6 +4,7 @@ import { lyricIndexAt, parseLrc, type Lyric } from './lrc';
 import { createPanel } from './panel';
 import { formatTime, isMode, nextMode, pickNext, trackUrl, type Mode, type Track } from './playlist';
 import { readSaved, writeSaved } from './store';
+import { canSetVolume } from './volume';
 
 const PLAYLIST = '/assets/audio/playlist/playlist1.json';
 /** Show a lyric line slightly early so it is on screen when it is sung. */
@@ -217,6 +218,7 @@ function init(el: HTMLElement) {
   }
 
   const saved = readSaved();
+  if (!canSetVolume(audio)) document.documentElement.setAttribute('data-volume-fixed', '');
   audio.volume = typeof saved.v === 'number' ? saved.v : DEFAULT_VOLUME;
   vols.forEach((v) => (v.value = String(audio.volume)));
   if (isMode(saved.m)) mode = saved.m;
