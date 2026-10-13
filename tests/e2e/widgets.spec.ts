@@ -1,4 +1,4 @@
-import { expect, ready, test } from './fixtures';
+import { expect, mockPlayerMedia, navigate, ready, test } from './fixtures';
 
 test.describe('lightbox', () => {
   test('zooms with the keyboard and the wheel, and pages with the arrow keys', async ({ page }) => {
@@ -68,6 +68,163 @@ test.describe('lightbox', () => {
 });
 
 test.describe('music player', () => {
+  test('skips songs awaiting audio and uses the newest available song if the default is absent', async ({ page }) => {
+    await mockPlayerMedia(page);
+    await page.route('**/playlist1.json', async (route) => {
+      const response = await route.fetch();
+      const tracks = (await response.json()).filter((track: { url: string }) => track.url !== 'space-walk.mp3');
+      await route.fulfill({
+        json: [{ name: 'Awaiting audio', artist: '', url: '', addedAt: '2026-10-14' }, ...tracks],
+      });
+    });
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).toHaveText('Dear Boy (Avicii by Avicii)');
+    await expect(page.locator('#player')).toHaveClass(/playing/);
+    await page.locator('#player .pl-listbtn').click();
+    await expect(page.locator('#pl-panel .pl-list button')).toHaveCount(9);
+    await expect(page.locator('#pl-panel')).not.toContainText('Awaiting audio');
+    await page.keyboard.press('Escape');
+    await page.locator('#player .pl-next').click();
+    await expect(page.locator('#player .pl-title')).toHaveText('势若风雷 Irresistible Force');
+  });
+
+  test('autoplay updates controls and stays playing across client-side navigation', async ({ page }) => {
+    await mockPlayerMedia(page);
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('#player')).toHaveClass(/playing/);
+    await expect(page.locator('#player .pl-play')).toHaveAttribute('aria-label', '暂停');
+    await page.locator('#player audio').evaluate((audio) => {
+      audio.dataset.marker = 'playing';
+    });
+    await navigate(page, '/about/');
+    await expect(page.locator('#player audio')).toHaveAttribute('data-marker', 'playing');
+    await expect(page.locator('#player')).toHaveClass(/playing/);
+  });
+
+  test('restores the paused song and progress after leaving, even if it was playing before reload', async ({
+    page,
+  }) => {
+    await mockPlayerMedia(page);
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('#player')).toHaveClass(/playing/);
+    await page.locator('#player .pl-next').click();
+    await page.locator('#player audio').evaluate((audio: HTMLAudioElement) => {
+      audio.currentTime = 42;
+      audio.pause();
+    });
+    const title = await page.locator('#player .pl-title').textContent();
+    await page.reload();
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).toHaveText(title!);
+    await expect(page.locator('#player')).not.toHaveClass(/playing/);
+    expect(await page.locator('#player audio').evaluate((audio: HTMLAudioElement) => audio.currentTime)).toBe(42);
+    await page.locator('#player .pl-play').click();
+    await expect(page.locator('#player')).toHaveClass(/playing/);
+    await page.reload();
+    await ready(page);
+    await expect(page.locator('#player')).not.toHaveClass(/playing/);
+    expect(await page.locator('#player audio').evaluate((audio: HTMLAudioElement) => audio.currentTime)).toBe(42);
+  });
+
+  test('falls back to the default at zero when the saved song was removed', async ({ page }) => {
+    await mockPlayerMedia(page);
+    await page.addInitScript(() =>
+      localStorage.setItem('player', JSON.stringify({ url: 'removed.mp3', i: 0, t: 100 })),
+    );
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).toHaveText('太空漫步 Space Walk');
+    expect(await page.locator('#player audio').evaluate((audio: HTMLAudioElement) => audio.currentTime)).toBe(0);
+    await expect(page.locator('#player')).not.toHaveClass(/playing/);
+  });
+
+  test('pinning a song preserves the remaining queue and keyboard focus', async ({ page }) => {
+    await mockPlayerMedia(page);
+    await page.goto('/');
+    await ready(page);
+    await page.locator('#player .pl-listbtn').click();
+    const list = page.locator('#pl-panel .pl-list');
+    const selected = list.locator('button[data-i="1"]');
+    await selected.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#pl-panel')).toBeVisible();
+    await expect(list.locator('button').first()).toHaveAttribute('data-i', '1');
+    await expect(list.locator('button').first()).toBeFocused();
+    const remaining = await list
+      .locator('button')
+      .evaluateAll((rows) => rows.slice(1).map((row) => Number((row as HTMLElement).dataset.i)));
+    expect(remaining).toEqual([0, 2, 3, 4, 5, 6, 7, 8, 9]);
+    await page.keyboard.press('Escape');
+    await page.locator('#player .pl-next').click();
+    await page.locator('#player .pl-listbtn').click();
+    await expect(list.locator('button').first()).toHaveAttribute('data-i', '2');
+  });
+
+  test('tries autoplay without a saved song, handles a blocked attempt and does not autoplay on return', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const state = window as unknown as { __playAttempts: number };
+      state.__playAttempts = 0;
+      HTMLMediaElement.prototype.play = function () {
+        state.__playAttempts++;
+        return state.__playAttempts === 1
+          ? Promise.reject(new DOMException('Autoplay blocked', 'NotAllowedError'))
+          : Promise.resolve();
+      };
+    });
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).toHaveText('太空漫步 Space Walk');
+    const attempts = () => page.evaluate(() => (window as unknown as { __playAttempts: number }).__playAttempts);
+    await expect.poll(attempts).toBe(1);
+    await expect(page.locator('#player')).not.toHaveClass(/playing/);
+    await page.locator('#player .pl-play').click();
+    await expect.poll(attempts).toBe(2);
+
+    await page.reload();
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).toHaveText('太空漫步 Space Walk');
+    expect(await attempts()).toBe(0);
+  });
+
+  test('defaults to Space Walk and restores a saved song after the playlist is reordered', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).toHaveText('太空漫步 Space Walk');
+
+    await page.locator('#player .pl-next').click();
+    const chosen = await page.locator('#player .pl-title').textContent();
+    const state = await page.evaluate(() => JSON.parse(localStorage.getItem('player') ?? '{}'));
+    expect(state.url).toBeTruthy();
+    await page.route('**/playlist1.json', async (route) => {
+      const response = await route.fetch();
+      const list = await response.json();
+      await route.fulfill({
+        json: list
+          .map((track: { url: string }) => ({
+            ...track,
+            addedAt: track.url === state.url ? '2026-10-14' : '2026-10-13',
+          }))
+          .reverse(),
+      });
+    });
+    await page.reload();
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).toHaveText(chosen!);
+  });
+
+  test('migrates the old saved playlist index before sorting by addition date', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('player', JSON.stringify({ i: 0, t: 12 })));
+    await page.goto('/');
+    await ready(page);
+    await expect(page.locator('#player .pl-title')).toHaveText('Nuit Silencieuse');
+    const state = await page.evaluate(() => JSON.parse(localStorage.getItem('player') ?? '{}'));
+    expect(state.url).toBe('nuit-silencieuse.mp3');
+  });
   test('a stored value that is not an object does not break the player', async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('player', 'null'));
     await page.goto('/');
@@ -116,10 +273,11 @@ test.describe('music player', () => {
     await ready(page);
     await expect(page.locator('#player .pl-title')).not.toHaveText('—');
 
+    const initialPlays = await page.evaluate(() => (window as unknown as { __plays: number }).__plays);
     await page.locator('#player .pl-next').click();
     await expect
       .poll(() => page.evaluate(() => (window as unknown as { __plays: number }).__plays), { timeout: 1500 })
-      .toBeGreaterThan(0);
+      .toBeGreaterThan(initialPlays);
   });
 
   test('loads the playlist, switches tracks and remembers the choice', async ({ page }) => {
@@ -134,7 +292,7 @@ test.describe('music player', () => {
     const second = (await title.textContent())!;
 
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('player') ?? '{}'));
-    expect(saved.i).toBe(1);
+    expect(saved.url).toBe('nuit-silencieuse.mp3');
 
     await page.reload();
     await ready(page);
@@ -171,8 +329,10 @@ test.describe('music player', () => {
     const rows = panel.locator('.pl-list button');
     expect(await rows.count()).toBeGreaterThan(3);
 
-    await rows.nth(2).click();
+    await panel.locator('button[data-i="2"]').click();
     await expect(panel.locator('.pl-list li.on button')).toHaveAttribute('data-i', '2');
+    await expect(panel.locator('.pl-list li').first()).toHaveClass('on');
+    await expect(panel.locator('.pl-list button').first()).toHaveAttribute('data-i', '2');
     expect((await page.evaluate(() => JSON.parse(localStorage.getItem('player') ?? '{}'))).i).toBe(2);
 
     await page.keyboard.press('Escape');

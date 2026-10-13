@@ -2,7 +2,7 @@ import { audioBase } from '@/config/site';
 import { thumb } from '@/lib/assets/thumb';
 import { loadLyrics, lyricIndexAt, type Lyric } from './lrc';
 import { createPanel } from './panel';
-import { formatTime, isMode, nextMode, pickNext, trackUrl, type Mode, type Track } from './playlist';
+import { formatTime, isMode, newestFirst, nextMode, pickNext, trackUrl, type Mode, type Track } from './playlist';
 import { readSaved, writeSaved } from './store';
 import { canSetVolume } from './volume';
 
@@ -11,6 +11,7 @@ const PLAYLIST = '/assets/audio/playlist/playlist1.json';
 const LYRIC_LEAD = 0.15;
 const SAVE_EVERY_MS = 3000;
 const DEFAULT_VOLUME = 0.7;
+const DEFAULT_TRACK = 'space-walk.mp3';
 
 function init(el: HTMLElement) {
   const $ = <T extends HTMLElement>(sel: string) => el.querySelector<T>(sel)!;
@@ -39,7 +40,10 @@ function init(el: HTMLElement) {
 
   const coverOf = (src?: string) => thumb(src, 800) ?? '';
 
-  const save = () => writeSaved({ i: index, t: audio.currentTime || 0, v: audio.volume, m: mode });
+  const save = () => {
+    if (!tracks[index]) return;
+    writeSaved({ i: index, url: tracks[index].url, t: audio.currentTime || 0, v: audio.volume, m: mode });
+  };
 
   const setLyric = (text: string) => {
     if (lyricEl.dataset.text === text) return;
@@ -226,10 +230,20 @@ function init(el: HTMLElement) {
   fetch(PLAYLIST)
     .then((r) => r.json() as Promise<Track[]>)
     .then((list) => {
-      tracks = list;
+      const original = list.filter((track) => track.url);
+      tracks = newestFirst(original);
       if (!tracks.length) throw new Error('empty playlist');
-      const i = typeof saved.i === 'number' && saved.i < tracks.length ? saved.i : 0;
-      void load(i, { at: saved.t ?? 0 });
+      // Older saved states used the playlist's unsorted index instead of a stable URL.
+      const savedUrl = saved.url ?? (typeof saved.i === 'number' ? original[saved.i]?.url : undefined);
+      const restored = tracks.findIndex((track) => track.url === savedUrl);
+      const fallback = Math.max(
+        0,
+        tracks.findIndex((track) => track.url === DEFAULT_TRACK),
+      );
+      void load(restored >= 0 ? restored : fallback, {
+        at: restored >= 0 ? (saved.t ?? 0) : 0,
+        play: savedUrl === undefined,
+      });
     })
     .catch(() => {
       el.hidden = true;

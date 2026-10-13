@@ -2,7 +2,7 @@ import { isMode, type Mode } from './playlist';
 
 const KEY = 'player';
 
-export type SavedPlayer = { i?: number; t?: number; v?: number; m?: Mode };
+export type SavedPlayer = { i?: number; url?: string; t?: number; v?: number; m?: Mode };
 
 const isNumber = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 
@@ -10,6 +10,7 @@ export function parseSaved(raw: unknown): SavedPlayer {
   if (typeof raw !== 'object' || raw === null) return {};
   const r = raw as Record<string, unknown>;
   const saved: SavedPlayer = {};
+  if (typeof r.url === 'string' && r.url) saved.url = r.url;
   if (isNumber(r.i) && Number.isInteger(r.i) && r.i >= 0) saved.i = r.i;
   if (isNumber(r.t) && r.t >= 0) saved.t = r.t;
   if (isNumber(r.v) && r.v >= 0 && r.v <= 1) saved.v = r.v;
@@ -25,7 +26,7 @@ export function readSaved(): SavedPlayer {
   }
 }
 
-export function writeSaved(state: { i: number; t: number; v: number; m: Mode }) {
+export function writeSaved(state: { i: number; url: string; t: number; v: number; m: Mode }) {
   try {
     localStorage.setItem(KEY, JSON.stringify(state));
   } catch {}

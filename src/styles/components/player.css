@@ -19,16 +19,20 @@
     background 0.2s var(--ease),
     padding-left 0.25s var(--ease);
 }
-.tracklist button:hover,
+.tracklist button:enabled:hover,
 .tracklist button:focus-visible {
   padding-left: 1.25rem;
   background: var(--accent-soft);
+}
+.tracklist button:disabled {
+  cursor: default;
+  color: var(--fg-muted);
 }
 .tracklist .n {
   font: var(--fw-semibold) var(--text-2xs) var(--font-mono);
   color: var(--fg-faint);
 }
-.tracklist button:hover .n {
+.tracklist button:enabled:hover .n {
   color: var(--accent);
 }
 .tracklist .nm {

@@ -37,6 +37,9 @@ test.describe('narrow screens', () => {
 });
 
 test.describe('bottom bar', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('player', JSON.stringify({ url: 'space-walk.mp3' })));
+  });
   test('hides while scrolling down and returns when scrolling up', async ({ page }) => {
     await page.goto('/posts/waline/');
     await ready(page);
@@ -74,6 +77,9 @@ test.describe('bottom bar', () => {
 });
 
 test.describe('volume on phones', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('player', JSON.stringify({ url: 'space-walk.mp3' })));
+  });
   const startPlayer = (page: import('@playwright/test').Page) =>
     page.evaluate(() => document.getElementById('player')!.setAttribute('data-started', '1'));
 

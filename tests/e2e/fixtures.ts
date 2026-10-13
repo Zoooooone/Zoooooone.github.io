@@ -33,6 +33,38 @@ export const test = base.extend<Fixtures>({
 
 export { expect };
 
+export async function mockPlayerMedia(page: Page) {
+  await page.addInitScript(() => {
+    Object.defineProperties(HTMLMediaElement.prototype, {
+      paused: {
+        get() {
+          return this.dataset.mockPlaying !== 'true';
+        },
+        configurable: true,
+      },
+      currentTime: {
+        get() {
+          return Number(this.dataset.mockTime ?? 0);
+        },
+        set(time: number) {
+          this.dataset.mockTime = String(time);
+        },
+        configurable: true,
+      },
+      duration: { get: () => 600, configurable: true },
+    });
+    HTMLMediaElement.prototype.play = function () {
+      this.dataset.mockPlaying = 'true';
+      this.dispatchEvent(new Event('play'));
+      return Promise.resolve();
+    };
+    HTMLMediaElement.prototype.pause = function () {
+      this.dataset.mockPlaying = 'false';
+      this.dispatchEvent(new Event('pause'));
+    };
+  });
+}
+
 export async function ready(page: Page) {
   await page.waitForLoadState('load');
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));

@@ -6,9 +6,10 @@ import { join } from 'node:path';
 import { site } from '@/config';
 import { icons } from '@/lib/icons';
 import * as si from 'simple-icons';
+import { newestFirst } from '@/scripts/shell/player/playlist';
 
-const tracks: { name: string; artist: string }[] = JSON.parse(
-  readFileSync(join(process.cwd(), 'public/assets/audio/playlist/playlist1.json'), 'utf8'),
+const tracks: { name: string; artist: string }[] = newestFirst(
+  JSON.parse(readFileSync(join(process.cwd(), 'public/assets/audio/playlist/playlist1.json'), 'utf8')),
 );
 
 type Skill = { name: string; icon?: string };

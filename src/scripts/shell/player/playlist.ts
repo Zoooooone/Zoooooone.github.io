@@ -1,5 +1,8 @@
-export type Track = { name: string; artist: string; url: string; cover?: string; lrc?: string };
+export type Track = { name: string; artist: string; url: string; cover?: string; lrc?: string; addedAt?: string };
 export type Mode = 'list' | 'shuffle' | 'single';
+
+export const newestFirst = (tracks: Track[]) =>
+  [...tracks].sort((a, b) => (b.addedAt ?? '').localeCompare(a.addedAt ?? ''));
 
 export const isMode = (value: unknown): value is Mode => value === 'list' || value === 'shuffle' || value === 'single';
 

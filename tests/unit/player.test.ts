@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { loadLyrics, lyricIndexAt, parseLrc } from '@/scripts/shell/player/lrc';
-import { formatTime, isMode, nextMode, pickNext, trackUrl } from '@/scripts/shell/player/playlist';
+import { formatTime, isMode, newestFirst, nextMode, pickNext, trackUrl } from '@/scripts/shell/player/playlist';
 import { parseSaved } from '@/scripts/shell/player/store';
 
 describe('parseLrc', () => {
@@ -46,6 +46,23 @@ describe('lyricIndexAt', () => {
 });
 
 describe('playlist helpers', () => {
+  it('puts recent additions first and preserves the order of undated or same-day tracks', () => {
+    const tracks = [
+      { name: 'old', artist: '', url: 'old.mp3' },
+      { name: 'new', artist: '', url: 'new.mp3', addedAt: '2026-10-13' },
+      { name: 'older addition', artist: '', url: 'older.mp3', addedAt: '2026-10-12' },
+      { name: 'same day', artist: '', url: 'same.mp3', addedAt: '2026-10-13' },
+      { name: 'undated', artist: '', url: 'undated.mp3' },
+    ];
+    expect(newestFirst(tracks).map((t) => t.url)).toEqual([
+      'new.mp3',
+      'same.mp3',
+      'older.mp3',
+      'old.mp3',
+      'undated.mp3',
+    ]);
+    expect(tracks[0].url).toBe('old.mp3');
+  });
   it('cycles the play mode', () => {
     expect(nextMode('list')).toBe('shuffle');
     expect(nextMode('shuffle')).toBe('single');
@@ -82,6 +99,11 @@ describe('playlist helpers', () => {
 });
 
 describe('parseSaved', () => {
+  it('keeps the stable track URL and rejects invalid URLs', () => {
+    expect(parseSaved({ url: 'space-walk.mp3' })).toEqual({ url: 'space-walk.mp3' });
+    expect(parseSaved({ url: 5 })).toEqual({});
+    expect(parseSaved({ url: '' })).toEqual({});
+  });
   it('keeps valid values', () => {
     expect(parseSaved({ i: 3, t: 12.5, v: 0.4, m: 'shuffle' })).toEqual({ i: 3, t: 12.5, v: 0.4, m: 'shuffle' });
   });

@@ -31,10 +31,16 @@ export function createPanel({ player, panel, button, coverOf, onPick }: Options)
   };
 
   const render = (tracks: Track[], current: number) => {
+    const focused = listEl.contains(document.activeElement)
+      ? (document.activeElement as HTMLElement).dataset.i
+      : undefined;
     listEl.innerHTML = '';
     const count = panel.querySelector('.pl-count');
     if (count) count.textContent = `${tracks.length} TRACKS`;
-    tracks.forEach((t, i) => {
+    const order = tracks.map((_, i) => i).filter((i) => i !== current);
+    if (tracks[current]) order.unshift(current);
+    order.forEach((i, position) => {
+      const t = tracks[i];
       const li = document.createElement('li');
       li.className = i === current ? 'on' : '';
       const b = document.createElement('button');
@@ -43,7 +49,7 @@ export function createPanel({ player, panel, button, coverOf, onPick }: Options)
 
       const n = document.createElement('span');
       n.className = 'n';
-      n.textContent = String(i + 1).padStart(2, '0');
+      n.textContent = String(position + 1).padStart(2, '0');
 
       const cv = document.createElement('span');
       cv.className = 'cv';
@@ -70,6 +76,9 @@ export function createPanel({ player, panel, button, coverOf, onPick }: Options)
       li.append(b);
       listEl.append(li);
     });
+    if (focused !== undefined) {
+      listEl.querySelector<HTMLButtonElement>(`button[data-i="${focused}"]`)?.focus({ preventScroll: true });
+    }
   };
 
   window.addEventListener('resize', () => !panel.hidden && place());
@@ -87,7 +96,11 @@ export function createPanel({ player, panel, button, coverOf, onPick }: Options)
   });
   listEl.addEventListener('click', (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-i]');
-    if (b) onPick(Number(b.dataset.i));
+    if (b) {
+      // Rendering replaces the clicked node, which would look like an outside click after bubbling.
+      e.stopPropagation();
+      onPick(Number(b.dataset.i));
+    }
   });
 
   return { render };
