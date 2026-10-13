@@ -1,29 +1,8 @@
 [
   {
-    "src": "/assets/src/about_me/games/astroneer.jpg",
-    "title": "Astroneer",
-    "description": "异星探险家",
-    "w": 1920,
-    "h": 1080
-  },
-  {
     "src": "/assets/src/about_me/games/celeste.png",
     "title": "Celeste",
     "description": "蔚蓝",
-    "w": 1920,
-    "h": 1080
-  },
-  {
-    "src": "/assets/src/about_me/games/cocoon.png",
-    "title": "Cocoon",
-    "description": "",
-    "w": 1920,
-    "h": 1080
-  },
-  {
-    "src": "/assets/src/about_me/games/dead-cells.jpg",
-    "title": "Dead Cells",
-    "description": "死亡细胞",
     "w": 1920,
     "h": 1080
   },
@@ -49,25 +28,11 @@
     "h": 1080
   },
   {
-    "src": "/assets/src/about_me/games/fc24.jpeg",
-    "title": "FC24",
-    "description": "",
-    "w": 1920,
-    "h": 1080
-  },
-  {
     "src": "/assets/src/about_me/games/forbidden-west.jpg",
     "title": "Horizon Forbidden West",
     "description": "地平线：西之绝境",
     "w": 2560,
     "h": 1440
-  },
-  {
-    "src": "/assets/src/about_me/games/forza-horizon-5.jpg",
-    "title": "Forza Horizon 5",
-    "description": "极限竞速：地平线5",
-    "w": 1920,
-    "h": 1080
   },
   {
     "src": "/assets/src/about_me/games/genshin.jpg",
@@ -98,13 +63,6 @@
     "h": 1080
   },
   {
-    "src": "/assets/src/about_me/games/slay-the-spire.jpg",
-    "title": "Slay the Spire",
-    "description": "杀戮尖塔",
-    "w": 1920,
-    "h": 1080
-  },
-  {
     "src": "/assets/src/about_me/games/stardew-valley.png",
     "title": "Stardew Valley",
     "description": "星露谷物语",
@@ -112,9 +70,37 @@
     "h": 1080
   },
   {
-    "src": "/assets/src/about_me/games/zerodawn.jpg",
-    "title": "Horizon Zero Dawn",
-    "description": "地平线：零之曙光",
+    "src": "/assets/src/about_me/games/arknights-endfield.png",
+    "title": "Arknights: Endfield",
+    "description": "明日方舟：终末地",
+    "w": 1920,
+    "h": 1080
+  },
+  {
+    "src": "/assets/src/about_me/games/crimson-desert.jpg",
+    "title": "Crimson Desert",
+    "description": "红色沙漠",
+    "w": 1920,
+    "h": 1080
+  },
+  {
+    "src": "/assets/src/about_me/games/pragmata.jpg",
+    "title": "PRAGMATA",
+    "description": "识质存在",
+    "w": 1920,
+    "h": 1080
+  },
+  {
+    "src": "/assets/src/about_me/games/expedition-33.jpeg",
+    "title": "Clair Obscur: Expedition 33",
+    "description": "光与影：33号远征队",
+    "w": 1920,
+    "h": 1080
+  },
+  {
+    "src": "/assets/src/about_me/games/baldurs-gate-3.jpg",
+    "title": "Baldur's Gate 3",
+    "description": "博德之门3",
     "w": 1920,
     "h": 1080
   }

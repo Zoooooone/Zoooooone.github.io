@@ -21,39 +21,11 @@
     "lrc": "/assets/audio/lrc/κ.lrc"
   },
   {
-    "name": "Towards the Light",
-    "artist": "Jacoo",
-    "url": "towards-the-light.mp3",
-    "cover": "/assets/img/audio-cover/towards-the-light.jpg",
-    "lrc": "/assets/audio/lrc/towards-the-light.lrc"
-  },
-  {
     "name": "日落大道",
     "artist": "梁博",
     "url": "sunset-avenue.mp3",
     "cover": "/assets/img/audio-cover/日落大道.jpg",
     "lrc": "/assets/audio/lrc/日落大道.lrc"
-  },
-  {
-    "name": "Tremble (Original Mix)",
-    "artist": "Vicetone",
-    "url": "tremble.mp3",
-    "cover": "/assets/img/audio-cover/tremble.jpg",
-    "lrc": "/assets/audio/lrc/tremble.lrc"
-  },
-  {
-    "name": "Bangarang",
-    "artist": "Skrillex,Sirah",
-    "url": "bangarang.mp3",
-    "cover": "/assets/img/audio-cover/bangarang.jpg",
-    "lrc": "/assets/audio/lrc/bangarang.lrc"
-  },
-  {
-    "name": "杀死那个石家庄人",
-    "artist": "万能青年旅店",
-    "url": "kill-the-shijiazhuang-man.mp3",
-    "cover": "/assets/img/audio-cover/杀死那个石家庄人.jpeg",
-    "lrc": "/assets/audio/lrc/杀死那个石家庄人.lrc"
   },
   {
     "name": "The Process",
@@ -68,5 +40,37 @@
     "url": "by-your-side-inst.mp3",
     "cover": "/assets/img/audio-cover/在你的身边.png",
     "lrc": "/assets/audio/lrc/在你的身边.lrc"
+  },
+  {
+    "name": "Dear Boy (Avicii by Avicii)",
+    "artist": "Avicii",
+    "url": "dear-boy-avicii-by-avicii.mp3",
+    "cover": "/assets/img/audio-cover/dear-boy-avicii-by-avicii.jpg",
+    "lrc": "/assets/audio/lrc/dear-boy-avicii-by-avicii.lrc",
+    "addedAt": "2026-10-13"
+  },
+  {
+    "name": "势若风雷 Irresistible Force",
+    "artist": "HOYO-MiX",
+    "url": "irresistible-force.mp3",
+    "cover": "/assets/img/audio-cover/irresistible-force.jpg",
+    "lrc": "/assets/audio/lrc/irresistible-force.lrc",
+    "addedAt": "2026-10-13"
+  },
+  {
+    "name": "深塔萦梦 Songe de la plus haute tour",
+    "artist": "HOYO-MiX",
+    "url": "songe-de-la-plus-haute-tour.mp3",
+    "cover": "/assets/img/audio-cover/songe-de-la-plus-haute-tour.jpg",
+    "lrc": "/assets/audio/lrc/songe-de-la-plus-haute-tour.lrc",
+    "addedAt": "2026-10-13"
+  },
+  {
+    "name": "太空漫步 Space Walk",
+    "artist": "HOYO-MiX",
+    "url": "space-walk.mp3",
+    "cover": "/assets/img/audio-cover/space-walk.jpg",
+    "lrc": "/assets/audio/lrc/space-walk.lrc",
+    "addedAt": "2026-10-13"
   }
 ]
