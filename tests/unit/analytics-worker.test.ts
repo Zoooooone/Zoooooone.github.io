@@ -1,55 +1,12 @@
-import { readFileSync } from 'node:fs';
-import { DatabaseSync } from 'node:sqlite';
 import { describe, expect, it } from 'vitest';
-import worker, { hashIp, type Env } from '../../worker/src/index';
+import worker, { hashIp } from '../../worker/src/index';
 import { parseAgent } from '../../worker/src/ua';
+import { ORIGIN, setup } from './helpers/worker-db';
 
-const ORIGIN = 'https://site.test';
 const ID = 'a'.repeat(32);
 const IP = '203.0.113.9';
 const pvOf = (n: number) => n.toString(16).padStart(32, '0');
 const visitorOf = (n: number) => `f${n.toString(16).padStart(31, '0')}`;
-
-interface Fake {
-  bind: (...values: unknown[]) => Fake;
-  run: () => Promise<void>;
-  first: <T>() => Promise<T | null>;
-  exec: () => void;
-}
-
-// A real SQLite database with the real schema, so the SQL itself is tested and not only the JavaScript around it.
-function setup() {
-  const sqlite = new DatabaseSync(':memory:');
-  sqlite.exec(readFileSync(new URL('../../worker/schema.sql', import.meta.url), 'utf8'));
-
-  const statement = (sql: string, values: unknown[] = []): Fake => ({
-    bind: (...v) => statement(sql, v),
-    run: async () => void sqlite.prepare(sql).run(...(values as never[])),
-    first: async <T>() => (sqlite.prepare(sql).get(...(values as never[])) as T | undefined) ?? null,
-    exec: () => void sqlite.prepare(sql).run(...(values as never[])),
-  });
-
-  const env: Env = {
-    ALLOWED_ORIGINS: ORIGIN,
-    HASH_SECRET: 's',
-    DB: {
-      prepare: (sql) => statement(sql),
-      batch: async (list) => {
-        sqlite.exec('BEGIN');
-        try {
-          for (const item of list as Fake[]) item.exec();
-          sqlite.exec('COMMIT');
-        } catch (error) {
-          sqlite.exec('ROLLBACK');
-          throw error;
-        }
-      },
-    },
-  };
-
-  const rows = <T = Record<string, unknown>>(sql: string) => sqlite.prepare(sql).all() as T[];
-  return { env, rows };
-}
 
 function post(body: unknown, init: { origin?: string; ua?: string; ip?: string } = {}) {
   return new Request('https://worker.test/e', {

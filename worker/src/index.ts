@@ -1,23 +1,8 @@
+import { handleStats } from './stats';
+import type { Env } from './types';
 import { parseAgent } from './ua';
 
-// Just the part of the D1 API used here, so the Worker needs no Cloudflare typings and tests can fake it.
-interface Statement {
-  bind(...values: unknown[]): Statement;
-  run(): Promise<unknown>;
-  first<T>(): Promise<T | null>;
-}
-interface Database {
-  prepare(sql: string): Statement;
-  batch(statements: Statement[]): Promise<unknown>;
-}
-
-export interface Env {
-  DB: Database;
-  /** Comma-separated list of origins allowed to report, e.g. https://zoooooone.github.io */
-  ALLOWED_ORIGINS: string;
-  /** Secret mixed into the daily IP hash. */
-  HASH_SECRET: string;
-}
+export type { Env } from './types';
 
 interface Geo {
   country?: string;
@@ -56,7 +41,7 @@ export async function hashIp(ip: string, secret: string, day: string): Promise<s
     .join('');
 }
 
-function cors(origin: string): HeadersInit {
+function cors(origin: string): Record<string, string> {
   return { 'access-control-allow-origin': origin, vary: 'origin' };
 }
 
@@ -72,10 +57,13 @@ export default {
         status: 204,
         headers: {
           ...cors(origin),
-          'access-control-allow-methods': 'POST',
-          'access-control-allow-headers': 'content-type',
+          'access-control-allow-methods': 'GET, POST',
+          'access-control-allow-headers': 'content-type, authorization',
         },
       });
+    }
+    if (request.method === 'GET' && new URL(request.url).pathname.startsWith('/api/')) {
+      return handleStats(request, env, cors(origin));
     }
     if (request.method !== 'POST') return new Response(null, { status: 405 });
 

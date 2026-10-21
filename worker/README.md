@@ -51,3 +51,22 @@ After changing `schema.sql`, run it again (it only creates what is missing):
 ```bash
 npx wrangler d1 execute blog-visits --remote --file=schema.sql
 ```
+
+## Stats API
+
+Read-only endpoints for the stats page. They only exist when the `STATS_TOKEN` secret is set, and every request needs the blog's `Origin` and `Authorization: Bearer <token>`.
+
+```bash
+npx wrangler secret put STATS_TOKEN
+```
+
+Use a long random value (40+ characters) and change it the same way if it ever leaks.
+
+| Endpoint                                           | Returns                                                                                                         |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `GET /api/summary?days=30&bots=0`                  | Totals, new vs returning visitors, daily series, weekday×hour heatmap, top pages, sources, places, devices      |
+| `GET /api/visits?days=30&bots=0&limit=50&before=ts` | Newest visits first, with `next` as the cursor for the following page                                           |
+
+`/api/visits` also takes `path=`, `country=`, `visitor=` (all time with `days=0`) and `first=1` (only each visitor's first visit). `days=0` means everything. Times are grouped in Tokyo time. The IP hash is never returned.
+
+Each summary request reads every visit in the range several times, so keep an eye on the daily D1 read allowance once the table grows into the hundreds of thousands of rows.
