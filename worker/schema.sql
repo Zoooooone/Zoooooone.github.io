@@ -30,3 +30,4 @@ CREATE TABLE IF NOT EXISTS visits (
 CREATE INDEX IF NOT EXISTS visits_ts ON visits (ts);
 CREATE INDEX IF NOT EXISTS visits_visitor ON visits (visitor_id, ts);
 CREATE INDEX IF NOT EXISTS visits_path ON visits (path, ts);
+CREATE INDEX IF NOT EXISTS visits_ip ON visits (ip_hash, ts);
