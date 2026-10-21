@@ -5,6 +5,7 @@ Personal blog built with Astro, TypeScript and plain CSS. Package manager: pnpm.
 ## Commands
 
 - `pnpm dev` — thumbnails + dev server at `localhost:4321`
+- `pnpm dev:mock` — the same, with a fake stats Worker and made-up visits, to try `/stats/` (any token works)
 - `pnpm test` — unit tests (Vitest); `pnpm test:e2e` — browser smoke tests (Playwright, needs a build and Chrome)
 - `pnpm verify` — format check, ESLint, Stylelint, `astro check`, knip, unit tests, build, link check, browser tests. Run before committing.
 - `pnpm format` — Prettier over the whole repo

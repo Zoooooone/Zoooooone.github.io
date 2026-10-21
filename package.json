@@ -10,6 +10,7 @@
   "scripts": {
     "thumbs": "node scripts/make-thumbs.mjs",
     "dev": "node scripts/make-thumbs.mjs && astro dev",
+    "dev:mock": "node scripts/make-thumbs.mjs && node scripts/mock-stats.mjs",
     "build": "node scripts/make-thumbs.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",

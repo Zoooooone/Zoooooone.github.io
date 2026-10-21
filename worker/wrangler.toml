@@ -3,7 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2026-10-01"
 
 [vars]
-ALLOWED_ORIGINS = "https://zoooooone.github.io"
+ALLOWED_ORIGINS = "https://zoooooone.github.io,http://localhost:4321"
 
 [[d1_databases]]
 binding = "DB"
