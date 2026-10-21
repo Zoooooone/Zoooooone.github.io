@@ -26,3 +26,8 @@ export const audioBase = 'https://pub-89107895d621497da89c42413d45844a.r2.dev/au
 export const waline = {
   serverURL: 'https://waline-beige-eight.vercel.app/',
 };
+
+// Visit tracking Worker. Leave empty to disable tracking.
+export const analytics = {
+  endpoint: 'https://blog-visits.opitz4546.workers.dev',
+};

@@ -1,0 +1,12 @@
+name = "blog-visits"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://zoooooone.github.io"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "blog-visits"
+# Fill in after `wrangler d1 create blog-visits`.
+database_id = "a280adf0-2ca9-4ded-af3c-3fcd2b75804d"

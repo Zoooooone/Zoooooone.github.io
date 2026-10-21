@@ -38,3 +38,6 @@ audio-upload/
 # test output
 test-results/
 playwright-report/
+
+# Wrangler local state
+.wrangler/
