@@ -31,6 +31,7 @@ onPage(() => {
     !shouldTrack({
       endpoint: analytics.endpoint,
       hostname: location.hostname,
+      pathname: location.pathname,
       cookie: document.cookie,
       doNotTrack: navigator.doNotTrack,
     })

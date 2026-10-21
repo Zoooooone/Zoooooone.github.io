@@ -1,0 +1,130 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHead from '@/components/ui/PageHead.astro';
+import { analytics } from '@/config';
+
+// Only the dev server reads the override (pnpm dev:mock), so a built site can never be pointed elsewhere.
+const endpoint = (import.meta.env.DEV && import.meta.env.PUBLIC_STATS_ENDPOINT) || analytics.endpoint;
+
+const ranges = [
+  { days: 7, label: '7 天' },
+  { days: 30, label: '30 天' },
+  { days: 90, label: '90 天' },
+  { days: 0, label: '全部' },
+];
+---
+
+<BaseLayout title="Stats" noindex>
+  <PageHead label="STATS · 统计" title="访问统计" meta="PRIVATE · TOKYO TIME" />
+
+  <div class="stats" data-stats data-endpoint={endpoint}>
+    <form class="gate frame cut-s" data-gate hidden>
+      <label class="mono-label" for="stats-token">
+        ACCESS TOKEN · 口令
+      </label>
+      <input id="stats-token" name="token" type="password" autocomplete="current-password" required data-token />
+      <p class="gate-error" role="alert" data-gate-error></p>
+      <button class="go" type="submit">
+        UNLOCK ▸
+      </button>
+    </form>
+
+    <div class="board" data-dashboard hidden>
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="时间范围">
+          {ranges.map((r) => (
+            <button type="button" data-days={r.days} aria-pressed={r.days === 30 ? 'true' : 'false'}>
+              {r.label}
+            </button>
+          ))}
+        </div>
+        <label class="check">
+          <input type="checkbox" data-bots />
+          包含爬虫
+        </label>
+        <span class="grow"></span>
+        <span class="mono-label" role="status" data-status></span>
+        <button class="tool" type="button" data-refresh>
+          刷新
+        </button>
+        <button class="tool" type="button" data-signout>
+          退出
+        </button>
+      </div>
+
+      <div class="kpis" data-kpis></div>
+
+      <section class="panel frame cut-s" aria-label="每日访问">
+        <div class="panel-head">
+          <span class="idx">01</span>
+          <span class="grow">DAILY · 每日访问</span>
+        </div>
+        <div data-daily></div>
+      </section>
+
+      <section class="panel frame cut-s" aria-label="时段热力图">
+        <div class="panel-head">
+          <span class="idx">02</span>
+          <span class="grow">HEATMAP · 时段热力图</span>
+          <span>TOKYO</span>
+        </div>
+        <div data-heat></div>
+      </section>
+
+      <div class="cols">
+        <section class="panel frame cut-s" aria-label="热门页面">
+          <div class="panel-head">
+            <span class="idx">03</span>
+            <span class="grow">PAGES · 热门页面</span>
+            <span class="hint">点击筛选访问流水 ↓</span>
+          </div>
+          <div data-pages></div>
+        </section>
+        <section class="panel frame cut-s" aria-label="来源">
+          <div class="panel-head">
+            <span class="idx">04</span>
+            <span class="grow">SOURCES · 来源</span>
+          </div>
+          <div data-sources></div>
+        </section>
+      </div>
+
+      <section class="panel frame cut-s" aria-label="地区">
+        <div class="panel-head">
+          <span class="idx">05</span>
+          <span class="grow">PLACES · 地区</span>
+          <span class="hint">点击国家筛选访问流水 ↓</span>
+        </div>
+        <div data-places></div>
+      </section>
+
+      <section class="panel frame cut-s" aria-label="设备">
+        <div class="panel-head">
+          <span class="idx">06</span>
+          <span class="grow">DEVICES · 设备</span>
+        </div>
+        <div data-devices></div>
+      </section>
+
+      <section class="panel frame cut-s" aria-label="访问流水" data-visits-panel>
+        <div class="panel-head">
+          <span class="idx">07</span>
+          <span class="grow">VISITS · 访问流水</span>
+          <label class="check">
+            <input type="checkbox" data-first />
+            仅新访客
+          </label>
+        </div>
+        <div class="chips" data-filters></div>
+        <div class="table-wrap" data-visits></div>
+        <button class="tool more" type="button" data-more hidden>
+          加载更多
+        </button>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import '@/scripts/stats';
+</script>

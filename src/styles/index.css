@@ -25,6 +25,7 @@
 @import './pages/lists.css' layer(pages);
 @import './pages/about.css' layer(pages);
 @import './pages/utility.css' layer(pages);
+@import './pages/stats.css' layer(pages);
 @import './interaction.css' layer(interaction);
 @import './adaptive.css' layer(adaptive);
 @import './overrides.css' layer(overrides);

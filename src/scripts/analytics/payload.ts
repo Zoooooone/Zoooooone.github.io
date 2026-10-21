@@ -23,12 +23,14 @@ export function referrerOf(raw: string, ownOrigin: string, previousPath: string 
 export function shouldTrack(env: {
   endpoint: string;
   hostname: string;
+  pathname: string;
   cookie: string;
   doNotTrack: string | null | undefined;
 }): boolean {
   if (!env.endpoint) return false;
   if (['localhost', '127.0.0.1', '[::1]'].includes(env.hostname)) return false;
   if (env.doNotTrack === '1') return false;
+  if (env.pathname.startsWith('/stats/')) return false;
   return !env.cookie.split('; ').some((c) => c.startsWith('blogger_visit='));
 }
 

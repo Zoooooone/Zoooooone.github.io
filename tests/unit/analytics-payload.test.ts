@@ -21,7 +21,7 @@ describe('referrerOf', () => {
 });
 
 describe('shouldTrack', () => {
-  const base = { endpoint: 'https://w.dev/e', hostname: 'a.io', cookie: '', doNotTrack: null };
+  const base = { endpoint: 'https://w.dev/e', hostname: 'a.io', pathname: '/posts/x/', cookie: '', doNotTrack: null };
 
   it('tracks an ordinary visit', () => {
     expect(shouldTrack(base)).toBe(true);
@@ -31,6 +31,7 @@ describe('shouldTrack', () => {
     ['no endpoint', { endpoint: '' }],
     ['local development', { hostname: 'localhost' }],
     ['Do Not Track', { doNotTrack: '1' }],
+    ['the stats page itself', { pathname: '/stats/' }],
     ['the blogger cookie', { cookie: 'x=1; blogger_visit=true' }],
   ])('skips %s', (_name, override) => {
     expect(shouldTrack({ ...base, ...override })).toBe(false);
