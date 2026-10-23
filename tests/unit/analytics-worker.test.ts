@@ -1,24 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import worker, { hashIp } from '../../worker/src/index';
 import { parseAgent } from '../../worker/src/ua';
+import { IP, post } from './helpers/requests';
 import { ORIGIN, setup } from './helpers/worker-db';
 
 const ID = 'a'.repeat(32);
-const IP = '203.0.113.9';
 const pvOf = (n: number) => n.toString(16).padStart(32, '0');
 const visitorOf = (n: number) => `f${n.toString(16).padStart(31, '0')}`;
-
-function post(body: unknown, init: { origin?: string; ua?: string; ip?: string } = {}) {
-  return new Request('https://worker.test/e', {
-    method: 'POST',
-    headers: {
-      origin: init.origin ?? ORIGIN,
-      'user-agent': init.ua ?? 'Mozilla/5.0 (Windows NT 10.0) Chrome/120 Safari/537.36',
-      'cf-connecting-ip': init.ip ?? IP,
-    },
-    body: typeof body === 'string' ? body : JSON.stringify(body),
-  });
-}
 
 const hit = (extra: Record<string, unknown> = {}) => ({
   type: 'hit',

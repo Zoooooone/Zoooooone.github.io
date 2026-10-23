@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import worker from '../../worker/src/index';
+import { TOKEN, get } from './helpers/requests';
 import { ORIGIN, setup } from './helpers/worker-db';
+import type { Summary, VisitList } from '@/scripts/stats/types';
 
-const TOKEN = 'secret-token';
 const DAY = 24 * 60 * 60 * 1000;
 const id = (c: string) => c.repeat(32);
 const [A, B, C, D] = [id('a'), id('b'), id('c'), id('d')];
@@ -75,44 +76,6 @@ function seeded() {
   visit({ visitor: D, daysAgo: 60, path: '/old/' });
 
   return { ...world, aFirst, aSecond, bOnly };
-}
-
-interface Named {
-  name: string;
-  views: number;
-  visitors: number;
-}
-
-interface Summary {
-  days: number;
-  totals: {
-    views: number;
-    visitors: number;
-    newVisitors: number;
-    returningVisitors: number;
-    avgDurationMs: number | null;
-  };
-  daily: { day: string; views: number; visitors: number }[];
-  heatmap: { dow: number; hour: number; views: number }[];
-  pages: { path: string; views: number; visitors: number; avg_ms: number | null }[];
-  referrers: { direct: number; internal: number; external: { host: string; views: number }[] };
-  countries: Named[];
-  cities: { country: string; city: string; views: number; visitors: number }[];
-  browsers: Named[];
-  systems: Named[];
-  devices: Named[];
-}
-
-interface VisitList {
-  visits: { ts: number; visitor_id: string; is_first: boolean }[];
-  next: number | null;
-}
-
-function get(path: string, init: { token?: string | null; origin?: string } = {}) {
-  const headers: Record<string, string> = { origin: init.origin ?? ORIGIN };
-  const token = init.token === undefined ? TOKEN : init.token;
-  if (token) headers.authorization = `Bearer ${token}`;
-  return new Request(`https://worker.test${path}`, { headers });
 }
 
 const jst = (ts: number) => new Date(ts + 9 * 60 * 60 * 1000);

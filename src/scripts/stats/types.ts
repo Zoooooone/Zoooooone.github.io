@@ -22,6 +22,26 @@ export interface Summary {
   browsers: Named[];
   systems: Named[];
   devices: Named[];
+  networks: Named[];
+  languages: Named[];
+  screens: Named[];
+  timezones: Named[];
+  navTypes: Named[];
+  utm: { sources: Named[]; mediums: Named[]; campaigns: Named[] };
+  viewportWidths: { bucket: number; views: number }[];
+  scrollBuckets: { bucket: number; views: number }[];
+  /** How many visits carried each signal at all: visits from before it was collected are not "no", they are unknown. */
+  behavior: {
+    interaction: Measured;
+    automation: Measured;
+    touch: Measured;
+    scroll: { measured: number; average: number | null };
+  };
+}
+
+export interface Measured {
+  measured: number;
+  yes: number;
 }
 
 export interface VisitRow {
@@ -32,13 +52,26 @@ export interface VisitRow {
   country: string;
   region: string;
   city: string;
+  asn: number;
   as_org: string;
+  tz: string;
   browser: string;
   os: string;
   device: string;
   screen: string;
+  viewport: string;
+  dpr: string;
+  touch: number | null;
   lang: string;
+  nav: string;
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  ua: string;
   is_bot: boolean;
+  automation: boolean | null;
+  interacted: boolean | null;
+  scroll_pct: number | null;
   duration_ms: number | null;
   is_first: boolean;
 }

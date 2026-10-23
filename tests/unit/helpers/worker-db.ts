@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import type { Env } from '../../../worker/src/index';
 
@@ -12,10 +12,17 @@ interface Fake {
   exec: () => void;
 }
 
-// A real SQLite database with the real schema, so the SQL itself is tested and not only the JavaScript around it.
-export function setup(overrides: Partial<Env> = {}) {
+const MIGRATIONS = new URL('../../../worker/migrations/', import.meta.url);
+
+export const migrationFiles = () =>
+  readdirSync(MIGRATIONS)
+    .filter((f) => f.endsWith('.sql'))
+    .sort();
+
+// A real SQLite database built by the real migrations, so the SQL itself is tested and not only the JavaScript around it.
+export function setup(overrides: Partial<Env> = {}, migrations = migrationFiles()) {
   const sqlite = new DatabaseSync(':memory:');
-  sqlite.exec(readFileSync(new URL('../../../worker/schema.sql', import.meta.url), 'utf8'));
+  for (const file of migrations) sqlite.exec(readFileSync(new URL(file, MIGRATIONS), 'utf8'));
 
   const statement = (sql: string, values: unknown[] = []): Fake => {
     const args = values as never[];

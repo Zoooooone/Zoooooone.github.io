@@ -2,6 +2,19 @@
 
 Receives anonymous page-view reports from the blog and stores them in Cloudflare D1. Cloudflare supplies the country, region, city and network (ASN) of each request; the raw IP is never stored, only a hash that changes every day.
 
+## What is collected
+
+| Where from | Fields |
+| --- | --- |
+| Cloudflare, per request | country, region, city, network name and number, time zone (when the browser did not send one) |
+| Request header | the browser identifier (`ua`, at most 300 characters) and what is read from it: browser, system, device type, whether it looks like a known crawler |
+| Browser, with the page view | path, referrer (path only, no query), screen size, window size, pixel ratio, touch points, language, time zone, how the page was opened (`nav`), the three `utm_*` campaign tags, whether the browser looks automated |
+| Browser, when the visitor leaves | time on page, whether a real click or key press happened, how far down the page the window got (0 to 100) |
+
+The rest of the address (query string, fragment) is never sent, only the three campaign tags. A visit from before a field existed keeps `NULL` (or an empty string) for it, which means "not measured", not "no".
+
+Fingerprinting techniques (canvas, audio, fonts, graphics card, CPU and memory) are deliberately not used.
+
 ## Deploy
 
 Run from this folder (`worker/`):
@@ -14,7 +27,7 @@ npx wrangler d1 create blog-visits
 Copy the printed `database_id` into `wrangler.toml`, then:
 
 ```bash
-npx wrangler d1 execute blog-visits --remote --file=schema.sql
+npx wrangler d1 migrations apply blog-visits --remote
 npx wrangler secret put HASH_SECRET
 npx wrangler deploy
 ```
@@ -46,11 +59,15 @@ npx wrangler d1 execute blog-visits --remote --command "DELETE FROM visitors WHE
 
 The IP hash changes every day, so a hash only identifies one source within a single day.
 
-After changing `schema.sql`, run it again (it only creates what is missing):
+## Changing the database
+
+The tables are described by the files in `migrations/`, applied in order. To add a column, add the next numbered file instead of editing an old one, then apply it before deploying the Worker that needs it:
 
 ```bash
-npx wrangler d1 execute blog-visits --remote --file=schema.sql
+npx wrangler d1 migrations apply blog-visits --remote
 ```
+
+Wrangler remembers which files it has applied, so running the command again does nothing. The first file only creates what is missing, so it is safe on a database that was set up before migrations were used.
 
 ## Stats API
 
@@ -64,7 +81,7 @@ Use a long random value (40+ characters) and change it the same way if it ever l
 
 | Endpoint                                           | Returns                                                                                                         |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `GET /api/summary?days=30&bots=0`                  | Totals, new vs returning visitors, daily series, weekday×hour heatmap, top pages, sources, places, devices      |
+| `GET /api/summary?days=30&bots=0`                  | Totals, new vs returning visitors, daily series, weekday×hour heatmap, top pages, sources and campaign tags, places and networks, devices, screens, languages, scroll depth and the browser signals |
 | `GET /api/visits?days=30&bots=0&limit=50&before=ts` | Newest visits first, with `next` as the cursor for the following page                                           |
 
 `/api/visits` also takes `path=`, `country=`, `visitor=` (all time with `days=0`) and `first=1` (only each visitor's first visit). `days=0` means everything. Times are grouped in Tokyo time. The IP hash is never returned.
