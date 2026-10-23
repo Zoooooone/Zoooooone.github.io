@@ -1,6 +1,16 @@
 import { analytics } from '@/config/site';
 import { onPage } from '@/scripts/core/lifecycle';
-import { createStopwatch, newId, referrerOf, shouldTrack, type PageView } from './payload';
+import {
+  createStopwatch,
+  looksAutomated,
+  navTypeOf,
+  newId,
+  referrerOf,
+  scrollDepth,
+  shouldTrack,
+  utmOf,
+  type PageView,
+} from './payload';
 
 const VISITOR_KEY = 'visitor-id';
 
@@ -38,6 +48,8 @@ onPage(() => {
   )
     return;
 
+  const firstPage = previousPath === null;
+  const entry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
   const view: PageView = {
     pv: newId(),
     visitor: visitorId(),
@@ -46,6 +58,16 @@ onPage(() => {
     screen: `${screen.width}x${screen.height}`,
     lang: navigator.language,
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    viewport: `${innerWidth}x${innerHeight}`,
+    dpr: String(Math.round(devicePixelRatio * 100) / 100),
+    touch: navigator.maxTouchPoints,
+    nav: navTypeOf(entry?.type, firstPage),
+    ...utmOf(location.search),
+    automation: looksAutomated({
+      webdriver: navigator.webdriver,
+      userAgent: navigator.userAgent,
+      languages: navigator.languages,
+    }),
   };
   previousPath = location.pathname;
   send({ type: 'hit', ...view });
@@ -53,7 +75,32 @@ onPage(() => {
   const watch = createStopwatch();
   if (document.visibilityState === 'visible') watch.start();
 
-  const report = () => send({ type: 'leave', pv: view.pv, visitor: view.visitor, ms: watch.elapsed() });
+  // Only events the browser itself raised count: a script that dispatches clicks produces untrusted ones.
+  let interacted = false;
+  const onInteract = (event: Event) => {
+    if (event.isTrusted) interacted = true;
+  };
+  const interactions = ['pointerdown', 'keydown', 'touchstart', 'wheel'];
+  for (const type of interactions) addEventListener(type, onInteract, { passive: true });
+
+  let deepest = 0;
+  const measure = () => {
+    deepest = Math.max(deepest, scrollDepth(scrollY, innerHeight, document.documentElement.scrollHeight));
+  };
+  measure();
+  let frame = 0;
+  const onScroll = () => {
+    frame ||= requestAnimationFrame(() => {
+      frame = 0;
+      measure();
+    });
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+
+  const report = () => {
+    measure();
+    send({ type: 'leave', pv: view.pv, visitor: view.visitor, ms: watch.elapsed(), interacted, scroll: deepest });
+  };
   // Phones often kill the page without firing pagehide, so the time is reported whenever the page is hidden.
   // The server keeps the largest value, so reporting again after the visitor returns is safe.
   const onVisibility = () => {
@@ -76,5 +123,8 @@ onPage(() => {
     removeEventListener('pagehide', onPageHide);
     watch.pause();
     report();
+    for (const type of interactions) removeEventListener(type, onInteract);
+    removeEventListener('scroll', onScroll);
+    cancelAnimationFrame(frame);
   };
 });
