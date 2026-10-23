@@ -4,15 +4,26 @@ import {
   fillDays,
   filterLabels,
   formatCount,
+  formatDateTime,
   formatDuration,
   formatTime,
   heatGrid,
   heatLevel,
+  languageName,
+  navLabel,
+  percent,
   placeLabel,
+  scrollLabel,
+  shareOf,
   shortId,
   sourceLabel,
   tokyoDate,
+  touchLabel,
+  utmLabel,
   visitorName,
+  visitorSummary,
+  withOther,
+  yesNo,
   NAME_COMBINATIONS,
 } from '@/scripts/stats/format';
 
@@ -174,5 +185,112 @@ describe('filterLabels', () => {
 
   it('is empty without filters', () => {
     expect(filterLabels({})).toEqual([]);
+  });
+});
+
+describe('labels for the browser signals', () => {
+  it('shows a share of what was measured, or a dash when nothing was', () => {
+    expect(percent({ measured: 0, yes: 0 })).toBe('—');
+    expect(percent({ measured: 4, yes: 1 })).toBe('25%');
+    expect(percent({ measured: 3, yes: 1 })).toBe('33%');
+    expect(percent({ measured: 3, yes: 3 })).toBe('100%');
+  });
+
+  it('keeps unknown apart from no', () => {
+    expect(yesNo(null)).toBe('—');
+    expect(yesNo(true)).toBe('是');
+    expect(yesNo(false)).toBe('否');
+  });
+
+  it('writes scroll depth and touch points', () => {
+    expect(scrollLabel(null)).toBe('—');
+    expect(scrollLabel(80)).toBe('80%');
+    expect(touchLabel(null)).toBe('—');
+    expect(touchLabel(0)).toBe('否');
+    expect(touchLabel(5)).toBe('是（5 点）');
+  });
+
+  it('names how a page was opened', () => {
+    expect(navLabel('spa')).toBe('站内跳转');
+    expect(navLabel('reload')).toBe('刷新');
+    expect(navLabel('')).toBe('—');
+    expect(navLabel('something-new')).toBe('something-new');
+  });
+
+  it('joins the campaign tags that are there', () => {
+    expect(utmLabel({ utm_source: 'chatgpt.com', utm_medium: 'referral', utm_campaign: '' })).toBe(
+      'chatgpt.com / referral',
+    );
+    expect(utmLabel({ utm_source: '', utm_medium: '', utm_campaign: '' })).toBe('—');
+  });
+
+  it('names a language and falls back to the code', () => {
+    expect(languageName('zh-CN')).toContain('中文');
+    expect(languageName('')).toBe('—');
+    expect(languageName('not a code!')).toBe('not a code!');
+  });
+
+  it('writes the full time in Tokyo time', () => {
+    expect(formatDateTime(TS)).toBe('2026-10-21 21:39:04（东京时间）');
+  });
+});
+
+describe('visitorSummary', () => {
+  it('adds up the visits that are loaded', () => {
+    const rows = [
+      { ts: 3000, path: '/a/', duration_ms: 1000 },
+      { ts: 1000, path: '/b/', duration_ms: null },
+      { ts: 2000, path: '/a/', duration_ms: 500 },
+    ];
+    expect(visitorSummary(rows)).toEqual({ visits: 3, pages: 2, first: 1000, last: 3000, totalMs: 1500 });
+  });
+});
+
+describe('shareOf', () => {
+  it('rounds to a whole percent', () => {
+    expect(shareOf(1, 3)).toBe('33%');
+    expect(shareOf(2, 3)).toBe('67%');
+    expect(shareOf(5, 5)).toBe('100%');
+    expect(shareOf(0, 5)).toBe('0%');
+  });
+
+  it('says less than 1% instead of showing a rounded zero for something that happened', () => {
+    expect(shareOf(1, 1000)).toBe('<1%');
+  });
+
+  it('is a dash when there is nothing to compare with', () => {
+    expect(shareOf(0, 0)).toBe('—');
+  });
+});
+
+describe('withOther', () => {
+  const list = [
+    { name: 'a', views: 50 },
+    { name: 'b', views: 30 },
+    { name: 'c', views: 10 },
+    { name: 'd', views: 5 },
+  ];
+
+  it('keeps the first entries and adds up the rest, so the shares cover the whole', () => {
+    const items = withOther(list, 2, 100);
+    expect(items.map((i) => [i.name, i.views])).toEqual([
+      ['a', 50],
+      ['b', 30],
+      ['其他', 20],
+    ]);
+    expect(items.reduce((sum, i) => sum + i.views, 0)).toBe(100);
+    expect(items.map((i) => i.other)).toEqual([false, false, true]);
+  });
+
+  it('counts what the list did not include at all as other', () => {
+    expect(withOther(list, 10, 120).at(-1)).toEqual({ name: '其他', views: 25, other: true });
+  });
+
+  it('adds nothing when the entries already cover the whole', () => {
+    expect(withOther(list.slice(0, 2), 5, 80)).toHaveLength(2);
+  });
+
+  it('is empty when there is nothing', () => {
+    expect(withOther([], 5, 0)).toEqual([]);
   });
 });

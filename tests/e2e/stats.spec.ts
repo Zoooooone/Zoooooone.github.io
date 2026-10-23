@@ -1,88 +1,5 @@
-import type { Page, Request } from '@playwright/test';
-import { analytics } from '../../src/config/site';
 import { expect, horizontalOverflow, ready, test } from './fixtures';
-
-const HOST = new URL(analytics.endpoint).hostname;
-const GOOD = 'good-token';
-const VISITOR = 'a'.repeat(32);
-const NOW = Date.now();
-
-const summary = {
-  days: 30,
-  totals: { views: 1234, visitors: 321, newVisitors: 200, returningVisitors: 121, avgDurationMs: 192_000 },
-  daily: [
-    { day: '2026-10-19', views: 30, visitors: 12 },
-    { day: '2026-10-21', views: 80, visitors: 40 },
-  ],
-  heatmap: [
-    { dow: 1, hour: 21, views: 40 },
-    { dow: 3, hour: 9, views: 10 },
-  ],
-  pages: [
-    { path: '/posts/docker/', views: 90, visitors: 60, avg_ms: 120_000 },
-    { path: '/<img src=x onerror=alert(1)>/', views: 5, visitors: 2, avg_ms: null },
-  ],
-  referrers: { direct: 70, internal: 400, external: [{ host: 'google.com', views: 55 }] },
-  countries: [
-    { name: 'JP', views: 800, visitors: 200 },
-    { name: 'US', views: 100, visitors: 40 },
-  ],
-  cities: [{ country: 'JP', city: 'Tokyo', views: 700, visitors: 180 }],
-  browsers: [{ name: 'Chrome', views: 900, visitors: 250 }],
-  systems: [{ name: 'Windows', views: 700, visitors: 200 }],
-  devices: [{ name: 'desktop', views: 900, visitors: 250 }],
-};
-
-const visit = (n: number, extra: Record<string, unknown> = {}) => ({
-  visitor_id: VISITOR,
-  ts: NOW - n * 60_000,
-  path: `/posts/p${n}/`,
-  referrer: n % 2 ? 'https://www.google.com/search' : '',
-  country: 'JP',
-  region: 'Tokyo',
-  city: 'Tokyo',
-  as_org: 'KDDI',
-  browser: 'Chrome',
-  os: 'Windows',
-  device: 'desktop',
-  screen: '1920x1080',
-  lang: 'ja',
-  is_bot: false,
-  duration_ms: 5000 * n,
-  is_first: n === 1,
-  ...extra,
-});
-
-const FIRST_PAGE = [visit(1), visit(2), visit(3, { is_bot: true })];
-const SECOND_PAGE = [visit(4), visit(5)];
-
-async function mockWorker(page: Page) {
-  const requests: URL[] = [];
-  await page.route(`https://${HOST}/**`, async (route) => {
-    const request: Request = route.request();
-    const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization' };
-    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
-
-    const url = new URL(request.url());
-    requests.push(url);
-    if (request.headers().authorization !== `Bearer ${GOOD}`) return route.fulfill({ status: 401, headers: cors });
-
-    if (url.pathname === '/api/summary') return route.fulfill({ json: summary, headers: cors });
-    const before = url.searchParams.get('before');
-    return route.fulfill({
-      json: before ? { visits: SECOND_PAGE, next: null } : { visits: FIRST_PAGE, next: before ? null : 12345 },
-      headers: cors,
-    });
-  });
-  return requests;
-}
-
-async function unlock(page: Page, token = GOOD) {
-  await page.goto('/stats/');
-  await ready(page);
-  await page.locator('[data-token]').fill(token);
-  await page.locator('[data-gate] button[type="submit"]').click();
-}
+import { mockWorker, NOTHING_MEASURED, ROWS, summary, unlock, VISITOR } from './stats-fixtures';
 
 test.describe('stats page', () => {
   test('is kept out of search engines', async ({ page }) => {
@@ -113,7 +30,7 @@ test.describe('stats page', () => {
     await unlock(page);
 
     const kpis = page.locator('.kpi b');
-    await expect(kpis).toHaveText(['1,234', '321', '200', '3m 12s']);
+    await expect(kpis).toHaveText(['1,234', '321', '200', '3m 12s', '79%', '65%', '7%', '34%']);
     await expect(page.locator('.heat tbody tr')).toHaveCount(7);
     await expect(page.locator('.heat td[data-level="4"]')).toHaveCount(1);
     await expect(page.locator('[data-daily] svg rect.bar-views')).toHaveCount(30);
@@ -121,7 +38,7 @@ test.describe('stats page', () => {
     await expect(page.locator('[data-sources]')).toContainText('google.com');
     await expect(page.locator('[data-sources]')).toContainText('直接访问 70 · 站内跳转 400');
     await expect(page.locator('[data-places]')).toContainText('日本');
-    await expect(page.locator('.visits tbody tr')).toHaveCount(3);
+    await expect(page.locator(ROWS)).toHaveCount(3);
     await expect(page.locator('.visits [data-filter="visitor"]').first()).toHaveText(/^\D{2}\d{2}$/);
     await expect(page.locator('.visits .tag', { hasText: 'NEW' })).toHaveCount(1);
     await expect(page.locator('.visits .tag.bot')).toHaveCount(1);
@@ -158,7 +75,7 @@ test.describe('stats page', () => {
   test('filters the visit list from a page, can undo it, and loads more', async ({ page }) => {
     const requests = await mockWorker(page);
     await unlock(page);
-    await expect(page.locator('.visits tbody tr')).toHaveCount(3);
+    await expect(page.locator(ROWS)).toHaveCount(3);
 
     await page.locator('.visits [data-filter="path"]').first().click();
     await expect(page.locator('.chip')).toContainText('页面 /posts/p1/');
@@ -170,7 +87,7 @@ test.describe('stats page', () => {
     await expect(page.locator('.chip')).toHaveCount(0);
 
     await page.locator('[data-more]').click();
-    await expect(page.locator('.visits tbody tr')).toHaveCount(5);
+    await expect(page.locator(ROWS)).toHaveCount(5);
     await expect(page.locator('[data-more]')).toBeHidden();
     expect(requests.some((u) => u.searchParams.get('before') === '12345')).toBe(true);
   });
@@ -211,6 +128,212 @@ test.describe('stats page', () => {
     await expect(page.locator('[data-visits-panel]')).toBeInViewport();
   });
 
+  test('keeps long names clear of the bar next to them', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await expect(page.locator('[data-places]')).toContainText('America/Argentina/ComodRivadavia');
+
+    // The text is measured with a range because a plain-text label has no element of its own to measure.
+    const overlaps = await page.evaluate(
+      () =>
+        [...document.querySelectorAll('.rank li')].filter((item) => {
+          const label = item.querySelector('.rank-label')!;
+          const bar = item.querySelector('.rank-bar')!;
+          const range = document.createRange();
+          range.selectNodeContents(label.firstChild!);
+          const text = range.getBoundingClientRect();
+          return (
+            text.right > bar.getBoundingClientRect().left + 1 || text.right > label.getBoundingClientRect().right + 1
+          );
+        }).length,
+    );
+    expect(overlaps).toBe(0);
+    await expect(page.locator('[data-places] .rank-label wbr').first()).toBeAttached();
+  });
+
+  test('lists the networks, languages, screens, scroll steps and how visitors arrived', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await expect(page.locator('[data-places]')).toContainText('KDDI');
+    await expect(page.locator('[data-places]')).toContainText('Asia/Tokyo');
+    await expect(page.locator('[data-devices]')).toContainText('1920x1080');
+    await expect(page.locator('[data-devices]')).toContainText('≥1200');
+    await expect(page.locator('[data-devices]')).toContainText('ja-JP');
+    await expect(page.locator('[data-behavior]')).toContainText('0–24%');
+    await expect(page.locator('[data-behavior]')).toContainText('100%');
+    await expect(page.locator('[data-behavior]')).toContainText('新打开');
+    await expect(page.locator('[data-behavior] .rank li').first().locator('.rank-num')).toHaveText('100%');
+    await expect(page.locator('[data-sources]')).toContainText('chatgpt.com');
+  });
+
+  test('shows device, browser and system as shares of the whole', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    const shares = page.locator('[data-devices] .share');
+    await expect(shares).toHaveCount(3);
+    await expect(shares.first().locator('.share-legend')).toContainText(/desktop\s*73%/);
+    await expect(shares.first().locator('.share-legend')).toContainText(/其他\s*27%/);
+
+    await expect(shares.first().locator('.slice.other')).toHaveCSS('background-image', /repeating-linear-gradient/);
+
+    await shares.first().locator('.slice').first().hover();
+    await expect(page.locator('.stats-tip')).toHaveText('desktop · 900 次访问 · 73%');
+  });
+
+  test('draws window width and scroll depth as columns in order', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    const widths = page.locator('[data-devices] .columns li');
+    await expect(widths).toHaveCount(6);
+    await expect(widths.nth(0).locator('.col-value')).toHaveText('0%');
+    await expect(widths.nth(4).locator('.col-value')).toHaveText('100%');
+    await expect(widths.nth(4).locator('.col-label')).toHaveText('≥1200');
+    await widths.nth(4).hover();
+    await expect(page.locator('.stats-tip')).toHaveText('1200–1599 · 60 次访问 · 100%');
+
+    const depth = page.locator('[data-behavior] .columns li');
+    await expect(depth).toHaveCount(5);
+    await expect(depth.nth(0).locator('.col-value')).toHaveText('33%');
+    await expect(depth.nth(4).locator('.col-value')).toHaveText('67%');
+  });
+
+  test('folds the tail of the screen and language lists into other, with percentages', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    const screens = page.locator('[data-devices] .stats-split > div', { hasText: '屏幕尺寸' }).locator('.rank li');
+    await expect(screens).toHaveCount(2);
+    await expect(screens.nth(0)).toContainText('1920x1080');
+    await expect(screens.nth(0).locator('.rank-num')).toHaveText('57%');
+    await expect(screens.nth(1)).toContainText('其他');
+    await expect(screens.nth(1).locator('.rank-num')).toHaveText('43%');
+
+    const languages = page.locator('[data-devices] .stats-split > div', { hasText: '语言' }).locator('.rank li');
+    await expect(languages.nth(0)).toContainText('ja-JP');
+    await expect(languages.nth(0).locator('.rank-num')).toHaveText('49%');
+  });
+
+  test('lines the window width columns up with the bottom of the tallest list beside them', async ({ page }) => {
+    const sizes = ['1920x1080', '1440x900', '390x844', '412x915', '1710x1112', '2560x1440', '360x800'];
+    const tall = { ...summary, screens: sizes.map((name, i) => ({ name, views: 100 - i * 10, visitors: 10 })) };
+    await mockWorker(page, tall);
+    await unlock(page);
+    await expect(page.locator('[data-devices] .columns')).toBeVisible();
+
+    const gap = await page.evaluate(() => {
+      const columns = document.querySelector('[data-devices] .columns')!.getBoundingClientRect();
+      const screens = [...document.querySelectorAll('[data-devices] .stats-split > div')]
+        .find((group) => group.textContent?.includes('屏幕尺寸'))!
+        .querySelector('.rank')!
+        .getBoundingClientRect();
+      return { columns: columns.bottom, screens: screens.bottom, height: columns.height };
+    });
+    expect(gap.height).toBeGreaterThan(176);
+    expect(Math.abs(gap.columns - gap.screens)).toBeLessThan(1);
+  });
+
+  test('keeps the toolbar controls from overlapping', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await expect(page.locator('.toolbar .check').first()).toBeVisible();
+
+    // A control squeezed to nothing keeps its buttons drawn outside its own box, so the content is measured too.
+    const overlaps = await page.evaluate(() => {
+      const edges = [...document.querySelectorAll('.toolbar > *')]
+        .map((el) => ({
+          left: el.getBoundingClientRect().left,
+          right: el.getBoundingClientRect().left + el.scrollWidth,
+        }))
+        .filter((edge) => edge.right > edge.left)
+        .sort((a, b) => a.left - b.left);
+      return edges.filter((edge, i) => i > 0 && edge.left < edges[i - 1].right - 0.5).length;
+    });
+    expect(overlaps).toBe(0);
+    expect((await page.locator('.toolbar .seg').boundingBox())!.width).toBeGreaterThan(100);
+  });
+
+  test('draws every bar with the same thickness', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await expect(page.locator('.columns .col-bar').first()).toBeVisible();
+
+    const sizes = await page.evaluate(() => {
+      const measure = (selector: string, side: 'width' | 'height') =>
+        [...document.querySelectorAll(selector)].map((el) => el.getBoundingClientRect()[side]);
+      return {
+        share: measure('.share-bar', 'height'),
+        rank: measure('.rank-bar', 'height'),
+        column: measure('.col-bar', 'width'),
+      };
+    });
+    const all = [...sizes.share, ...sizes.rank, ...sizes.column];
+    expect(sizes.share.length).toBeGreaterThan(0);
+    expect(sizes.rank.length).toBeGreaterThan(0);
+    expect(sizes.column.length).toBeGreaterThan(0);
+    for (const size of all) expect(Math.abs(size - all[0])).toBeLessThan(0.5);
+    // As thin as the ranking bars have always been on the live site.
+    expect(all[0]).toBeLessThanOrEqual(4);
+  });
+
+  test('says so when a signal was not measured, instead of showing zero', async ({ page }) => {
+    await mockWorker(page, NOTHING_MEASURED);
+    await unlock(page);
+    await expect(page.locator('.kpi b')).toHaveText(['1,234', '321', '200', '3m 12s', '—', '—', '—', '—']);
+    await expect(page.locator('.kpi', { hasText: 'INTERACTED' })).toContainText('开始采集之后');
+    await expect(page.locator('[data-behavior]')).toContainText('开始采集之后');
+  });
+
+  test('opens a visit to show every field, and closes it again', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    const toggle = page.locator('.expand').first();
+    const detail = page.locator('.detail-row').first();
+    await expect(detail).toBeHidden();
+
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(detail).toBeVisible();
+    for (const text of [
+      '完整时间',
+      '浏览器标识',
+      'Mozilla/5.0 test-agent',
+      '真实互动',
+      '滚动深度',
+      '自动化标记',
+      'AS2516',
+      '1280x720',
+      '像素密度',
+    ]) {
+      await expect(detail).toContainText(text);
+    }
+
+    await toggle.click();
+    await expect(detail).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('shows a dash for what an older visit never reported', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    const second = page.locator(ROWS).nth(1);
+    await expect(second.locator('td').nth(-2)).toHaveText('—');
+    await expect(second.locator('td').nth(-1)).toHaveText('—');
+  });
+
+  test('marks a visit whose browser looks automated', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await expect(page.locator('.visits .tag.auto')).toHaveCount(1);
+    await expect(page.locator(ROWS).nth(2)).toContainText('AUTO');
+  });
+
+  test('adds up one visitor when their visits are opened', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await page.locator('.visits [data-filter="visitor"]').first().click();
+    await expect(page.locator('[data-visitor]')).toContainText('共 3 次访问');
+    await expect(page.locator('[data-visitor]')).toContainText(VISITOR);
+  });
+
   test('opens one visitor across all time', async ({ page }) => {
     const requests = await mockWorker(page);
     await unlock(page);
@@ -241,7 +364,7 @@ test.describe('stats page', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await mockWorker(page);
     await unlock(page);
-    await expect(page.locator('.visits tbody tr')).toHaveCount(3);
+    await expect(page.locator(ROWS)).toHaveCount(3);
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
   });
 });

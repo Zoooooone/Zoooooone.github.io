@@ -1,4 +1,4 @@
-import type { Filters, VisitRow } from './types';
+import type { Filters, Measured, VisitRow } from './types';
 
 const TOKYO_OFFSET_MS = 9 * 60 * 60 * 1000;
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -32,6 +32,79 @@ export function formatDuration(ms: number | null): string {
 
 export const formatCount = (n: number) => n.toLocaleString('en-US');
 
+export function shareOf(part: number, whole: number): string {
+  if (whole <= 0) return '—';
+  const share = part / whole;
+  return part > 0 && share < 0.005 ? '<1%' : `${Math.round(share * 100)}%`;
+}
+
+const OTHER = '其他';
+
+export function withOther(list: { name: string; views: number }[], limit: number, total: number) {
+  const shown = list.slice(0, limit).map(({ name, views }) => ({ name, views, other: false }));
+  const rest = total - shown.reduce((sum, item) => sum + item.views, 0);
+  return rest > 0 ? [...shown, { name: OTHER, views: rest, other: true }] : shown;
+}
+
+export function formatDateTime(ts: number): string {
+  const { date, clock } = tokyo(ts);
+  return `${date} ${clock}（东京时间）`;
+}
+
+export const percent = ({ measured, yes }: Measured) =>
+  measured === 0 ? '—' : `${Math.round((yes / measured) * 100)}%`;
+
+export const yesNo = (value: boolean | null) => (value === null ? '—' : value ? '是' : '否');
+
+export const scrollLabel = (pct: number | null) => (pct === null ? '—' : `${pct}%`);
+
+const NAV_LABELS: Record<string, string> = {
+  navigate: '新打开',
+  reload: '刷新',
+  back_forward: '前进/后退',
+  prerender: '预渲染',
+  spa: '站内跳转',
+};
+export const navLabel = (nav: string) => (nav ? (NAV_LABELS[nav] ?? nav) : '—');
+
+export const SCROLL_STEPS = ['0–24%', '25–49%', '50–74%', '75–99%', '100%'];
+export const VIEWPORT_STEPS = ['< 576', '576–767', '768–991', '992–1199', '1200–1599', '≥ 1600'];
+export const VIEWPORT_TICKS = ['<576', '≥576', '≥768', '≥992', '≥1200', '≥1600'];
+
+let languages: Intl.DisplayNames | undefined;
+let regions: Intl.DisplayNames | undefined;
+
+export function languageName(code: string): string {
+  if (!code) return '—';
+  try {
+    languages ??= new Intl.DisplayNames(['zh-CN'], { type: 'language' });
+    return languages.of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
+
+export function touchLabel(points: number | null): string {
+  if (points === null) return '—';
+  return points > 0 ? `是（${points} 点）` : '否';
+}
+
+export function utmLabel(row: Pick<VisitRow, 'utm_source' | 'utm_medium' | 'utm_campaign'>): string {
+  const parts = [row.utm_source, row.utm_medium, row.utm_campaign].filter(Boolean);
+  return parts.length ? parts.join(' / ') : '—';
+}
+
+export function visitorSummary(rows: Pick<VisitRow, 'ts' | 'path' | 'duration_ms'>[]) {
+  const times = rows.map((r) => r.ts);
+  return {
+    visits: rows.length,
+    pages: new Set(rows.map((r) => r.path)).size,
+    first: Math.min(...times),
+    last: Math.max(...times),
+    totalMs: rows.reduce((sum, r) => sum + (r.duration_ms ?? 0), 0),
+  };
+}
+
 export const shortId = (id: string) => id.slice(0, 8);
 
 const WORDS =
@@ -39,7 +112,6 @@ const WORDS =
     ' ',
   );
 
-/** A short readable stand-in for a visitor id, always the same for the same id: 海豚07. */
 export function visitorName(id: string): string {
   const word = WORDS[parseInt(id.slice(0, 4), 16) % WORDS.length];
   return word + String(parseInt(id.slice(4, 8), 16) % 100).padStart(2, '0');
@@ -49,7 +121,8 @@ export const NAME_COMBINATIONS = WORDS.length * 100;
 
 export function countryName(code: string): string {
   try {
-    return new Intl.DisplayNames(['zh-CN'], { type: 'region' }).of(code) ?? code;
+    regions ??= new Intl.DisplayNames(['zh-CN'], { type: 'region' });
+    return regions.of(code) ?? code;
   } catch {
     return code;
   }
@@ -71,7 +144,6 @@ export function sourceLabel(referrer: string): string {
   }
 }
 
-/** Days from the oldest to today without gaps, so a quiet day shows up as an empty bar and not as a missing one. */
 export function fillDays(
   daily: { day: string; views: number; visitors: number }[],
   days: number,
@@ -89,7 +161,6 @@ export function fillDays(
   return out;
 }
 
-/** A 7 x 24 grid (Sunday first) of view counts and the busiest cell. */
 export function heatGrid(cells: { dow: number; hour: number; views: number }[]) {
   const grid = Array.from({ length: 7 }, () => new Array<number>(24).fill(0));
   for (const c of cells) grid[c.dow][c.hour] = c.views;

@@ -1,7 +1,7 @@
 import { onPage } from '@/scripts/core/lifecycle';
 import { ApiError, fetchSummary, fetchVisits } from './api';
-import { h } from './dom';
 import {
+  renderBehavior,
   renderDaily,
   renderDevices,
   renderFilters,
@@ -10,9 +10,11 @@ import {
   renderPages,
   renderPlaces,
   renderSources,
+  renderVisitorSummary,
   renderVisits,
 } from './render';
-import type { Filters, VisitRow } from './types';
+import { attachTooltip } from './tooltip';
+import type { Filters, Summary, VisitRow } from './types';
 
 const TOKEN_KEY = 'stats-token';
 
@@ -83,6 +85,9 @@ onPage(() => {
   function paintVisits() {
     $('[data-visits]').replaceChildren(renderVisits(view.rows, Date.now()));
     $('[data-filters]').replaceChildren(...renderFilters(view.filters));
+    $('[data-visitor]').replaceChildren(
+      ...(view.filters.visitor ? renderVisitorSummary(view.filters.visitor, view.rows) : []),
+    );
     firstOnly.checked = Boolean(view.filters.first);
     more.hidden = view.next === null;
     more.disabled = false;
@@ -100,44 +105,54 @@ onPage(() => {
     view.next = list.next;
   }
 
-  async function loadAll(): Promise<boolean> {
+  function paintSummary(summary: Summary) {
+    $('[data-kpis]').replaceChildren(...renderKpis(summary));
+    $('[data-daily]').replaceChildren(renderDaily(summary, Date.now()));
+    $('[data-heat]').replaceChildren(renderHeatmap(summary.heatmap));
+    $('[data-pages]').replaceChildren(renderPages(summary.pages));
+    $('[data-sources]').replaceChildren(renderSources(summary));
+    $('[data-places]').replaceChildren(renderPlaces(summary));
+    $('[data-devices]').replaceChildren(renderDevices(summary));
+    $('[data-behavior]').replaceChildren(renderBehavior(summary));
+  }
+
+  function begin() {
     controller?.abort();
     controller = new AbortController();
-    const { signal } = controller;
-    const id = ++generation;
     status.textContent = 'LOADING…';
+    const id = ++generation;
+    return { signal: controller.signal, stale: () => id !== generation };
+  }
+
+  const markUpdated = () => {
+    status.textContent = `UPDATED ${new Date().toLocaleTimeString('en-GB')}`;
+  };
+
+  async function loadAll(): Promise<boolean> {
+    const { signal, stale } = begin();
     try {
       const [summary] = await Promise.all([fetchSummary(endpoint, view.token!, query(), signal), loadVisits(signal)]);
-      if (id !== generation) return false;
+      if (stale()) return false;
 
-      $('[data-kpis]').replaceChildren(...renderKpis(summary.totals));
-      $('[data-daily]').replaceChildren(renderDaily(summary, Date.now()));
-      $('[data-heat]').replaceChildren(renderHeatmap(summary.heatmap));
-      $('[data-pages]').replaceChildren(renderPages(summary.pages));
-      $('[data-sources]').replaceChildren(renderSources(summary.referrers));
-      $('[data-places]').replaceChildren(renderPlaces(summary));
-      $('[data-devices]').replaceChildren(renderDevices(summary));
+      paintSummary(summary);
       paintVisits();
-      status.textContent = `UPDATED ${new Date().toLocaleTimeString('en-GB')}`;
+      markUpdated();
       return true;
     } catch (error) {
-      if (id === generation) fail(error);
+      if (!stale()) fail(error);
       return false;
     }
   }
 
   async function reloadVisits() {
-    controller?.abort();
-    controller = new AbortController();
-    const id = ++generation;
-    status.textContent = 'LOADING…';
+    const { signal, stale } = begin();
     try {
-      await loadVisits(controller.signal);
-      if (id !== generation) return;
+      await loadVisits(signal);
+      if (stale()) return;
       paintVisits();
-      status.textContent = `UPDATED ${new Date().toLocaleTimeString('en-GB')}`;
+      markUpdated();
     } catch (error) {
-      if (id === generation) fail(error);
+      if (!stale()) fail(error);
     }
   }
 
@@ -160,6 +175,16 @@ onPage(() => {
 
   const onClick = (event: Event) => {
     const target = event.target as HTMLElement;
+
+    const toggle = target.closest<HTMLElement>('[data-toggle]');
+    if (toggle) {
+      const detail = root.querySelector<HTMLElement>(`#${toggle.dataset.toggle}`)!;
+      const opening = detail.hidden;
+      detail.hidden = !opening;
+      toggle.setAttribute('aria-expanded', String(opening));
+      toggle.textContent = opening ? '▾' : '▸';
+      return;
+    }
 
     const filter = target.closest<HTMLElement>('[data-filter]');
     if (filter) {
@@ -205,31 +230,10 @@ onPage(() => {
     if (await loadAll()) writeToken(entered);
   };
 
-  // Own tooltip: the browser's title tooltip waits a second and cannot be aimed at a thin bar.
-  const tip = h('div', { class: 'stats-tip', role: 'tooltip', hidden: true });
-  document.body.append(tip);
-  const onPointer = (event: PointerEvent) => {
-    const source = (event.target as Element).closest('[data-tip]');
-    if (!source) {
-      tip.hidden = true;
-      return;
-    }
-    tip.textContent = source.getAttribute('data-tip');
-    tip.hidden = false;
-    const left = Math.min(event.clientX + 14, innerWidth - tip.offsetWidth - 8);
-    tip.style.left = `${Math.max(8, left)}px`;
-    tip.style.top = `${Math.max(8, event.clientY - tip.offsetHeight - 12)}px`;
-  };
-  const hideTip = () => {
-    tip.hidden = true;
-  };
-
   root.addEventListener('click', onClick);
   root.addEventListener('change', onChange);
-  root.addEventListener('pointermove', onPointer);
-  root.addEventListener('pointerdown', onPointer);
-  root.addEventListener('pointerleave', hideTip);
   gate.addEventListener('submit', onSubmit);
+  const detachTooltip = attachTooltip(root);
 
   if (!endpoint) {
     gateError.textContent = '统计还没有启用：site.ts 里的 analytics.endpoint 是空的';
@@ -246,10 +250,7 @@ onPage(() => {
     controller?.abort();
     root.removeEventListener('click', onClick);
     root.removeEventListener('change', onChange);
-    root.removeEventListener('pointermove', onPointer);
-    root.removeEventListener('pointerdown', onPointer);
-    root.removeEventListener('pointerleave', hideTip);
-    tip.remove();
+    detachTooltip();
     gate.removeEventListener('submit', onSubmit);
   };
 });

@@ -1,4 +1,5 @@
 .stats {
+  --bar: 0.1875rem;
   margin-top: 1.625rem;
 }
 .stats .sr {
@@ -10,7 +11,6 @@
   white-space: nowrap;
 }
 
-/* Gate */
 .stats .gate {
   display: flex;
   flex-direction: column;
@@ -35,7 +35,6 @@
   color: var(--amber);
 }
 
-/* Toolbar */
 .stats .board {
   display: flex;
   flex-direction: column;
@@ -102,7 +101,6 @@
   cursor: default;
 }
 
-/* Panels */
 .stats .kpis {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -147,18 +145,23 @@
 }
 .stats .stats-split {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   gap: 1.5rem;
 }
-.stats .stats-split.three {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.stats .stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.stats .stats-split > div {
+  display: flex;
+  flex-direction: column;
 }
 .stats .stats-split h3 {
   margin: 0 0 0.5rem;
   font-weight: var(--fw-medium);
 }
 
-/* Daily chart */
 .stats .chart-scale {
   display: flex;
   justify-content: space-between;
@@ -202,7 +205,7 @@
   background: var(--accent);
 }
 
-/* Tooltip, filled in by the script */
+/* The tooltip is appended to <body>, outside .stats, so it is not scoped like the rest. */
 .stats-tip {
   position: fixed;
   z-index: 60;
@@ -231,7 +234,6 @@
   scroll-margin-top: 5.5rem;
 }
 
-/* Heatmap */
 .stats .heat {
   width: 100%;
   table-layout: fixed;
@@ -261,7 +263,7 @@
   background: color-mix(in srgb, var(--accent) 25%, transparent);
 }
 .stats .heat td[data-level='2'] {
-  background: color-mix(in srgb, var(--accent) 50%, transparent);
+  background: color-mix(in srgb, var(--accent) 44%, transparent);
 }
 .stats .heat td[data-level='3'] {
   background: color-mix(in srgb, var(--accent) 75%, transparent);
@@ -270,7 +272,6 @@
   background: var(--accent);
 }
 
-/* Ranked lists */
 .stats .rank {
   display: flex;
   flex-direction: column;
@@ -280,7 +281,7 @@
 }
 .stats .rank li {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(2.5rem, 28%) 3rem;
+  grid-template-columns: minmax(0, 1fr) minmax(2rem, 20%) 2.75rem;
   align-items: center;
   gap: 0.75rem;
   padding: 0.4375rem 0;
@@ -293,9 +294,7 @@
   min-width: 0;
 }
 .stats .rank-label > :first-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
   text-align: left;
 }
 .stats .rank-label small {
@@ -304,14 +303,14 @@
 }
 .stats .rank-bar {
   position: relative;
-  height: 0.1875rem;
+  height: var(--bar);
   background: var(--border);
 }
 .stats .rank-bar::after {
   content: '';
   position: absolute;
   inset: 0 auto 0 0;
-  width: max(var(--w), 0.1875rem);
+  width: max(var(--w), 0.125rem);
   background: var(--accent);
 }
 .stats .rank-num {
@@ -320,7 +319,74 @@
   color: var(--fg-muted);
 }
 
-/* Visit stream */
+.stats .visits .text {
+  max-width: 15rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.stats .visits .text .link {
+  text-align: left;
+}
+.stats .visits .sub {
+  display: block;
+  font: var(--text-2xs) var(--font-mono);
+  color: var(--fg-faint);
+}
+.stats .visits .id {
+  display: block;
+  font: var(--text-2xs) var(--font-mono);
+  color: var(--fg-faint);
+}
+.stats .visits .toggle {
+  padding-right: 0.25rem;
+}
+.stats .expand {
+  padding: 0 0.375rem;
+  border: 0;
+  background: transparent;
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.stats .expand:hover {
+  color: var(--accent);
+}
+.stats .visits .detail-row td {
+  padding: 0 0 0.75rem;
+  border-bottom: 1px solid var(--border-strong);
+  white-space: normal;
+}
+.stats .detail {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.625rem 1.5rem;
+  margin: 0;
+  padding: 0.875rem 1rem;
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+}
+.stats .detail div {
+  min-width: 0;
+}
+.stats .detail dt {
+  font: var(--fw-medium) var(--text-2xs) var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  color: var(--fg-faint);
+}
+.stats .detail dd {
+  margin: 0.125rem 0 0;
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+.stats .detail .wide {
+  grid-column: 1 / -1;
+}
+.stats .detail .code {
+  font: var(--text-xs) var(--font-mono);
+  color: var(--fg-muted);
+}
+.stats .tag.auto {
+  background: var(--accent);
+}
 .stats .chips {
   display: flex;
   flex-wrap: wrap;
@@ -406,8 +472,7 @@
 @media (max-width: 860px) {
   .stats .kpis,
   .stats .cols,
-  .stats .stats-split,
-  .stats .stats-split.three {
+  .stats .stats-split {
     grid-template-columns: minmax(0, 1fr);
   }
   .stats .kpis {
@@ -421,6 +486,146 @@
     width: 2rem;
   }
 }
+.stats .shares {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.stats .share {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0.5rem 1rem;
+  align-items: start;
+}
+.stats .share h3 {
+  margin: 0.125rem 0 0;
+  font-weight: var(--fw-medium);
+}
+.stats .share-bar {
+  display: flex;
+  gap: 0.125rem;
+  height: var(--bar);
+}
+.stats .slice {
+  flex-basis: 0;
+  min-width: 0.125rem;
+}
+.stats .slice:hover {
+  outline: 1px solid var(--fg);
+}
+.stats .slice.s0,
+.stats .swatch.s0 {
+  background: var(--accent);
+}
+.stats .slice.s1,
+.stats .swatch.s1 {
+  background: color-mix(in srgb, var(--accent) 66%, transparent);
+}
+.stats .slice.s2,
+.stats .swatch.s2 {
+  background: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.stats .slice.s3,
+.stats .swatch.s3 {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+.stats .slice.s4,
+.stats .swatch.s4 {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+.stats .slice.other,
+.stats .swatch.other {
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--fg) 30%, transparent) 0 2px,
+    transparent 2px 5px
+  );
+}
+.stats .share-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+.stats .share-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.stats .share-legend .swatch {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin: 0;
+}
+.stats .share-legend b {
+  font: var(--fw-semibold) var(--text-xs) var(--font-mono);
+  color: var(--fg-muted);
+}
+
+.stats .columns {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 11rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.stats .columns li {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.375rem;
+  min-width: 0;
+  text-align: center;
+}
+.stats .col-track {
+  position: relative;
+  margin-top: 1.25rem;
+  border-bottom: 1px solid var(--border-strong);
+}
+.stats .col-value {
+  position: absolute;
+  inset-inline: 0;
+  margin-bottom: 0.25rem;
+  font: var(--fw-semibold) var(--text-2xs) var(--font-mono);
+  color: var(--fg-muted);
+}
+.stats .col-bar {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: var(--bar);
+  min-height: 0.125rem;
+  transform: translateX(-50%);
+  background: var(--accent);
+}
+.stats .columns li:hover .col-bar {
+  background: var(--fg);
+}
+.stats .col-label {
+  font: var(--text-2xs) var(--font-mono);
+  color: var(--fg-faint);
+  overflow-wrap: anywhere;
+}
+
+.stats .rank-label.inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.5rem;
+}
+
+@media (max-width: 860px) {
+  .stats .share {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* Last, so it beats the display values above at equal specificity. */
 .stats [hidden] {
   display: none;

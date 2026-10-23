@@ -106,9 +106,17 @@ const ranges = [
         <div data-devices></div>
       </section>
 
-      <section class="panel frame cut-s" aria-label="访问流水" data-visits-panel>
+      <section class="panel frame cut-s" aria-label="行为">
         <div class="panel-head">
           <span class="idx">07</span>
+          <span class="grow">BEHAVIOUR · 行为</span>
+        </div>
+        <div data-behavior></div>
+      </section>
+
+      <section class="panel frame cut-s" aria-label="访问流水" data-visits-panel>
+        <div class="panel-head">
+          <span class="idx">08</span>
           <span class="grow">VISITS · 访问流水</span>
           <label class="check">
             <input type="checkbox" data-first />
@@ -116,6 +124,7 @@ const ranges = [
           </label>
         </div>
         <div class="chips" data-filters></div>
+        <div data-visitor></div>
         <div class="table-wrap" data-visits></div>
         <button class="tool more" type="button" data-more hidden>
           加载更多
