@@ -41,6 +41,8 @@ export function createCommands(go: (href: string) => void, click: (id: string) =
     page('归档 · Archives', '/archives/'),
     page('关于 · About', '/about/'),
     page('更新日志 · Changelog', '/changelog/'),
+    page('访问统计 · Stats', '/stats/'),
+    page('模型观察 · Model Watch', '/model-watch/'),
     action('切换主题（深浅色）· Theme', 'THEME', 'theme-toggle'),
     action('切换背景壁纸 · Wallpaper', 'WALLPAPER', 'bg-toggle'),
   ];

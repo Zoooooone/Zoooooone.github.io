@@ -108,6 +108,23 @@ test.describe('app shell', () => {
     await expect(page.locator('.rail-nav a[aria-current="page"]')).toHaveAttribute('href', '/about/');
   });
 
+  test('the rail leads to the private pages and marks the one that is open', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    const links = page.locator('.rail-private a');
+    await expect(links).toHaveText([/Stats\s*统计/, /Model Watch\s*模型/]);
+    await expect(links.locator('svg')).toHaveCount(2);
+    await expect(page.locator('.rail-private a[aria-current="page"]')).toHaveCount(0);
+
+    await links.nth(1).click();
+    await expect(page).toHaveURL(/\/model-watch\/$/);
+    await expect(page.locator('.rail-private a[aria-current="page"]')).toHaveAttribute('href', '/model-watch/');
+    await expect(page.locator('.rail-nav a[aria-current="page"]')).toHaveCount(0);
+
+    await links.nth(0).click();
+    await expect(page.locator('.rail-private a[aria-current="page"]')).toHaveAttribute('href', '/stats/');
+  });
+
   test('the command palette opens with Ctrl+K, searches and closes with Escape', async ({ page }) => {
     await page.goto('/');
     await ready(page);

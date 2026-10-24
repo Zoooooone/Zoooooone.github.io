@@ -76,6 +76,8 @@ describe('commands', () => {
     commands.find((c) => c.meta === '/archives/')!.run();
     commands.find((c) => c.meta === 'THEME')!.run();
     expect(go).toHaveBeenCalledWith('/archives/');
+    commands.find((c) => c.meta === '/model-watch/')!.run();
+    expect(go).toHaveBeenCalledWith('/model-watch/');
     expect(click).toHaveBeenCalledWith('theme-toggle');
   });
 

@@ -45,7 +45,7 @@ const updateRuler = setupRuler();
 
 onPage(() => {
   const path = location.pathname;
-  document.querySelectorAll<HTMLAnchorElement>('.rail-nav a').forEach((a) => {
+  document.querySelectorAll<HTMLAnchorElement>('.rail-nav a, .rail-private a').forEach((a) => {
     const href = new URL(a.href).pathname;
     if (isActive(href, path)) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');

@@ -14,6 +14,11 @@ const nav = [
   { href: '/about/', label: 'About', zh: '关于' },
 ];
 
+const tools = [
+  { href: '/stats/', label: 'Stats', zh: '统计', icon: 'stats' },
+  { href: '/model-watch/', label: 'Model Watch', zh: '模型', icon: 'trend' },
+];
+
 const isActive = (href: string) => (href === '/' ? path === '/' || path.startsWith('/posts/') : path.startsWith(href));
 ---
 
@@ -31,6 +36,20 @@ const isActive = (href: string) => (href === '/' ? path === '/' || path.startsWi
         <span class="n">{String(i + 1).padStart(2, '0')}</span>
         <span>{n.label}</span>
         <small>{n.zh}</small>
+      </a>
+    ))}
+  </nav>
+  <div class="rail-label">Private</div>
+  <nav class="rail-social rail-private" aria-label="private">
+    {tools.map((t) => (
+      <a href={t.href} aria-current={path.startsWith(t.href) ? 'page' : undefined}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          {icons[t.icon].map((d) => (
+            <path d={d} />
+          ))}
+        </svg>
+        <span>{t.label}</span>
+        <small>{t.zh}</small>
       </a>
     ))}
   </nav>

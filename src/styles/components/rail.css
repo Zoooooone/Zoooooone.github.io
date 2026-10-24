@@ -234,6 +234,21 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.rail-private a::after {
+  content: none;
+}
+.rail-private small {
+  margin-left: auto;
+  font-size: var(--text-2xs);
+  color: var(--fg-faint);
+}
+.rail-private a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--fg);
+}
+.rail-private a[aria-current='page'] svg {
+  stroke: var(--accent);
+}
 .rail-btn[aria-pressed='false'] {
   opacity: 0.6;
 }
