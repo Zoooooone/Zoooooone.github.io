@@ -13,24 +13,9 @@ import {
   renderVisitorSummary,
   renderVisits,
 } from './render';
-import { attachTooltip } from './tooltip';
+import { readToken, writeToken } from '@/scripts/core/stats-token';
+import { attachTooltip } from '@/scripts/core/tooltip';
 import type { Filters, Summary, VisitRow } from './types';
-
-const TOKEN_KEY = 'stats-token';
-
-const readToken = () => {
-  try {
-    return localStorage.getItem(TOKEN_KEY);
-  } catch {
-    return null;
-  }
-};
-const writeToken = (token: string | null) => {
-  try {
-    if (token) localStorage.setItem(TOKEN_KEY, token);
-    else localStorage.removeItem(TOKEN_KEY);
-  } catch {}
-};
 
 function explain(error: unknown): string {
   if (error instanceof ApiError) {

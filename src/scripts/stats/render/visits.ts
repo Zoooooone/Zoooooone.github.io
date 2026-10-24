@@ -1,4 +1,4 @@
-import { h } from '../dom';
+import { h } from '@/scripts/core/dom';
 import {
   countryName,
   filterLabels,

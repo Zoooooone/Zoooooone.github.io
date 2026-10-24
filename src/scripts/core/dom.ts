@@ -14,7 +14,7 @@ function apply(el: Element, attrs: Attrs, children: Child[]) {
   return el;
 }
 
-// Everything shown comes from the server (page paths, referrers, network names), so it only ever goes in as text.
+// Everything shown comes from a server (page paths, referrers, model names), so it only ever goes in as text.
 export function h<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   attrs: Attrs = {},

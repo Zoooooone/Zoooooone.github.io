@@ -1,4 +1,4 @@
-import { h } from '../dom';
+import { h } from '@/scripts/core/dom';
 import { formatCount, formatDuration, percent, scrollLabel } from '../format';
 import type { Summary } from '../types';
 import { NOT_MEASURED } from './shared';

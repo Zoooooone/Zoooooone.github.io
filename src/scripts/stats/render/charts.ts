@@ -1,4 +1,4 @@
-import { h, svg } from '../dom';
+import { h, svg } from '@/scripts/core/dom';
 import { WEEKDAYS, fillDays, formatCount, heatGrid, heatLevel, shareOf, tokyoDate, withOther } from '../format';
 import type { Named, Summary } from '../types';
 import { empty } from './shared';

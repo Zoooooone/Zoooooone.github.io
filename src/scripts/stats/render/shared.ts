@@ -1,4 +1,4 @@
-import { h } from '../dom';
+import { h } from '@/scripts/core/dom';
 import type { Filters } from '../types';
 
 export const empty = (text = '这段时间没有数据') => h('p', { class: 'stats-empty' }, text);
