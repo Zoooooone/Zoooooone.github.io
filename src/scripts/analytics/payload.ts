@@ -75,7 +75,7 @@ export function shouldTrack(env: {
   if (!env.endpoint) return false;
   if (['localhost', '127.0.0.1', '[::1]'].includes(env.hostname)) return false;
   if (env.doNotTrack === '1') return false;
-  if (env.pathname.startsWith('/stats/')) return false;
+  if (env.pathname.startsWith('/stats/') || env.pathname.startsWith('/model-watch/')) return false;
   return !env.cookie.split('; ').some((c) => c.startsWith('blogger_visit='));
 }
 

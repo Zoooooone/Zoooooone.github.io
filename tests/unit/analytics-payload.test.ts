@@ -40,6 +40,7 @@ describe('shouldTrack', () => {
     ['local development', { hostname: 'localhost' }],
     ['Do Not Track', { doNotTrack: '1' }],
     ['the stats page itself', { pathname: '/stats/' }],
+    ['the model watch page', { pathname: '/model-watch/' }],
     ['the blogger cookie', { cookie: 'x=1; blogger_visit=true' }],
   ])('skips %s', (_name, override) => {
     expect(shouldTrack({ ...base, ...override })).toBe(false);

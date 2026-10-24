@@ -1,0 +1,158 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHead from '@/components/ui/PageHead.astro';
+import { analytics } from '@/config';
+import { BOARD_LABELS } from '@/scripts/model-watch/metrics';
+import { MEDIA_BOARDS } from '@/scripts/model-watch/types';
+
+// Only the dev server reads the override (pnpm dev:mock), so a built site can never be pointed elsewhere.
+const endpoint = (import.meta.env.DEV && import.meta.env.PUBLIC_STATS_ENDPOINT) || analytics.endpoint;
+
+const ranges = [7, 30, 90];
+---
+
+<BaseLayout title="Model Watch" noindex>
+  <PageHead label="MODEL WATCH · 模型观察" title="AI 模型动态" meta="PRIVATE · DAILY 06:00 TOKYO" />
+
+  <div class="stats model-watch" data-model-watch data-endpoint={endpoint}>
+    <form class="gate frame cut-s" data-gate hidden>
+      <label class="mono-label" for="model-watch-token">
+        ACCESS TOKEN · 口令
+      </label>
+      <input id="model-watch-token" name="token" type="password" autocomplete="current-password" required data-token />
+      <p class="gate-error" role="alert" data-gate-error></p>
+      <button class="go" type="submit">
+        UNLOCK ▸
+      </button>
+    </form>
+
+    <div class="board" data-dashboard hidden>
+      <div class="toolbar">
+        <label class="check">
+          <input type="checkbox" data-merge checked />
+          合并推理档位
+        </label>
+        <label class="check">
+          <input type="checkbox" data-unlisted />
+          包含没有价格的模型
+        </label>
+        <span class="grow"></span>
+        <span class="mono-label" role="status" data-status></span>
+        <button class="tool" type="button" data-refresh>
+          刷新
+        </button>
+        <button class="tool" type="button" data-signout>
+          退出
+        </button>
+      </div>
+      <div class="warn" role="alert" data-warn></div>
+
+      <div class="kpis" data-kpis></div>
+
+      <section class="panel frame cut-s" aria-label="变化">
+        <div class="panel-head">
+          <span class="idx">01</span>
+          <span class="grow">CHANGES · 变化</span>
+          <label class="hint" for="model-watch-change-metric">
+            指标变动按
+          </label>
+          <select id="model-watch-change-metric" class="pick" data-change-metric></select>
+          <div class="seg" role="group" aria-label="比较范围">
+            {ranges.map((days) => (
+              <button type="button" data-days={days} aria-pressed={days === 7 ? 'true' : 'false'}>
+                {days} 天
+              </button>
+            ))}
+          </div>
+        </div>
+        <div data-changes></div>
+      </section>
+
+      <section class="panel frame cut-s" aria-label="排行">
+        <div class="panel-head">
+          <span class="idx">02</span>
+          <span class="grow">LEADERBOARD · 排行</span>
+          <label class="sr" for="model-watch-metric">
+            排行依据
+          </label>
+          <select id="model-watch-metric" class="pick" data-metric></select>
+        </div>
+        <div data-board></div>
+        <button class="tool more" type="button" data-more>
+          显示全部
+        </button>
+      </section>
+
+      <section class="panel frame cut-s" aria-label="性价比">
+        <div class="panel-head">
+          <span class="idx">03</span>
+          <span class="grow">VALUE · 智能与价格</span>
+          <span class="hint">越靠左上越好：更聪明也更便宜</span>
+        </div>
+        <div data-value></div>
+      </section>
+
+      <section class="panel frame cut-s" aria-label="速度">
+        <div class="panel-head">
+          <span class="idx">04</span>
+          <span class="grow">SPEED · 智能与速度</span>
+          <span class="hint">越靠右上越好：更聪明也更快</span>
+        </div>
+        <div data-speed></div>
+      </section>
+
+      <section class="panel frame cut-s" aria-label="前沿演进">
+        <div class="panel-head">
+          <span class="idx">05</span>
+          <span class="grow">FRONTIER · 前沿演进</span>
+          <span class="hint">按发布月份，含已下线的模型</span>
+          <label class="sr" for="model-watch-frontier-metric">
+            前沿指标
+          </label>
+          <select id="model-watch-frontier-metric" class="pick" data-frontier-metric></select>
+        </div>
+        <div data-frontier></div>
+      </section>
+
+      <section class="panel frame cut-s" aria-label="厂商">
+        <div class="panel-head">
+          <span class="idx">06</span>
+          <span class="grow">CREATORS · 厂商</span>
+        </div>
+        <div data-creators></div>
+      </section>
+
+      <section class="panel frame cut-s" aria-label="媒体竞技场">
+        <div class="panel-head">
+          <span class="idx">07</span>
+          <span class="grow">ARENAS · 媒体竞技场</span>
+          <label class="sr" for="model-watch-category">
+            分类
+          </label>
+          <select id="model-watch-category" class="pick" data-category></select>
+        </div>
+        <div class="seg wrap" role="group" aria-label="竞技场">
+          {MEDIA_BOARDS.map((board, i) => (
+            <button type="button" data-media={board} aria-pressed={i === 0 ? 'true' : 'false'}>
+              {BOARD_LABELS[board]}
+            </button>
+          ))}
+        </div>
+        <div data-media-list></div>
+      </section>
+
+      <p class="source">
+        Source:{' '}
+        <a href="https://artificialanalysis.ai/" rel="noopener" target="_blank">
+          Artificial Analysis (artificialanalysis.ai)
+        </a>
+        。Based on data from Artificial Analysis：本页的排名、汇总和图表由本站根据其免费 API 自动生成，不代表 Artificial
+        Analysis 的观点，也未经其认可。
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import '@/scripts/model-watch';
+</script>
