@@ -2,6 +2,10 @@ name = "blog-visits"
 main = "src/index.ts"
 compatibility_date = "2026-10-01"
 
+# Hourly, so a failed daily fetch of the model lists is retried; runs before 06:00 Tokyo do nothing.
+[triggers]
+crons = ["0 * * * *"]
+
 [vars]
 ALLOWED_ORIGINS = "https://zoooooone.github.io,http://localhost:4321"
 

@@ -87,3 +87,34 @@ Use a long random value (40+ characters) and change it the same way if it ever l
 `/api/visits` also takes `path=`, `country=`, `visitor=` (all time with `days=0`) and `first=1` (only each visitor's first visit). `days=0` means everything. Times are grouped in Tokyo time. The IP hash is never returned.
 
 Each summary request reads every visit in the range several times, so keep an eye on the daily D1 read allowance once the table grows into the hundreds of thousands of rows.
+
+## Model snapshots
+
+The same Worker keeps a daily copy of the [Artificial Analysis](https://artificialanalysis.ai/) free API for the private `/model-watch/` page: the LLM list and the five media arenas (text to image, image editing, text to speech, text to video, image to video).
+
+```bash
+npx wrangler secret put AA_API_KEY
+npx wrangler d1 migrations apply blog-visits --remote
+npx wrangler deploy
+```
+
+- A cron trigger runs every hour. From 06:00 Tokyo time it fetches each board that has no snapshot for today yet, so a failed board is retried the next hour and a finished day costs no further requests (six a day, the limit is 1000).
+- Days are Tokyo dates. A price or speed of `0` from the API means "not measured" and is stored as `NULL`.
+- A response that is not JSON, lists no models, or has less than half the models of the previous snapshot is refused and logged in `aa_runs`; the page keeps showing the last good day.
+- The response is handed to SQLite as one value and taken apart there with `json_each`, so the Worker never parses the 0.6 MB list. D1 refuses values over 2 MB.
+
+| Endpoint                          | Returns                                                                          |
+| --------------------------------- | -------------------------------------------------------------------------------- |
+| `GET /api/models/latest`          | Newest list of every board, the latest fetch attempts, and the best intelligence index per day |
+| `GET /api/models/changes?days=7&metric=intelligence` | Models added, removed, rescored or repriced since the snapshot `days` earlier, and rank changes in each arena. `metric` is the column or benchmark that "rescored" compares; an unknown name gets `400` |
+| `GET /api/models/history?id=`     | Every stored day of one LLM                                                      |
+
+They use the same `Origin` and `STATS_TOKEN` checks as the stats API.
+
+Terms: the data is licensed by the Artificial Analysis [Data Platform Terms](https://artificialanalysiscdn.com/legal/ProDataPlatformTerms.pdf) for internal use. Keep the page behind the token, never commit API responses (tests and `pnpm dev:mock` use invented models), and keep the attribution on the page. If the API access ends, delete the `aa_*` tables within 30 days.
+
+To try a fetch by hand after deploying, use "Trigger" on the Worker's cron in the Cloudflare dashboard, then:
+
+```bash
+npx wrangler d1 execute blog-visits --remote --command "SELECT datetime(ts/1000,'unixepoch') AS at, board, ok, models, error FROM aa_runs ORDER BY ts DESC LIMIT 12"
+```

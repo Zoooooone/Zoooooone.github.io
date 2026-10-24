@@ -1,4 +1,5 @@
 import { collect } from './collect';
+import { ingestModels } from './models/ingest';
 import { handleStats } from './stats';
 import type { Env } from './types';
 
@@ -33,5 +34,9 @@ export default {
 
     const status = await collect(request, env);
     return new Response(null, status === 204 ? { status, headers: cors(origin) } : { status });
+  },
+
+  async scheduled(_controller: unknown, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }) {
+    ctx.waitUntil(ingestModels(env));
   },
 };

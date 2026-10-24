@@ -17,4 +17,6 @@ export interface Env {
   HASH_SECRET: string;
   /** Bearer token that unlocks the read-only stats API. Without it the API does not exist. */
   STATS_TOKEN?: string;
+  /** Key for the Artificial Analysis free API. Without it the daily model snapshots are skipped. */
+  AA_API_KEY?: string;
 }

@@ -1,3 +1,4 @@
+import { handleModels } from '../models/api';
 import type { Env } from '../types';
 import { integer, json, type ResponseHeaders } from './shared';
 import { summary } from './summary';
@@ -27,6 +28,7 @@ export async function handleStats(request: Request, env: Env, headers: ResponseH
   }
 
   const url = new URL(request.url);
+  if (url.pathname.startsWith('/api/models/')) return handleModels(env.DB, url, headers);
   const days = integer(url.searchParams.get('days'), 0, 3650, 30);
   const filters = { since: days ? Date.now() - days * DAY_MS : 0, bots: url.searchParams.get('bots') === '1' };
 
