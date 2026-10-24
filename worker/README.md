@@ -113,7 +113,7 @@ They use the same `Origin` and `STATS_TOKEN` checks as the stats API.
 
 Terms: the data is licensed by the Artificial Analysis [Data Platform Terms](https://artificialanalysiscdn.com/legal/ProDataPlatformTerms.pdf) for internal use. Keep the page behind the token, never commit API responses (tests and `pnpm dev:mock` use invented models), and keep the attribution on the page. If the API access ends, delete the `aa_*` tables within 30 days.
 
-To try a fetch by hand after deploying, use "Trigger" on the Worker's cron in the Cloudflare dashboard, then:
+A deployed Worker has no button to run its cron on demand. After deploying, wait for the next full hour (watch it with `npx wrangler tail --format pretty`), then check the log:
 
 ```bash
 npx wrangler d1 execute blog-visits --remote --command "SELECT datetime(ts/1000,'unixepoch') AS at, board, ok, models, error FROM aa_runs ORDER BY ts DESC LIMIT 12"
