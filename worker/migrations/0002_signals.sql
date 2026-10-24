@@ -1,5 +1,3 @@
--- Signals collected from the browser. Visits recorded before this migration keep NULL (or an empty string),
--- which means "not measured", not "no".
 ALTER TABLE visits ADD COLUMN viewport TEXT NOT NULL DEFAULT '';
 ALTER TABLE visits ADD COLUMN dpr TEXT NOT NULL DEFAULT '';
 ALTER TABLE visits ADD COLUMN touch INTEGER;
