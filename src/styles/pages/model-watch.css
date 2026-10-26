@@ -157,6 +157,70 @@
   pointer-events: none;
 }
 
+.model-watch .scatter .series,
+.model-watch .scatter .pt.series,
+.model-watch .swatch-dot {
+  --series: oklch(var(--series-l) var(--series-c) var(--h));
+}
+.model-watch .scatter .series-line {
+  fill: none;
+  stroke: var(--series);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.model-watch .scatter .series-link {
+  stroke: var(--series);
+  stroke-width: 1;
+  opacity: 0.6;
+}
+.model-watch .scatter .series-end {
+  fill: var(--series);
+  font-size: 12px;
+  font-weight: var(--fw-bold);
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  cursor: pointer;
+}
+.model-watch .scatter .series.dim {
+  opacity: 0.2;
+}
+.model-watch .scatter .pt.series .dot {
+  fill: var(--series);
+}
+.model-watch .scatter .pt.series.plain .dot {
+  fill: color-mix(in oklab, var(--series) 45%, transparent);
+}
+.model-watch .scatter .pt.series.best .dot {
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+.model-watch .scatter .pt.series.pinned .dot {
+  stroke: var(--fg);
+  stroke-width: 2;
+}
+
+.model-watch .timeline-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+}
+.model-watch .timeline-bar .creators {
+  flex: 1 1 24rem;
+  margin-bottom: 0;
+}
+.model-watch .swatch-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.375rem;
+  background: var(--series);
+}
+
 .model-watch .scatter .hover-card rect {
   fill: var(--fg);
 }
@@ -200,6 +264,39 @@
 }
 
 /* The row that opens under a model spans the whole list, whether the list is a grid or a flex row. */
+.model-watch .paging {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.model-watch .paging-page {
+  min-width: 4.5rem;
+  font: var(--fw-medium) var(--text-xs) var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-muted);
+  text-align: center;
+}
+.model-watch .paging-btn {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+}
+.model-watch .paging-btn svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.model-watch :is(.rank, .changes) > li[hidden] {
+  display: none;
+}
 .model-watch :is(.rank, .changes) > li.detail-row {
   display: block;
   padding: 0.25rem 0 0.875rem;
@@ -282,4 +379,36 @@
   .model-watch .panel-head {
     flex-wrap: wrap;
   }
+}
+
+.model-watch .anchors {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 25;
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border-strong);
+  background: var(--glass-strong);
+  backdrop-filter: blur(1rem) saturate(1.35);
+  -webkit-backdrop-filter: blur(1rem) saturate(1.35);
+}
+.model-watch .anchors a {
+  flex: 1;
+  padding: 0.3125rem 0.75rem;
+  color: var(--fg-muted);
+  font: var(--fw-semibold) var(--text-xs) var(--font-mono);
+  letter-spacing: var(--tracking-wide);
+  text-align: center;
+  white-space: nowrap;
+}
+.model-watch .anchors a:hover {
+  color: var(--fg);
+}
+.model-watch .anchors a[aria-current='true'] {
+  background: var(--accent);
+  color: var(--bg);
+}
+.model-watch [data-section] {
+  scroll-margin-top: 4rem;
 }

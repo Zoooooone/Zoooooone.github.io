@@ -2,7 +2,7 @@ import { h } from '@/scripts/core/dom';
 import { categoryName, creatorBoard, rank } from '../data';
 import { formatScore } from '../metrics';
 import type { LlmModel, MediaModel } from '../types';
-import { fromRange, fromZero, note, rankList } from './shared';
+import { fromRange, fromZero, LIST_PAGE, note, rankList } from './shared';
 
 export function renderCreators(models: LlmModel[]): HTMLElement {
   const creators = creatorBoard(models);
@@ -22,6 +22,8 @@ export function renderCreators(models: LlmModel[]): HTMLElement {
         creators.map((c) => c.best.intelligence!),
         'high',
       ),
+      undefined,
+      LIST_PAGE,
     ),
   );
 }
@@ -41,11 +43,10 @@ const confidence = (ci95: string | undefined) => {
   return match ? (match[1] === match[2] ? `±${match[1]}` : `−${match[1]}/+${match[2]}`) : '';
 };
 
-export function renderMedia(list: MediaModel[], category: string, limit: number): HTMLElement {
+export function renderMedia(list: MediaModel[], category: string): HTMLElement {
   const elo = (m: MediaModel) =>
     category ? (m.categories.find((c) => categoryName(c) === category)?.elo ?? null) : m.elo;
   const ranked = rank(list, elo, 'high');
-  const shown = ranked.slice(0, limit);
   return h(
     'div',
     {},
@@ -53,7 +54,7 @@ export function renderMedia(list: MediaModel[], category: string, limit: number)
       `${ranked.length} 个模型 · 按${category ? `「${category}」分类的` : ''} Elo 排序 · 只含对战次数够多、上了排行的模型`,
     ),
     rankList(
-      shown.map(({ item, value }) => {
+      ranked.map(({ item, value }) => {
         const cat = category ? item.categories.find((c) => categoryName(c) === category) : undefined;
         const ci = confidence(cat ? cat.ci95 : item.ci95);
         const appearances = cat ? cat.appearances : item.appearances;
@@ -71,8 +72,9 @@ export function renderMedia(list: MediaModel[], category: string, limit: number)
           valueText: String(Math.round(value)),
         };
       }),
-      fromRange(shown.map((r) => r.value)),
+      fromRange(ranked.map((r) => r.value)),
       list.length ? '这个分类还没有数据' : '这个竞技场还没有数据',
+      LIST_PAGE,
     ),
   );
 }

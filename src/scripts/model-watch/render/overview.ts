@@ -22,7 +22,6 @@ const best = <T>(list: T[], value: (item: T) => number | null, better: 'high' | 
 
 type Leader<T> = { item: T; value: number } | undefined;
 
-/** A card for the best entry of a ranking, with its name underneath. */
 const leader = <T extends { name: string }>(label: string, found: Leader<T>, format: (n: number) => string) =>
   kpi(label, found ? format(found.value) : '—', found ? found.item.name : '还没有数据');
 

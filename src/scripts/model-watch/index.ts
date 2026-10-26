@@ -5,19 +5,21 @@ import { attachTooltip } from '@/scripts/core/tooltip';
 import { ApiError } from '@/scripts/stats/api';
 import { fetchChanges, fetchHistory, fetchLatest } from './api';
 import { attachChartHover } from './chart-hover';
-import { collapse, frontierByMonth, isListed } from './data';
+import { collapse, frontierByMonth, isListed, leadingCreators } from './data';
 import { createDetails } from './details';
 import { formatPrice, formatSpeed, INTELLIGENCE, metricsFor, type Metric } from './metrics';
 import { categoriesOf, renderCreators, renderMedia } from './render/boards';
 import { renderChanges } from './render/changes';
 import { redrawChart, renderFrontier, renderScatter, type ChartState, type ScatterOptions } from './render/charts';
 import { renderLeaderboard } from './render/leaderboard';
+import { renderTimeline } from './render/timeline';
+import { assignSlots, SLOTS, type WindowKey } from './timeline-data';
 import { renderKpis } from './render/overview';
-import { fillSelect } from './render/shared';
+import { fillSelect, turnPage } from './render/shared';
 import { explain, statusLine, warnings } from './status';
 import type { Changes, Latest, MediaBoard } from './types';
 
-const SHORT_LIST = 25;
+const DEFAULT_LANES = 5;
 
 onPage(() => {
   const root = document.querySelector<HTMLElement>('[data-model-watch]');
@@ -35,8 +37,8 @@ onPage(() => {
   const metricSelect = $<HTMLSelectElement>('[data-metric]');
   const changeMetricSelect = $<HTMLSelectElement>('[data-change-metric]');
   const frontierMetricSelect = $<HTMLSelectElement>('[data-frontier-metric]');
+  const timelineMetricSelect = $<HTMLSelectElement>('[data-timeline-metric]');
   const categorySelect = $<HTMLSelectElement>('[data-category]');
-  const more = $<HTMLButtonElement>('[data-more]');
 
   const view = {
     token: readToken(),
@@ -46,8 +48,12 @@ onPage(() => {
     metric: INTELLIGENCE as Metric,
     changeMetric: INTELLIGENCE as Metric,
     frontierMetric: INTELLIGENCE as Metric,
+    timelineMetric: INTELLIGENCE as Metric,
+    /** Creators the reader picked for the timeline; `null` until then, which shows the leading ones. */
+    lanes: null as string[] | null,
+    slots: {} as Record<string, number>,
+    window: '2y' as WindowKey,
     metrics: [] as Metric[],
-    expanded: false,
     board: 'text-to-image' as MediaBoard,
     category: '',
     pinned: null as string | null,
@@ -93,14 +99,13 @@ onPage(() => {
     view.metric = keep(view.metric);
     view.changeMetric = keep(view.changeMetric);
     view.frontierMetric = keep(view.frontierMetric);
+    view.timelineMetric = keep(view.timelineMetric);
     fillSelect(metricSelect, view.metrics, view.metric.key);
     fillSelect(changeMetricSelect, view.metrics, view.changeMetric.key);
     // A record only means something for a value that gets better as it grows.
-    fillSelect(
-      frontierMetricSelect,
-      view.metrics.filter((m) => m.better === 'high'),
-      view.frontierMetric.key,
-    );
+    const growing = view.metrics.filter((m) => m.better === 'high');
+    fillSelect(frontierMetricSelect, growing, view.frontierMetric.key);
+    fillSelect(timelineMetricSelect, growing, view.timelineMetric.key);
   }
 
   function paintStatus() {
@@ -109,11 +114,10 @@ onPage(() => {
   }
 
   function paintLeaderboard() {
-    $('[data-board]').replaceChildren(
-      renderLeaderboard(visible(), view.metric, merge.checked, view.expanded ? Infinity : SHORT_LIST),
-    );
-    more.textContent = view.expanded ? '只看前 25' : '显示全部';
+    $('[data-board]').replaceChildren(renderLeaderboard(visible(), view.metric, merge.checked));
   }
+
+  const chartsWidth = () => $('[data-charts]').clientWidth;
 
   const chartState = (): ChartState => ({ pinned: view.pinned, creator: view.creator });
 
@@ -139,7 +143,27 @@ onPage(() => {
     slot.replaceChildren(
       renderFrontier(frontierByMonth(collapse(view.latest!.llm, metric.value), metric.value), view.latest!.daily, {
         metric,
-        width: slot.clientWidth,
+        width: chartsWidth(),
+        state: chartState(),
+      }),
+    );
+  }
+
+  function lanesNow() {
+    const models = view.latest!.llm;
+    return view.lanes ?? leadingCreators(models, view.timelineMetric.value).slice(0, DEFAULT_LANES);
+  }
+
+  function paintTimeline() {
+    const creators = lanesNow();
+    view.slots = assignSlots(view.slots, creators);
+    $('[data-timeline]').replaceChildren(
+      renderTimeline(view.latest!.llm, {
+        metric: view.timelineMetric,
+        creators,
+        slots: view.slots,
+        window: view.window,
+        width: chartsWidth(),
         state: chartState(),
       }),
     );
@@ -150,7 +174,7 @@ onPage(() => {
     const byIntelligence = merge.checked ? collapse(models, (m) => m.intelligence) : models;
     const draw = (selector: string, options: Omit<ScatterOptions, 'width' | 'state'>) => {
       const slot = $(selector);
-      slot.replaceChildren(renderScatter(byIntelligence, { ...options, width: slot.clientWidth, state: chartState() }));
+      slot.replaceChildren(renderScatter(byIntelligence, { ...options, width: chartsWidth(), state: chartState() }));
     };
     draw('[data-value]', {
       key: 'value',
@@ -175,9 +199,10 @@ onPage(() => {
   function paintCharts() {
     // Details opened in a chart's slot go with the old drawing, so the pick must not outlive them.
     view.pinned = null;
-    paintedWidth = $('[data-value]').clientWidth;
+    paintedWidth = chartsWidth();
     paintScatters();
     paintFrontier();
+    paintTimeline();
   }
 
   function paintMedia() {
@@ -192,7 +217,7 @@ onPage(() => {
     dashboard
       .querySelectorAll<HTMLElement>('[data-media]')
       .forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.media === view.board)));
-    $('[data-media-list]').replaceChildren(renderMedia(list, view.category, SHORT_LIST));
+    $('[data-media-list]').replaceChildren(renderMedia(list, view.category));
   }
 
   function paintModels() {
@@ -220,6 +245,7 @@ onPage(() => {
       paintChanges();
       paintModels();
       paintMedia();
+      followScroll();
       return true;
     } catch (error) {
       if (!stale()) fail(error);
@@ -242,6 +268,38 @@ onPage(() => {
 
   const onClick = (event: Event) => {
     const target = event.target as HTMLElement;
+    const tab = target.closest<HTMLElement>('[data-tab]');
+    if (tab) return selectTab(...(tab.dataset.tab!.split(':') as [string, string]));
+    const anchor = target.closest<HTMLAnchorElement>('[data-anchor]');
+    if (anchor) {
+      event.preventDefault();
+      markSection(anchor.dataset.anchor!);
+      const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      return document
+        .getElementById(anchor.dataset.anchor!)
+        ?.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+    }
+    const turn = target.closest<HTMLElement>('[data-turn]');
+    if (turn) {
+      details.clear();
+      return turnPage(turn);
+    }
+    const timeRange = target.closest<HTMLElement>('[data-window]');
+    if (timeRange) {
+      view.window = timeRange.dataset.window as WindowKey;
+      details.clear();
+      return paintTimeline();
+    }
+    const lane = target.closest<HTMLElement>('[data-lane]');
+    if (lane) {
+      const now = lanesNow();
+      const picked = lane.dataset.lane!;
+      const next = now.includes(picked) ? now.filter((c) => c !== picked) : [...now, picked];
+      // The last one stays, and so does the chart's room for colours.
+      if (next.length && next.length <= SLOTS) view.lanes = next;
+      details.clear();
+      return paintTimeline();
+    }
     const creator = target.closest<HTMLElement>('[data-creator]');
     if (creator) {
       const picked = creator.dataset.creator ?? '';
@@ -267,13 +325,18 @@ onPage(() => {
       view.category = '';
       return paintMedia();
     }
-    if (target.closest('[data-more]')) {
-      view.expanded = !view.expanded;
-      return paintLeaderboard();
-    }
     if (target.closest('[data-refresh]')) void loadAll();
     if (target.closest('[data-signout]')) signOut();
   };
+
+  function selectTab(group: string, name: string) {
+    const on = `${group}:${name}`;
+    root!
+      .querySelectorAll<HTMLElement>(`[data-tab^="${group}:"]`)
+      .forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tab === on)));
+    root!.querySelectorAll<HTMLElement>(`[data-pane^="${group}:"]`).forEach((p) => (p.hidden = p.dataset.pane !== on));
+    root!.querySelectorAll<HTMLElement>(`[data-show^="${group}:"]`).forEach((c) => (c.hidden = c.dataset.show !== on));
+  }
 
   const metricOf = (key: string) => view.metrics.find((m) => m.key === key) ?? INTELLIGENCE;
 
@@ -288,6 +351,11 @@ onPage(() => {
       view.frontierMetric = metricOf(frontierMetricSelect.value);
       details.clear();
       paintFrontier();
+    }
+    if (event.target === timelineMetricSelect) {
+      view.timelineMetric = metricOf(timelineMetricSelect.value);
+      details.clear();
+      paintTimeline();
     }
     if (event.target === changeMetricSelect) {
       view.changeMetric = metricOf(changeMetricSelect.value);
@@ -318,10 +386,32 @@ onPage(() => {
   // A scrollbar appearing is not worth redrawing for: a drawing a few pixels off only scales a little.
   const RESIZE_STEP = 40;
   const observer = new ResizeObserver(() => {
-    const width = $('[data-value]').clientWidth;
+    const width = chartsWidth();
     if (view.latest && width && Math.abs(width - paintedWidth) >= RESIZE_STEP) paintCharts();
   });
-  observer.observe($('[data-value]'));
+  observer.observe($('[data-charts]'));
+
+  // The last section whose top has passed a line a third of the way down; at the very bottom, the last section.
+  const sections = [...dashboard.querySelectorAll<HTMLElement>('[data-section]')];
+  const markSection = (id: string) =>
+    dashboard.querySelectorAll<HTMLElement>('[data-anchor]').forEach((a) => {
+      if (a.dataset.anchor === id) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
+  function followScroll() {
+    const atEnd = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+    const passed = sections.filter((section) => section.getBoundingClientRect().top <= innerHeight * 0.35);
+    markSection((atEnd ? sections.at(-1) : (passed.at(-1) ?? sections[0]))!.id);
+  }
+  let frame = 0;
+  const onScroll = () => {
+    frame ||= requestAnimationFrame(() => {
+      frame = 0;
+      followScroll();
+    });
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
 
   if (!endpoint) {
     gateError.textContent = '还没有启用：site.ts 里的 analytics.endpoint 是空的';
@@ -337,6 +427,9 @@ onPage(() => {
   return () => {
     controller?.abort();
     observer.disconnect();
+    cancelAnimationFrame(frame);
+    window.removeEventListener('scroll', onScroll);
+    window.removeEventListener('resize', onScroll);
     detachHover();
     root.removeEventListener('click', onClick);
     root.removeEventListener('change', onChange);

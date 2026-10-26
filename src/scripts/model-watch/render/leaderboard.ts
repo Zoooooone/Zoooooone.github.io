@@ -2,14 +2,13 @@ import { h } from '@/scripts/core/dom';
 import { baseName, collapse, rank, variantOf } from '../data';
 import type { Metric } from '../metrics';
 import type { LlmModel } from '../types';
-import { fromZero, note, rankList } from './shared';
+import { fromZero, LIST_PAGE, note, rankList } from './shared';
 
-export function renderLeaderboard(models: LlmModel[], metric: Metric, merge: boolean, limit: number): HTMLElement {
+export function renderLeaderboard(models: LlmModel[], metric: Metric, merge: boolean): HTMLElement {
   const pool = merge ? collapse(models, metric.value, metric.better) : models;
   const ranked = rank(pool, metric.value, metric.better);
-  const shown = ranked.slice(0, limit);
   const width = fromZero(
-    shown.map((r) => r.value),
+    ranked.map((r) => r.value),
     metric.better,
   );
   return h(
@@ -21,7 +20,7 @@ export function renderLeaderboard(models: LlmModel[], metric: Metric, merge: boo
       }`,
     ),
     rankList(
-      shown.map(({ item, value }) => {
+      ranked.map(({ item, value }) => {
         const variant = variantOf(item.name);
         return {
           label: merge ? baseName(item.name) : item.name,
@@ -33,6 +32,7 @@ export function renderLeaderboard(models: LlmModel[], metric: Metric, merge: boo
       }),
       width,
       '没有模型有这项数据',
+      LIST_PAGE,
     ),
   );
 }

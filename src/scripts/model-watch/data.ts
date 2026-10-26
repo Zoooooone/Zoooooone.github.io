@@ -90,7 +90,6 @@ export interface MonthBest {
   record: boolean;
 }
 
-/** The best model released each month by a higher-is-better value, and whether it beat everything released before. */
 export function frontierByMonth(models: LlmModel[], value: (model: LlmModel) => number | null): MonthBest[] {
   const months = new Map<string, { model: LlmModel; value: number }>();
   for (const model of models) {
@@ -107,6 +106,44 @@ export function frontierByMonth(models: LlmModel[], value: (model: LlmModel) => 
       const record = v > top;
       top = Math.max(top, v);
       return { month, best: model, value: v, top, record };
+    });
+}
+
+export function leadingCreators(models: LlmModel[], value: (model: LlmModel) => number | null): string[] {
+  const top = new Map<string, number>();
+  for (const m of models) {
+    const v = value(m);
+    if (v != null && v > (top.get(m.creator) ?? -Infinity)) top.set(m.creator, v);
+  }
+  return [...top.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([creator]) => creator);
+}
+
+export interface Release {
+  model: LlmModel;
+  /** Release date in milliseconds. */
+  day: number;
+  value: number;
+  /** Beat everything this creator had released before. */
+  record: boolean;
+}
+
+/** What one creator released, oldest first, with its reasoning settings merged into the best one. */
+export function releasesOf(models: LlmModel[], creator: string, value: (model: LlmModel) => number | null): Release[] {
+  let best = -Infinity;
+  return collapse(
+    models.filter((m) => m.creator === creator),
+    value,
+  )
+    .flatMap((model) => {
+      const v = value(model);
+      const day = Date.parse(model.release_date);
+      return v == null || Number.isNaN(day) ? [] : [{ model, day, value: v }];
+    })
+    .sort((a, b) => a.day - b.day || b.value - a.value)
+    .map((release) => {
+      const record = release.value > best;
+      best = Math.max(best, release.value);
+      return { ...release, record };
     });
 }
 

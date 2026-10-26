@@ -9,6 +9,25 @@ import { MEDIA_BOARDS } from '@/scripts/model-watch/types';
 const endpoint = (import.meta.env.DEV && import.meta.env.PUBLIC_STATS_ENDPOINT) || analytics.endpoint;
 
 const ranges = [7, 30, 90];
+
+const sections = [
+  { id: 'mw-changes', label: '变化' },
+  { id: 'mw-ranking', label: '排行' },
+  { id: 'mw-charts', label: '图表' },
+  { id: 'mw-arenas', label: '竞技场' },
+];
+
+const rankTabs = [
+  { key: 'metric', label: '按指标' },
+  { key: 'creator', label: '按厂商' },
+];
+
+const chartTabs = [
+  { key: 'value', label: '智能与价格' },
+  { key: 'speed', label: '智能与速度' },
+  { key: 'frontier', label: '前沿演进' },
+  { key: 'timeline', label: '发布时间线' },
+];
 ---
 
 <BaseLayout title="Model Watch" noindex>
@@ -49,7 +68,15 @@ const ranges = [7, 30, 90];
 
       <div class="kpis" data-kpis></div>
 
-      <section class="panel frame cut-s" aria-label="变化">
+      <nav class="anchors" aria-label="页面导航" data-anchors>
+        {sections.map((section) => (
+          <a href={`#${section.id}`} data-anchor={section.id}>
+            {section.label}
+          </a>
+        ))}
+      </nav>
+
+      <section class="panel frame cut-s" id="mw-changes" data-section aria-label="变化">
         <div class="panel-head">
           <span class="idx">01</span>
           <span class="grow">CHANGES · 变化</span>
@@ -68,63 +95,69 @@ const ranges = [7, 30, 90];
         <div data-changes></div>
       </section>
 
-      <section class="panel frame cut-s" aria-label="排行">
+      <section class="panel frame cut-s" id="mw-ranking" data-section aria-label="排行">
         <div class="panel-head">
           <span class="idx">02</span>
-          <span class="grow">LEADERBOARD · 排行</span>
+          <span class="grow">RANKING · 排行</span>
+          <div class="seg" role="group" aria-label="排行方式">
+            {rankTabs.map((tab, i) => (
+              <button type="button" data-tab={`rank:${tab.key}`} aria-pressed={i === 0 ? 'true' : 'false'}>
+                {tab.label}
+              </button>
+            ))}
+          </div>
           <label class="sr" for="model-watch-metric">
             排行依据
           </label>
-          <select id="model-watch-metric" class="pick" data-metric></select>
+          <select id="model-watch-metric" class="pick" data-metric data-show="rank:metric"></select>
         </div>
-        <div data-board></div>
-        <button class="tool more" type="button" data-more>
-          显示全部
-        </button>
+        <div data-pane="rank:metric" data-board></div>
+        <div data-pane="rank:creator" data-creators hidden></div>
       </section>
 
-      <section class="panel frame cut-s" aria-label="性价比">
+      <section class="panel frame cut-s" id="mw-charts" data-section aria-label="图表">
         <div class="panel-head">
           <span class="idx">03</span>
-          <span class="grow">VALUE · 智能与价格</span>
-          <span class="hint">越靠左上越好：更聪明也更便宜</span>
-        </div>
-        <div data-value></div>
-      </section>
-
-      <section class="panel frame cut-s" aria-label="速度">
-        <div class="panel-head">
-          <span class="idx">04</span>
-          <span class="grow">SPEED · 智能与速度</span>
-          <span class="hint">越靠右上越好：更聪明也更快</span>
-        </div>
-        <div data-speed></div>
-      </section>
-
-      <section class="panel frame cut-s" aria-label="前沿演进">
-        <div class="panel-head">
-          <span class="idx">05</span>
-          <span class="grow">FRONTIER · 前沿演进</span>
-          <span class="hint">按发布月份，含已下线的模型</span>
+          <span class="grow">CHARTS · 图表</span>
+          <div class="seg wrap" role="group" aria-label="图表">
+            {chartTabs.map((tab, i) => (
+              <button type="button" data-tab={`chart:${tab.key}`} aria-pressed={i === 0 ? 'true' : 'false'}>
+                {tab.label}
+              </button>
+            ))}
+          </div>
           <label class="sr" for="model-watch-frontier-metric">
             前沿指标
           </label>
-          <select id="model-watch-frontier-metric" class="pick" data-frontier-metric></select>
+          <select
+            id="model-watch-frontier-metric"
+            class="pick"
+            data-frontier-metric
+            data-show="chart:frontier"
+            hidden
+          ></select>
+          <label class="sr" for="model-watch-timeline-metric">
+            时间线指标
+          </label>
+          <select
+            id="model-watch-timeline-metric"
+            class="pick"
+            data-timeline-metric
+            data-show="chart:timeline"
+            hidden
+          ></select>
         </div>
-        <div data-frontier></div>
+        <div data-charts>
+          <div data-pane="chart:value" data-value></div>
+          <div data-pane="chart:speed" data-speed hidden></div>
+          <div data-pane="chart:frontier" data-frontier hidden></div>
+          <div data-pane="chart:timeline" data-timeline hidden></div>
+        </div>
       </section>
 
-      <section class="panel frame cut-s" aria-label="厂商">
+      <section class="panel frame cut-s" id="mw-arenas" data-section aria-label="媒体竞技场">
         <div class="panel-head">
-          <span class="idx">06</span>
-          <span class="grow">CREATORS · 厂商</span>
-        </div>
-        <div data-creators></div>
-      </section>
-
-      <section class="panel frame cut-s" aria-label="媒体竞技场">
-        <div class="panel-head">
-          <span class="idx">07</span>
+          <span class="idx">04</span>
           <span class="grow">ARENAS · 媒体竞技场</span>
           <label class="sr" for="model-watch-category">
             分类

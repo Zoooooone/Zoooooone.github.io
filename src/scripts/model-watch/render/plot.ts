@@ -7,10 +7,10 @@ const MIN_WIDTH = 280;
 const TICKS_WANTED = 5;
 
 // The chart is drawn at the pixel size of its panel instead of being scaled, so text and dots keep their size.
-export function geometry(width: number) {
+export function geometry(width: number, { right = 24 }: { right?: number } = {}) {
   const w = Math.max(MIN_WIDTH, Math.floor(width) || FALLBACK_WIDTH);
+  const pad = { left: 52, right, top: 24, bottom: 46 };
   const height = Math.round(Math.min(Math.max(w * 0.56, 300), 440));
-  const pad = { left: 52, right: 24, top: 24, bottom: 46 };
   return {
     w,
     h: height,
@@ -50,6 +50,30 @@ export function logAxis(min: number, max: number, from: number, to: number): Axi
   };
 }
 
+const MONTH = 30.44 * 24 * 60 * 60 * 1000;
+const MONTH_STEPS = [1, 3, 6, 12, 24];
+const TICK_SPACING = 64;
+
+export function timeAxis(min: number, max: number, from: number, to: number) {
+  const months = (max - min) / MONTH;
+  const step = MONTH_STEPS.find((s) => (to - from) / Math.max(months / s, 1) >= TICK_SPACING) ?? 24;
+  const ticks: number[] = [];
+  const first = new Date(min);
+  for (let index = first.getUTCFullYear() * 12 + first.getUTCMonth(); ; index++) {
+    const t = Date.UTC(Math.floor(index / 12), index % 12, 1);
+    if (t > max) break;
+    if (t >= min && index % step === 0) ticks.push(t);
+  }
+  const label = (t: number) => {
+    const d = new Date(t);
+    return step >= 12
+      ? String(d.getUTCFullYear())
+      : `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+  };
+  const axis: Axis = { at: (t) => from + ((t - min) / (max - min || 1)) * (to - from), ticks };
+  return { axis, label };
+}
+
 const tickText = (n: number) => (n >= 1000 ? `${n / 1000}k` : String(n));
 
 export interface PlotSpec {
@@ -60,7 +84,6 @@ export interface PlotSpec {
   format?: { x?: (n: number) => string; y?: (n: number) => string };
 }
 
-/** The chart's svg: grid and axes first, then the layers the caller draws, then the card that names a hovered point. */
 export function plot(geo: Geometry, { label, x, y, titles, format = {} }: PlotSpec, layers: SVGElement[]): HTMLElement {
   const xText = format.x ?? tickText;
   const yText = format.y ?? String;

@@ -12,7 +12,6 @@ export interface DetailsContext {
   fail: (error: unknown) => void;
 }
 
-/** A model's details open as one row where the reader clicked: under a list item, or in a chart's slot. */
 export function createDetails(root: HTMLElement, ctx: DetailsContext) {
   const histories = new Map<string, History>();
 
@@ -41,7 +40,6 @@ export function createDetails(root: HTMLElement, ctx: DetailsContext) {
     }
   }
 
-  /** Opens or closes one model, and keeps only that one marked in the charts. */
   async function toggle(model: LlmModel, wasOpen: boolean, open: () => Promise<void>) {
     close();
     ctx.pin(wasOpen ? null : model.id);
@@ -52,9 +50,7 @@ export function createDetails(root: HTMLElement, ctx: DetailsContext) {
 
   return {
     close,
-    /** Forgets what was fetched, for when the page loads fresh data. */
     forget: () => histories.clear(),
-    /** Closes the details and clears the mark. */
     clear() {
       close();
       ctx.pin(null);

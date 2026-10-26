@@ -1,4 +1,3 @@
-// Made-up model lists in the shape the stats Worker returns under /api/models/.
 // Every name here is invented: real Artificial Analysis data must not be committed to this public repository.
 const DAY = 24 * 60 * 60 * 1000;
 

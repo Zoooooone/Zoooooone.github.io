@@ -1,7 +1,7 @@
 import { h } from '@/scripts/core/dom';
 import { BOARD_LABELS, formatPrice, formatScore, type Metric } from '../metrics';
 import { MEDIA_BOARDS, type Changes, type LlmChange } from '../types';
-import { changeList, empty, group, note, type ChangeItem } from './shared';
+import { CHANGE_PAGE, changeList, empty, group, note, type ChangeItem } from './shared';
 
 const signed = (n: number, digits = 1) => `${n > 0 ? '+' : n < 0 ? '−' : '±'}${Math.abs(n).toFixed(digits)}`;
 const tone = (n: number, higherIsBetter = true): ChangeItem['tone'] =>
@@ -29,6 +29,7 @@ function llmSection(llm: NonNullable<Changes['llm']>, days: number, metric: Metr
         changeList(
           llm.added.map((m) => ({ label: m.name, sub: sub(m), value: `智能 ${score(m.now)}`, model: m.id })),
           '没有新模型',
+          CHANGE_PAGE,
         ),
       ),
       group(
@@ -50,6 +51,7 @@ function llmSection(llm: NonNullable<Changes['llm']>, days: number, metric: Metr
             };
           }),
           `「${metric.label}」没有变化`,
+          CHANGE_PAGE,
         ),
       ),
       group(
@@ -68,6 +70,7 @@ function llmSection(llm: NonNullable<Changes['llm']>, days: number, metric: Metr
             };
           }),
           '价格没有变化',
+          CHANGE_PAGE,
         ),
       ),
       group(
@@ -75,6 +78,7 @@ function llmSection(llm: NonNullable<Changes['llm']>, days: number, metric: Metr
         changeList(
           llm.removed.map((m) => ({ label: m.name, sub: sub(m), value: `智能 ${score(m.was)}` })),
           '没有模型下榜',
+          CHANGE_PAGE,
         ),
       ),
     ),
@@ -116,7 +120,7 @@ function arenaSection(changes: Changes): HTMLElement {
             tone: 'down' as const,
           })),
         ];
-        return group(heading, changeList(items, '排名没有变化'));
+        return group(heading, changeList(items, '排名没有变化', CHANGE_PAGE));
       }),
     ),
   );

@@ -18,6 +18,10 @@ export interface Mark extends Dot {
   /** Settles who is labelled first among marks of the same kind. */
   weight: number;
   dim?: boolean;
+  /** `false` keeps the mark out of the permanent labels however well it ranks. */
+  label?: boolean;
+  /** Hue (0 to 360) of the series it belongs to; the stylesheet turns it into a colour for the current theme. */
+  hue?: number;
 }
 
 export const drawMarks = (marks: Mark[]) =>
@@ -27,7 +31,8 @@ export const drawMarks = (marks: Mark[]) =>
       svg(
         'g',
         {
-          class: `pt ${m.kind}${m.dim ? ' dim' : ''}`,
+          class: `pt ${m.kind}${m.dim ? ' dim' : ''}${m.hue === undefined ? '' : ' series'}`,
+          style: m.hue === undefined ? undefined : `--h:${m.hue}`,
           'data-pick': m.id,
           'data-name': m.name,
           'data-line': m.line,
@@ -40,20 +45,26 @@ export const drawMarks = (marks: Mark[]) =>
       ),
     );
 
-const priorityOf = ({ kind, weight }: Mark): number | null =>
-  kind === 'pinned' ? 3000 + weight : kind === 'lit' ? 2000 + weight : kind === 'best' ? 1000 + weight : null;
+const priorityOf = ({ kind, weight, label }: Mark): number | null =>
+  label === false && kind !== 'pinned'
+    ? null
+    : kind === 'pinned'
+      ? 3000 + weight
+      : kind === 'lit'
+        ? 2000 + weight
+        : kind === 'best'
+          ? 1000 + weight
+          : null;
 
 /** How many permanent labels fit; a narrow chart gets fewer instead of smaller text. */
 const labelBudget = (w: number) => (w < 460 ? 4 : w < 640 ? 6 : 8);
 
-/** Permanent labels for the marks that stand out, with a line back to the dot for those that sit away from it. */
-export function drawLabels(geo: Geometry, marks: Mark[]): SVGElement[] {
+export function drawLabels(geo: Geometry, marks: Mark[], budget = labelBudget(geo.w)): SVGElement[] {
   const candidates = marks.flatMap((m) => {
     const priority = priorityOf(m);
     return priority === null ? [] : [{ x: m.x, y: m.y, text: baseName(m.name), priority }];
   });
-  const budget = labelBudget(geo.w) + (marks.some((m) => m.kind === 'pinned') ? 1 : 0);
-  const placed = placeLabels(candidates, geo.area, budget, marks);
+  const placed = placeLabels(candidates, geo.area, budget + (marks.some((m) => m.kind === 'pinned') ? 1 : 0), marks);
 
   const lines = placed
     .filter((label) => label.leader)

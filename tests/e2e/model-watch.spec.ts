@@ -114,7 +114,6 @@ const changes = (days: number, metric = 'intelligence') => ({
       },
     ],
   },
-  // Only one arena has two days of snapshots so far.
   media: {
     'text-to-image': {
       from: '2026-10-17',
@@ -170,6 +169,7 @@ async function unlock(page: Page, token = GOOD) {
 }
 
 const leaderboard = (page: Page) => page.locator('[data-board] .rank li');
+const openChart = (page: Page, key: string) => page.locator(`[data-tab="chart:${key}"]`).click();
 
 test.describe('model watch page', () => {
   test('is kept out of search engines', async ({ page }) => {
@@ -227,6 +227,84 @@ test.describe('model watch page', () => {
     await expect(leaderboard(page).first().locator('.rank-num')).toHaveText('50.0%');
   });
 
+  test('pages through a long list ten at a time, and can jump to either end from anywhere', async ({ page }) => {
+    const many = Array.from({ length: 25 }, (_, i) =>
+      llm(`m${i}`, { name: `Model ${i}`, intelligence: 60 - i, price_blended: 1 + i }),
+    );
+    await mockWorker(page, { snapshot: { ...latest, llm: many } });
+    await unlock(page);
+    const rows = page.locator('[data-board] .rank li');
+    const shown = page.locator('[data-board] .rank li:visible');
+    const paging = page.locator('[data-board] .paging');
+    const [first, previous, next, last] = ['首页', '上一页', '下一页', '末页'].map((name) =>
+      paging.getByRole('button', { name }),
+    );
+    const at = paging.locator('.paging-page');
+
+    await expect(rows).toHaveCount(25);
+    await expect(shown).toHaveCount(10);
+    await expect(at).toHaveText('1 / 3');
+    await expect(paging).toHaveCSS('opacity', '1');
+    await expect(first).toBeDisabled();
+    await expect(previous).toBeDisabled();
+    await expect(next).toBeEnabled();
+    await expect(last).toBeEnabled();
+
+    await next.click();
+    await expect(at).toHaveText('2 / 3');
+    await expect(shown.first().locator('.pos')).toHaveText('11');
+    await expect(first).toBeEnabled();
+
+    // From the middle, one press reaches either end.
+    await last.click();
+    await expect(at).toHaveText('3 / 3');
+    await expect(shown).toHaveCount(5);
+    await expect(next).toBeDisabled();
+    await expect(last).toBeDisabled();
+
+    await page.locator('[data-board] [data-model="m22"]').click();
+    await expect(page.locator('[data-board] .detail-row')).toHaveCount(1);
+    await previous.click();
+    await expect(at).toHaveText('2 / 3');
+    await expect(page.locator('[data-board] .detail-row')).toHaveCount(0);
+
+    await first.click();
+    await expect(at).toHaveText('1 / 3');
+    await expect(shown.first().locator('.pos')).toHaveText('01');
+  });
+
+  test('keeps the arrows in the middle of the list, however wide the page', async ({ page }) => {
+    const many = Array.from({ length: 25 }, (_, i) => llm(`m${i}`, { name: `Model ${i}`, intelligence: 60 - i }));
+    await mockWorker(page, { snapshot: { ...latest, llm: many } });
+    await unlock(page);
+    const centred = await page.locator('[data-board] .paging').evaluate((paging) => {
+      const own = paging.getBoundingClientRect();
+      const list = paging.previousElementSibling!.getBoundingClientRect();
+      const buttons = [...paging.children].map((c) => c.getBoundingClientRect());
+      const content = (buttons[0].left + buttons[buttons.length - 1].right) / 2;
+      return { fills: Math.abs(own.width - list.width), middle: Math.abs(content - (list.left + list.width / 2)) };
+    });
+    expect(centred.fills).toBeLessThan(1);
+    expect(centred.middle).toBeLessThan(1);
+  });
+
+  test('has no arrows for a list that fits on one page, and starts again from the first page after a change', async ({
+    page,
+  }) => {
+    const many = Array.from({ length: 25 }, (_, i) =>
+      llm(`m${i}`, { name: `Model ${i}`, intelligence: 60 - i, price_blended: 1 + i }),
+    );
+    await mockWorker(page, { snapshot: { ...latest, llm: many } });
+    await unlock(page);
+    await expect(page.locator('[data-media-list] .paging')).toHaveCount(0);
+
+    const paging = page.locator('[data-board] .paging');
+    await paging.getByRole('button', { name: '末页' }).click();
+    await expect(paging.locator('.paging-page')).toHaveText('3 / 3');
+    await page.locator('[data-metric]').selectOption('price_blended');
+    await expect(page.locator('[data-board] .paging-page')).toHaveText('1 / 3');
+  });
+
   test('opens a model in a row right under it, with its numbers and history, and closes it again', async ({ page }) => {
     const requests = await mockWorker(page);
     await unlock(page);
@@ -243,7 +321,6 @@ test.describe('model watch page', () => {
     expect(requests.some((u) => u.pathname === '/api/models/history' && u.searchParams.get('id') === 'swift')).toBe(
       true,
     );
-    // It opens where the model is, instead of taking the page somewhere else.
     expect(Math.abs((await page.evaluate(() => scrollY)) - before)).toBeLessThan(2);
 
     await button.click();
@@ -306,7 +383,6 @@ test.describe('model watch page', () => {
     const corners = await chart.locator('polyline.front').getAttribute('points');
     expect(corners!.trim().split(/\s+/)).toHaveLength(3);
 
-    // Drawn at the size of its panel, so text and dots are not scaled up or down.
     const scale = await chart.locator('svg.scatter').evaluate((el) => {
       const box = el.getBoundingClientRect();
       return box.width / Number(el.getAttribute('width'));
@@ -317,7 +393,12 @@ test.describe('model watch page', () => {
   test('keeps every label clear of the others and of the dots', async ({ page }) => {
     await mockWorker(page);
     await unlock(page);
-    for (const selector of ['[data-value]', '[data-speed]', '[data-frontier]']) {
+    for (const [selector, key] of [
+      ['[data-value]', 'value'],
+      ['[data-speed]', 'speed'],
+      ['[data-frontier]', 'frontier'],
+    ]) {
+      await openChart(page, key);
       const overlaps = await page.evaluate((chart) => {
         const root = document.querySelector(chart)!;
         const labels = [...root.querySelectorAll('.dot-label')].map((el) => el.getBoundingClientRect());
@@ -414,9 +495,203 @@ test.describe('model watch page', () => {
     await expect(page.locator('[data-value] .dot-label').first()).toBeVisible();
   });
 
+  test('shows one chart at a time and keeps its own controls with it', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await expect(page.locator('[data-tab^="chart:"]')).toHaveText([
+      '智能与价格',
+      '智能与速度',
+      '前沿演进',
+      '发布时间线',
+    ]);
+    await expect(page.locator('[data-value]')).toBeVisible();
+    await expect(page.locator('[data-speed]')).toBeHidden();
+    await expect(page.locator('[data-frontier-metric]')).toBeHidden();
+    await expect(page.locator('[data-timeline-metric]')).toBeHidden();
+
+    await openChart(page, 'frontier');
+    await expect(page.locator('[data-value]')).toBeHidden();
+    await expect(page.locator('[data-frontier]')).toBeVisible();
+    await expect(page.locator('[data-frontier-metric]')).toBeVisible();
+    await expect(page.locator('[data-tab="chart:frontier"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-tab="chart:value"]')).toHaveAttribute('aria-pressed', 'false');
+
+    await openChart(page, 'timeline');
+    await expect(page.locator('[data-frontier]')).toBeHidden();
+    await expect(page.locator('[data-timeline-metric]')).toBeVisible();
+    await expect(page.locator('[data-frontier-metric]')).toBeHidden();
+  });
+
+  test('keeps a picked model marked while another chart is shown', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await page.locator('[data-value] .pt.best').first().click({ force: true });
+    await openChart(page, 'speed');
+    await expect(page.locator('[data-speed] .pt.pinned')).toHaveCount(1);
+    await expect(page.locator('[data-speed] svg.scatter')).toBeVisible();
+  });
+
+  test('ranks by creator in another tab of the same panel', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await expect(page.locator('[data-board]')).toBeVisible();
+    await expect(page.locator('[data-metric]')).toBeVisible();
+    await expect(page.locator('[data-creators]')).toBeHidden();
+
+    await page.locator('[data-tab="rank:creator"]').click();
+    await expect(page.locator('[data-creators]')).toBeVisible();
+    await expect(page.locator('[data-creators] .rank li')).toHaveCount(2);
+    await expect(page.locator('[data-board]')).toBeHidden();
+    await expect(page.locator('[data-metric]')).toBeHidden();
+  });
+
+  test('jumps to a section from the sticky bar and marks where the page is', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    const bar = page.locator('[data-anchors]');
+    await expect(bar.locator('a')).toHaveText(['变化', '排行', '图表', '竞技场']);
+
+    await bar.locator('[data-anchor="mw-arenas"]').click();
+    await expect(page.locator('#mw-arenas')).toBeInViewport();
+    await expect(bar.locator('[aria-current="true"]')).toHaveText('竞技场');
+    // It follows the reader down the page.
+    await expect(bar).toBeInViewport();
+
+    await bar.locator('[data-anchor="mw-changes"]').click();
+    await expect(bar.locator('[aria-current="true"]')).toHaveText('变化');
+  });
+
+  test('draws every chosen creator as a coloured line on shared axes, named at its end', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await openChart(page, 'timeline');
+    const timeline = page.locator('[data-timeline]');
+    await expect(timeline.locator('.series-end')).toHaveText(['Acme', 'Bolt']);
+    await expect(timeline.locator('.series-line')).toHaveCount(2);
+    await expect(timeline.locator('.pick-chip[aria-pressed="true"] .swatch-dot')).toHaveCount(2);
+    await expect(timeline.locator('svg.scatter')).toHaveCount(1);
+
+    const colours = await timeline
+      .locator('.series-line')
+      .evaluateAll((lines) => lines.map((l) => getComputedStyle(l).stroke));
+    expect(colours.every((c) => c !== 'none')).toBe(true);
+    expect(new Set(colours).size).toBe(2);
+    const line = await timeline
+      .locator('.series-line')
+      .first()
+      .evaluate((l) => getComputedStyle(l).stroke);
+    const dot = await timeline
+      .locator('.pt.series .dot')
+      .first()
+      .evaluate((d) => getComputedStyle(d).fill);
+    expect(dot).toBe(line);
+  });
+
+  test('changes the colours with the theme without drawing the chart again', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await openChart(page, 'timeline');
+    const timeline = page.locator('[data-timeline]');
+    await timeline.locator('svg.scatter').evaluate((svg) => svg.setAttribute('data-kept', 'yes'));
+    const stroke = () =>
+      timeline
+        .locator('.series-line')
+        .first()
+        .evaluate((l) => getComputedStyle(l).stroke);
+
+    await page.evaluate(() => (document.documentElement.dataset.theme = 'light'));
+    const light = await stroke();
+    await page.evaluate(() => (document.documentElement.dataset.theme = 'dark'));
+    const dark = await stroke();
+    expect(dark).not.toBe(light);
+    await expect(timeline.locator('svg.scatter')).toHaveAttribute('data-kept', 'yes');
+  });
+
+  test('shows every release of one creator, and names its new highs', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await openChart(page, 'timeline');
+    const timeline = page.locator('[data-timeline]');
+    await timeline.locator('[data-window="all"]').click();
+    // Side by side only the releases that raised a creator's best are drawn: Bolt's two and Acme's one.
+    await expect(timeline.locator('.pt')).toHaveCount(3);
+
+    await timeline.locator('[data-lane="Acme"]').click();
+    await expect(timeline.locator('.series-end')).toHaveText(['Bolt']);
+    await expect(timeline.locator('.pt')).toHaveCount(3);
+    await expect(timeline.locator('.pt.plain')).toHaveCount(1);
+    expect((await timeline.locator('.dot-label').allTextContents()).sort()).toEqual(['Elder', 'Swift']);
+    await expect(page.locator('[data-milestones]')).toHaveCount(0);
+
+    // The last creator stays.
+    await timeline.locator('[data-lane="Bolt"]').click();
+    await expect(timeline.locator('.series-end')).toHaveText(['Bolt']);
+  });
+
+  test('focuses one creator from the end of its line, and lets go again', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await openChart(page, 'timeline');
+    const timeline = page.locator('[data-timeline]');
+    await timeline.locator('[data-window="all"]').click();
+    await expect(timeline.locator('g.series:not(.pt).dim')).toHaveCount(0);
+    await expect(timeline.locator('.dot-label')).toHaveCount(0);
+
+    await timeline.locator('.series-end', { hasText: 'Bolt' }).click();
+    await expect(timeline.locator('g.series:not(.pt).dim')).toHaveCount(1);
+    await expect(timeline.locator('.pt.plain')).toHaveCount(1);
+    await expect(timeline.locator('.pt.dim')).toHaveCount(1);
+    expect((await timeline.locator('.dot-label').allTextContents()).sort()).toEqual(['Elder', 'Swift']);
+
+    await timeline.locator('.series-end', { hasText: 'Bolt' }).click();
+    await expect(timeline.locator('g.series:not(.pt).dim')).toHaveCount(0);
+    await expect(timeline.locator('.dot-label')).toHaveCount(0);
+  });
+
+  test('limits the time range, keeping the level a creator had already reached', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await openChart(page, 'timeline');
+    const timeline = page.locator('[data-timeline]');
+    await expect(timeline.locator('[data-window="2y"]')).toHaveAttribute('aria-pressed', 'true');
+
+    await timeline.locator('[data-window="1y"]').click();
+    await expect(timeline.locator('[data-window="1y"]')).toHaveAttribute('aria-pressed', 'true');
+    // Bolt's last high is older than a year, so it has no dot in the range, but its line is still there.
+    await expect(timeline.locator('.series-line')).toHaveCount(2);
+    await expect(timeline.locator('.pt.series')).toHaveCount(1);
+  });
+
+  test('tells who first reached each score, and how long the others took', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await openChart(page, 'timeline');
+    const rows = page.locator('[data-milestones] .changes li');
+    await expect(rows.filter({ hasText: '≥ 20.0' })).toContainText('Bolt · 2024-01-05');
+    await expect(rows.filter({ hasText: '≥ 20.0' })).toContainText(/Acme \+\d+ 天/);
+    await expect(rows.filter({ hasText: '≥ 60.0' })).toContainText('Acme · 2026-10-01');
+    await expect(rows.filter({ hasText: '≥ 60.0' })).toContainText('未达到：Bolt');
+  });
+
+  test('opens a release on click, and clears the details when the metric changes', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await openChart(page, 'timeline');
+    const timeline = page.locator('[data-timeline]');
+    await timeline.locator('.pt[data-pick="nova-max"]').click({ force: true });
+    await expect(timeline.locator('.pt.pinned')).toHaveCount(1);
+    await expect(timeline.locator('.chart-slot .detail-row')).toContainText('Nova');
+    await expect(page.locator('[data-value] .pt.pinned')).toHaveCount(1);
+
+    await page.locator('[data-timeline-metric]').selectOption('coding');
+    await expect(timeline.locator('svg.scatter')).toHaveAttribute('aria-label', /编程指数/);
+    await expect(timeline.locator('.detail-row')).toHaveCount(0);
+  });
+
   test('draws the frontier over time for any value that gets better as it grows', async ({ page }) => {
     await mockWorker(page);
     await unlock(page);
+    await openChart(page, 'frontier');
     const select = page.locator('[data-frontier-metric]');
     await expect(select.locator('option[value="price_blended"]')).toHaveCount(0);
     await expect(select.locator('option[value="tps"]')).toHaveCount(1);

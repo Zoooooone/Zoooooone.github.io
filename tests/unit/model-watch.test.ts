@@ -4,8 +4,10 @@ import {
   collapse,
   creatorBoard,
   frontierByMonth,
+  leadingCreators,
   pareto,
   rank,
+  releasesOf,
   stairs,
   variantOf,
 } from '@/scripts/model-watch/data';
@@ -137,6 +139,54 @@ describe('model watch data', () => {
     expect(board.map((c) => [c.creator, c.best.name, c.models, c.latest])).toEqual([
       ['Other', 'y', 1, '2026-01-01'],
       ['Acme', 'x (High)', 1, '2026-05-01'],
+    ]);
+  });
+});
+
+describe('release timeline', () => {
+  const lineup = [
+    model({ id: 'a1', name: 'Alpha 1', creator: 'Acme', release_date: '2025-01-10', intelligence: 30 }),
+    model({ id: 'a2', name: 'Alpha 2 (High)', creator: 'Acme', release_date: '2025-06-01', intelligence: 40 }),
+    model({ id: 'a2m', name: 'Alpha 2 (Max)', creator: 'Acme', release_date: '2025-06-01', intelligence: 45 }),
+    model({ id: 'a3', name: 'Alpha 3', creator: 'Acme', release_date: '2025-09-01', intelligence: 38 }),
+    model({ id: 'a4', name: 'Alpha 4', creator: 'Acme', release_date: '2026-01-01', intelligence: 50 }),
+    model({ id: 'b1', name: 'Beta 1', creator: 'Bolt', release_date: '2025-03-01', intelligence: 52 }),
+    model({ id: 'c1', name: 'Gamma 1', creator: 'Cora', release_date: '2025-04-01', intelligence: null }),
+    model({ id: 'd1', name: 'Delta 1', creator: 'Dune', release_date: 'soon', intelligence: 99 }),
+  ];
+  const score = (m: LlmModel) => m.intelligence;
+
+  it('orders creators by the best value any of their models reaches, and skips those with none', () => {
+    expect(leadingCreators(lineup, score)).toEqual(['Dune', 'Bolt', 'Acme']);
+    expect(leadingCreators([], score)).toEqual([]);
+  });
+
+  it('breaks a tie by name', () => {
+    const tied = [model({ creator: 'Zed', intelligence: 10 }), model({ creator: 'Abe', intelligence: 10 })];
+    expect(leadingCreators(tied, score)).toEqual(['Abe', 'Zed']);
+  });
+
+  it('lists a creator’s releases oldest first, merges reasoning settings, and marks the new highs', () => {
+    const releases = releasesOf(lineup, 'Acme', score);
+    expect(releases.map((r) => [r.model.id, r.value, r.record])).toEqual([
+      ['a1', 30, true],
+      ['a2m', 45, true],
+      ['a3', 38, false],
+      ['a4', 50, true],
+    ]);
+    expect(releases[0].day).toBe(Date.parse('2025-01-10'));
+  });
+
+  it('leaves out models without a value or a usable date, and gives the best of a same-day pair the record', () => {
+    expect(releasesOf(lineup, 'Cora', score)).toEqual([]);
+    expect(releasesOf(lineup, 'Dune', score)).toEqual([]);
+    const sameDay = [
+      model({ id: 'x', name: 'X', release_date: '2025-05-05', intelligence: 20 }),
+      model({ id: 'y', name: 'Y', release_date: '2025-05-05', intelligence: 30 }),
+    ];
+    expect(releasesOf(sameDay, 'Acme', score).map((r) => [r.model.id, r.record])).toEqual([
+      ['y', true],
+      ['x', false],
     ]);
   });
 });

@@ -19,7 +19,7 @@ const redraws = new WeakMap<Element, (state: ChartState) => void>();
 /** Draws the chart again for a new selection without rebuilding the rest of the panel around it. */
 export const redrawChart = (chart: Element, state: ChartState) => redraws.get(chart)?.(state);
 
-function panel(
+export function panel(
   key: string,
   state: ChartState,
   draw: (state: ChartState) => HTMLElement[],
@@ -58,7 +58,6 @@ export interface ScatterOptions {
   state: ChartState;
 }
 
-/** Intelligence index against price or speed, with the models nothing else beats on both marked as the frontier. */
 export function renderScatter(models: LlmModel[], options: ScatterOptions): HTMLElement {
   const points = models.flatMap((m) => {
     const x = options.x(m);
@@ -215,7 +214,7 @@ export function renderFrontier(months: MonthBest[], daily: Latest['daily'], opti
     options.state,
     draw,
     note(
-      `线：截至每个月发布过的「${metric.label}」最高值 · 大实心点：当月刷新纪录的模型，常驻标签只给最近几个 · 小点：当月最强但没破纪录 · 悬停看名字，点击展开详情`,
+      `线：截至每个月发布过的「${metric.label}」最高值 · 大实心点：当月刷新纪录的模型，常驻标签只给最近几个 · 小点：当月最强但没破纪录 · 悬停看名字，点击展开详情 · 含已下线的模型`,
     ),
     group(
       `最近 ${Math.min(RECORDS_LISTED, records.length)} 次刷新纪录`,

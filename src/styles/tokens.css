@@ -17,6 +17,8 @@
   --code-bg: var(--wp-code-bg-l, #f8f6f6);
   --sage: #6c8c70;
   --amber: #d39a3c;
+  --series-l: 0.5;
+  --series-c: 0.15;
   --shadow: 0 1px 0.125rem rgba(20, 22, 26, 0.05), 0 0.5rem 1.5rem -0.75rem rgba(20, 22, 26, 0.18);
   --shadow-hover: 0 0.125rem 0.25rem rgba(20, 22, 26, 0.06), 0 1.125rem 2.25rem -0.875rem rgba(20, 22, 26, 0.28);
   --font-sans: 'Inter Variable', 'Noto Sans SC Variable', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
@@ -74,6 +76,8 @@
   --code-bg: var(--wp-code-bg-d, #131314);
   --sage: #8fb093;
   --amber: #e2b55a;
+  --series-l: 0.78;
+  --series-c: 0.13;
   --shadow: 0 1px 0.125rem rgba(0, 0, 0, 0.3), 0 0.5rem 1.5rem -0.75rem rgba(0, 0, 0, 0.5);
   --shadow-hover: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.35), 0 1.125rem 2.25rem -0.875rem rgba(0, 0, 0, 0.65);
 }
