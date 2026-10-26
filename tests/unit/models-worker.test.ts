@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import worker from '../../worker/src/index';
 import { BOARDS, ingestModels, tokyoDay } from '../../worker/src/models/ingest';
@@ -163,6 +164,31 @@ describe('model snapshots', () => {
     const done = await ingestModels(env, at('2026-10-24', 6), fakeApi({ llm: llmBody(many.slice(0, 4)) }).fetcher);
     expect(done.llm).toBe('only 4 models, down from 10');
     expect(rows("SELECT * FROM aa_llm WHERE day = '2026-10-24'")).toEqual([]);
+  });
+});
+
+describe('best score of the day', () => {
+  it('is stored with the LLM snapshot only', async () => {
+    const { env, rows } = world();
+    await ingestModels(env, at('2026-10-24', 6), fakeApi().fetcher);
+    const tops = Object.fromEntries(
+      rows<{ board: string; top: number | null }>('SELECT board, top FROM aa_snapshots').map((r) => [r.board, r.top]),
+    );
+    expect(tops).toMatchObject({ llm: 50, 'text-to-image': null, 'text-to-video': null });
+  });
+
+  it('is filled in for days that were stored before the column existed', () => {
+    const before = ['0001_init.sql', '0002_signals.sql', '0003_models.sql'];
+    const { rows, sqlite } = setup({}, before);
+    sqlite.exec(`
+      INSERT INTO aa_snapshots (day, board, fetched_at, models) VALUES ('2026-10-20', 'llm', 0, 2), ('2026-10-20', 'text-to-image', 0, 1);
+      INSERT INTO aa_llm (day, id, name, intelligence) VALUES ('2026-10-20', 'a', 'A', 41), ('2026-10-20', 'b', 'B', 47.5);
+    `);
+    sqlite.exec(readFileSync(new URL('../../worker/migrations/0004_snapshot_top.sql', import.meta.url), 'utf8'));
+    expect(rows('SELECT board, top FROM aa_snapshots ORDER BY board')).toEqual([
+      { board: 'llm', top: 47.5 },
+      { board: 'text-to-image', top: null },
+    ]);
   });
 });
 

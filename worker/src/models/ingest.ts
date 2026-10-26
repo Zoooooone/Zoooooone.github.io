@@ -55,6 +55,12 @@ const INSERT_MEDIA = `INSERT OR REPLACE INTO aa_media (day, board, id, name, slu
     COALESCE(json(value -> '$.categories'), '[]')
   FROM json_each(?3, '$.data') WHERE ${VALID_MODELS}`;
 
+const SNAPSHOT_ROW = {
+  llm: `INSERT OR REPLACE INTO aa_snapshots (day, board, fetched_at, models, top)
+    VALUES (?1, ?2, ?3, ?4, (SELECT MAX(intelligence) FROM aa_llm WHERE day = ?1))`,
+  media: `INSERT OR REPLACE INTO aa_snapshots (day, board, fetched_at, models) VALUES (?1, ?2, ?3, ?4)`,
+};
+
 type Fetcher = (url: string, init: RequestInit) => Promise<Response>;
 
 async function ingestBoard(
@@ -87,9 +93,7 @@ async function ingestBoard(
 
   await db.batch([
     board === 'llm' ? db.prepare(INSERT_LLM).bind(day, body) : db.prepare(INSERT_MEDIA).bind(day, board, body),
-    db
-      .prepare('INSERT OR REPLACE INTO aa_snapshots (day, board, fetched_at, models) VALUES (?, ?, ?, ?)')
-      .bind(day, board, now, models),
+    db.prepare(SNAPSHOT_ROW[board === 'llm' ? 'llm' : 'media']).bind(day, board, now, models),
     db.prepare('INSERT INTO aa_runs (ts, board, ok, models) VALUES (?, ?, 1, ?)').bind(now, board, models),
   ]);
   return models;

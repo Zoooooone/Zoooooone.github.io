@@ -12,6 +12,7 @@ const MEDIA_OBJECT = `json_object('id', id, 'name', name, 'slug', slug, 'creator
   'categories', json(categories))`;
 
 const MODEL_ID = /^[\w-]{1,64}$/;
+const DAILY_DAYS = 30;
 
 /** Answers with JSON text that SQLite already built, so the Worker never parses or re-serialises the 0.5 MB model list. */
 const prebuilt = (body: string, headers: ResponseHeaders) =>
@@ -26,7 +27,11 @@ async function latest(db: Database): Promise<string> {
     .prepare('SELECT board, ts, ok, models, error FROM aa_runs ORDER BY ts DESC LIMIT 30')
     .all<Record<string, unknown>>();
   const daily = await db
-    .prepare('SELECT day, MAX(intelligence) AS top, COUNT(*) AS models FROM aa_llm GROUP BY day ORDER BY day')
+    .prepare(
+      `SELECT day, top, models FROM
+         (SELECT day, top, models FROM aa_snapshots WHERE board = 'llm' ORDER BY day DESC LIMIT ${DAILY_DAYS})
+       ORDER BY day`,
+    )
     .all<Record<string, unknown>>();
 
   const llmDay = boards.results.find((b) => b.board === 'llm')?.day;
