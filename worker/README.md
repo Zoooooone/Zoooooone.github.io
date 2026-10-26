@@ -102,6 +102,8 @@ npx wrangler deploy
 - Days are Tokyo dates. A price or speed of `0` from the API means "not measured" and is stored as `NULL`.
 - A response that is not JSON, lists no models, or has less than half the models of the previous snapshot is refused and logged in `aa_runs`; the page keeps showing the last good day.
 - The response is handed to SQLite as one value and taken apart there with `json_each`, so the Worker never parses the 0.6 MB list. D1 refuses values over 2 MB.
+- The best intelligence index of each day is stored with the LLM snapshot (`aa_snapshots.top`), so opening the page does not scan every row of `aa_llm`.
+- A missing `AA_API_KEY` or a database error leaves no failed run behind. The page therefore also warns when a board's newest snapshot is two or more days old, or yesterday's after 08:00 Tokyo time.
 
 | Endpoint                          | Returns                                                                          |
 | --------------------------------- | -------------------------------------------------------------------------------- |

@@ -14,7 +14,7 @@ import { redrawChart, renderFrontier, renderScatter, type ChartState, type Scatt
 import { renderLeaderboard } from './render/leaderboard';
 import { renderKpis } from './render/overview';
 import { fillSelect } from './render/shared';
-import { explain, failures, statusLine } from './status';
+import { explain, statusLine, warnings } from './status';
 import type { Changes, Latest, MediaBoard } from './types';
 
 const SHORT_LIST = 25;
@@ -105,7 +105,7 @@ onPage(() => {
 
   function paintStatus() {
     status.textContent = statusLine(view.latest!);
-    $('[data-warn]').replaceChildren(...failures(view.latest!).map((text) => h('p', {}, text)));
+    $('[data-warn]').replaceChildren(...warnings(view.latest!).map((text) => h('p', {}, text)));
   }
 
   function paintLeaderboard() {

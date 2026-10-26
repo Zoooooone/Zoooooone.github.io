@@ -135,7 +135,10 @@ const history = {
   ],
 };
 
-async function mockWorker(page: Page, { noHistory = false } = {}) {
+async function mockWorker(
+  page: Page,
+  { noHistory = false, snapshot = latest }: { noHistory?: boolean; snapshot?: typeof latest } = {},
+) {
   const requests: URL[] = [];
   await page.route(`https://${HOST}/**`, async (route) => {
     const request = route.request();
@@ -144,7 +147,7 @@ async function mockWorker(page: Page, { noHistory = false } = {}) {
     const url = new URL(request.url());
     requests.push(url);
     if (request.headers().authorization !== `Bearer ${GOOD}`) return route.fulfill({ status: 401, headers: cors });
-    if (url.pathname === '/api/models/latest') return route.fulfill({ json: latest, headers: cors });
+    if (url.pathname === '/api/models/latest') return route.fulfill({ json: snapshot, headers: cors });
     if (url.pathname === '/api/models/changes') {
       const days = Number(url.searchParams.get('days'));
       const metric = url.searchParams.get('metric') ?? undefined;
@@ -422,6 +425,27 @@ test.describe('model watch page', () => {
     await expect(page.locator('[data-frontier] svg.scatter')).toHaveAttribute('aria-label', /Humanity's Last Exam/);
     await expect(page.locator('[data-frontier] .stats-note')).toContainText('Humanity');
     await expect(page.locator('[data-frontier] .pt')).toHaveCount(4);
+  });
+
+  test('warns when the snapshots have stopped coming, and stays quiet while they are fresh', async ({ page }) => {
+    const tokyoDay = (daysAgo: number) =>
+      new Date(Date.now() + 9 * 3600_000 - daysAgo * 86_400_000).toISOString().slice(0, 10);
+    const dated = (daysAgo: number) => ({
+      ...latest,
+      runs: [],
+      boards: latest.boards.map((b) => ({ ...b, day: tokyoDay(daysAgo) })),
+    });
+
+    await mockWorker(page, { snapshot: dated(3) });
+    await unlock(page);
+    await expect(page.locator('[data-warn] p')).toHaveCount(3);
+    await expect(page.locator('[data-warn]')).toContainText('语言模型 已经 3 天没有更新');
+
+    await page.unrouteAll();
+    await mockWorker(page, { snapshot: dated(0) });
+    await page.locator('[data-refresh]').click();
+    await expect(page.locator('[data-status]')).toContainText(`DATA ${tokyoDay(0)}`);
+    await expect(page.locator('[data-warn] p')).toHaveCount(0);
   });
 
   test('compares over a longer range on request', async ({ page }) => {
