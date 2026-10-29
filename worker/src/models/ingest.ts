@@ -128,7 +128,6 @@ async function ingestBoard(
   return models;
 }
 
-/** Result per board: how many models were stored, or why it failed. */
 export async function ingestModels(env: Env, now = Date.now(), fetcher: Fetcher = fetch) {
   const done: Partial<Record<Board, number | string>> = {};
   if (!env.AA_API_KEY || tokyoHour(now) < FETCH_HOUR) return done;

@@ -92,7 +92,6 @@ export function surfaceLayers(
 
 const worstContrast = (rgb: Rgb, layers: Rgb[]) => Math.min(...layers.map((l) => contrast(rgb, l)));
 
-/** Moves the tone away from the surfaces (darker in light mode, lighter in dark mode) until the contrast is met. */
 function toneFor(palette: TonalPalette, base: number, layers: Rgb[], min: number, mode: Mode): number {
   const step = mode === 'light' ? -0.5 : 0.5;
   let tone = base;
@@ -129,7 +128,6 @@ const cache = new Map<string, WallpaperTheme>();
 
 type Seed = { hue: number; chroma: number };
 
-/** The best theme color of the image, or null when it has no usable color (grayscale). */
 async function seedOf(file: string): Promise<Seed | null> {
   const { data } = await sharp(file)
     .resize(96, 96, { fit: 'cover' })
@@ -144,7 +142,6 @@ async function seedOf(file: string): Promise<Seed | null> {
   return { hue: hct.hue, chroma: hct.chroma };
 }
 
-/** The wallpaper pixel at the given lightness percentile, which the translucent sheet is checked against. */
 export async function percentile(file: string, pick: number): Promise<Rgb> {
   const { data } = await sharp(file)
     .resize(64, 64, { fit: 'cover' })

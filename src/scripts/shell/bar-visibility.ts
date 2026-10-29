@@ -1,5 +1,4 @@
 export const DEAD_ZONE = 12;
-/** Distance from the top or bottom of the page where the bar always shows. */
 export const EDGE = 32;
 
 export type BarInput = {

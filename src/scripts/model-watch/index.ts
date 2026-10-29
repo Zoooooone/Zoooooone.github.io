@@ -121,7 +121,6 @@ onPage(() => {
 
   const chartState = (): ChartState => ({ pinned: view.pinned, creator: view.creator });
 
-  /** Marks the pick and the highlighted creator on every chart, leaving the lists around them as they are. */
   const syncCharts = () =>
     dashboard.querySelectorAll('[data-chart]').forEach((chart) => redrawChart(chart, chartState()));
 

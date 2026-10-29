@@ -256,7 +256,6 @@ test.describe('model watch page', () => {
     await expect(shown.first().locator('.pos')).toHaveText('11');
     await expect(first).toBeEnabled();
 
-    // From the middle, one press reaches either end.
     await last.click();
     await expect(at).toHaveText('3 / 3');
     await expect(shown).toHaveCount(5);
@@ -555,7 +554,6 @@ test.describe('model watch page', () => {
     await bar.locator('[data-anchor="mw-arenas"]').click();
     await expect(page.locator('#mw-arenas')).toBeInViewport();
     await expect(bar.locator('[aria-current="true"]')).toHaveText('竞技场');
-    // It follows the reader down the page.
     await expect(bar).toBeInViewport();
 
     await bar.locator('[data-anchor="mw-changes"]').click();
@@ -624,7 +622,6 @@ test.describe('model watch page', () => {
     expect((await timeline.locator('.dot-label').allTextContents()).sort()).toEqual(['Elder', 'Swift']);
     await expect(page.locator('[data-milestones]')).toHaveCount(0);
 
-    // The last creator stays.
     await timeline.locator('[data-lane="Bolt"]').click();
     await expect(timeline.locator('.series-end')).toHaveText(['Bolt']);
   });

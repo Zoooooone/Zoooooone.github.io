@@ -12,7 +12,6 @@ const HIT_RADIUS = 10;
 export interface Mark extends Dot {
   id: string;
   name: string;
-  /** Second line of the hover card. */
   line: string;
   kind: Kind;
   /** Settles who is labelled first among marks of the same kind. */

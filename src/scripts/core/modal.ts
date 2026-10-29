@@ -1,6 +1,5 @@
 const SKIPPED = new Set(['SCRIPT', 'STYLE', 'LINK', 'TEMPLATE']);
 
-/** Makes everything outside `dialog` inert and returns a function that undoes it and gives the focus back. */
 export function enterModal(dialog: HTMLElement): () => void {
   const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const background = [...document.body.children].filter(

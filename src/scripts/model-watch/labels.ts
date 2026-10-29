@@ -16,7 +16,6 @@ export interface Box {
 }
 
 export interface PlacedLabel {
-  /** Index in the candidates that were passed in. */
   index: number;
   x: number;
   y: number;

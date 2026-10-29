@@ -16,7 +16,6 @@ export interface ChartState {
 
 const redraws = new WeakMap<Element, (state: ChartState) => void>();
 
-/** Draws the chart again for a new selection without rebuilding the rest of the panel around it. */
 export const redrawChart = (chart: Element, state: ChartState) => redraws.get(chart)?.(state);
 
 export function panel(

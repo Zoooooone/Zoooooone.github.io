@@ -24,7 +24,6 @@ interface RankItem {
   label: string;
   value: number;
   sub?: string;
-  /** Put the small text beside the label instead of under it. */
   inline?: boolean;
   valueText?: string;
   tip?: string;

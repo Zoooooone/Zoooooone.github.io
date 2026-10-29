@@ -11,7 +11,6 @@ export const isListed = (model: LlmModel) => model.price_blended != null;
 
 const beats = (better: 'high' | 'low', a: number, b: number) => (better === 'high' ? a > b : a < b);
 
-/** Keeps one variant per model: the one that does best on the given value. */
 export function collapse<T extends { name: string; creator: string }>(
   list: T[],
   value: (item: T) => number | null,
@@ -85,7 +84,6 @@ export interface MonthBest {
   month: string;
   best: LlmModel;
   value: number;
-  /** Highest value among models released up to and including this month. */
   top: number;
   record: boolean;
 }
@@ -127,7 +125,6 @@ export interface Release {
   record: boolean;
 }
 
-/** What one creator released, oldest first, with its reasoning settings merged into the best one. */
 export function releasesOf(models: LlmModel[], creator: string, value: (model: LlmModel) => number | null): Release[] {
   let best = -Infinity;
   return collapse(

@@ -1,5 +1,3 @@
-// Runs a fake stats Worker with made-up visits and model lists and starts the dev server pointed at it,
-// so the stats and model watch pages can be tried without touching the real database.
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { changes, history, latest } from './mock-stats/models.mjs';
