@@ -17,7 +17,7 @@ Fingerprinting techniques (canvas, audio, fonts, graphics card, CPU and memory) 
 
 ## Telling bots apart
 
-Bots are stored with `is_bot = 1` (`src/suspect.ts`) when the browser reports automation, the screen is 800x600 (the default of headless browsers), or the network is Microsoft, Google LLC, OpenAI or Ahrefs. Cloudflare is excluded because WARP exits carry real visitors. `suspect` only marks a likely scraper that real visitors could also match: 1920x1080, `en-US`, no referrer, a window narrower than the screen, and a browser time zone in another part of the world than the IP's. The statistics ignore it; `/api/visits` returns both flags.
+Bots are stored with `is_bot = 1` (`src/suspect.ts`) when the browser reports automation, the screen is 800x600 (the default of headless browsers), or the network is Microsoft, Google LLC, OpenAI or Ahrefs. Cloudflare is excluded because WARP exits carry real visitors. `suspect` only marks a likely scraper that real visitors could also match: 1920x1080, `en-US`, no referrer, a window narrower than the screen, and a browser time zone in another part of the world than the IP's. The stats page hides both unless it is told to include crawlers; `/api/visits` returns both flags.
 
 ## Deploy
 

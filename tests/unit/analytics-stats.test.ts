@@ -246,6 +246,15 @@ describe('visits', () => {
     expect((await list('?bots=1')).visits).toHaveLength(4);
   });
 
+  it('hides a suspect visit like a bot, in the list and in the totals', async () => {
+    world.sqlite.prepare('UPDATE visits SET is_bot = 0, suspect = 1 WHERE visitor_id = ?').run(C);
+    expect((await list()).visits).toHaveLength(3);
+    expect((await list('?bots=1')).visits).toHaveLength(4);
+    const views = async (query: string) =>
+      ((await (await worker.fetch(get(`/api/summary?days=30${query}`), world.env)).json()) as Summary).totals.views;
+    expect(await views('&bots=1')).toBe((await views('')) + 1);
+  });
+
   it.each([['visitor=zzz'], ['country=jp'], ['path=x'], ['path=/a?b=1']])('rejects the filter %s', async (query) => {
     const res = await worker.fetch(get(`/api/visits?${query}`), world.env);
     expect(res.status).toBe(400);

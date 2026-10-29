@@ -221,6 +221,7 @@ for (let n = 0; n < 1800; n++) {
     referrer: random() < 0.25 ? '/' : pick(REFERRERS),
     duration_ms: random() < 0.15 ? null : Math.round(2000 + random() ** 2 * 280000),
     is_bot: false,
+    suspect: false,
   };
 
   let row;
@@ -292,6 +293,7 @@ for (let n = 0; n < 1800; n++) {
       referrer: '',
       duration_ms: 5400,
       is_bot: true,
+      suspect: false,
       country: 'US',
       region: 'Virginia',
       city: 'Boydton',

@@ -36,7 +36,7 @@ const measuredShare = (list, key, yes) => {
 
 function summary({ days, bots }) {
   const since = days ? now - days * DAY : 0;
-  const list = rows.filter((r) => r.ts >= since && (bots || !r.is_bot));
+  const list = rows.filter((r) => r.ts >= since && (bots || (!r.is_bot && !r.suspect)));
   const people = new Set(list.map((r) => r.visitor_id));
   const newVisitors = [...people].filter((v) => firstSeen.get(v) >= since).length;
 
@@ -141,7 +141,7 @@ function visits(params) {
     (r) =>
       r.ts >= since &&
       r.ts < before &&
-      (params.get('bots') === '1' || !r.is_bot) &&
+      (params.get('bots') === '1' || (!r.is_bot && !r.suspect)) &&
       (!params.get('path') || r.path === params.get('path')) &&
       (!params.get('country') || r.country === params.get('country')) &&
       (!visitor || r.visitor_id === visitor) &&

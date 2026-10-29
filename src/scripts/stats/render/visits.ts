@@ -76,6 +76,7 @@ function renderDetail(r: VisitRow): HTMLElement {
     field('滚动深度', scrollLabel(r.scroll_pct)),
     field('自动化标记', yesNo(r.automation)),
     field('爬虫标记', yesNo(r.is_bot)),
+    field('可疑标记', yesNo(r.suspect)),
     field('停留', formatDuration(r.duration_ms)),
     h('div', { class: 'wide' }, h('dt', {}, '浏览器标识'), h('dd', { class: 'code' }, r.ua || '—')),
   );
@@ -116,6 +117,7 @@ export function renderVisits(rows: VisitRow[], now: number): HTMLElement {
           filterButton('visitor', r.visitor_id, visitorName(r.visitor_id), `ID ${r.visitor_id}`),
           r.is_first ? h('span', { class: 'tag' }, 'NEW') : null,
           r.is_bot ? h('span', { class: 'tag bot' }, 'BOT') : null,
+          r.suspect ? h('span', { class: 'tag suspect' }, 'SUSPECT') : null,
           r.automation ? h('span', { class: 'tag auto' }, 'AUTO') : null,
           h('small', { class: 'id' }, shortId(r.visitor_id)),
         ),

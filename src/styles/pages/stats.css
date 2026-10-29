@@ -448,7 +448,8 @@
   font: var(--fw-bold) var(--text-2xs) var(--font-mono);
   letter-spacing: var(--tracking-wide);
 }
-.stats .tag.bot {
+.stats .tag.bot,
+.stats .tag.suspect {
   background: var(--amber);
 }
 .stats .link {

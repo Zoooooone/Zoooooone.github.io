@@ -19,7 +19,7 @@ export async function visits(
 ): Promise<Response | object> {
   const conditions = ['v.ts >= ?'];
   const values: unknown[] = [since];
-  if (!bots) conditions.push('v.is_bot = 0');
+  if (!bots) conditions.push('v.is_bot = 0 AND v.suspect = 0');
 
   const before = params.get('before');
   if (before !== null) {

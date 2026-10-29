@@ -51,7 +51,7 @@ function sourcesOf(referrers: { referrer: string; views: number }[]) {
 }
 
 export async function summary(db: Database, { since, bots }: Filters) {
-  const where = bots ? 'ts >= ?' : 'ts >= ? AND is_bot = 0';
+  const where = bots ? 'ts >= ?' : 'ts >= ? AND is_bot = 0 AND suspect = 0';
   const local = `(ts / 1000 + ${TZ_OFFSET_S})`;
   const rows = async <T>(sql: string, binds: unknown[] = [since]) =>
     (

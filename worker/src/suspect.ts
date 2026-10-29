@@ -14,7 +14,7 @@ export interface Signals {
 export interface Verdict {
   /** Certain enough to be counted as a bot. */
   bot: boolean;
-  /** Looks like a scraper, but real visitors could match too, so it is only recorded. */
+  /** Looks like a scraper, but real visitors could match too, so it is not called a bot. */
   suspect: boolean;
 }
 

@@ -98,6 +98,7 @@ const visit = (n: number, extra: Record<string, unknown> = {}) => ({
   utm_campaign: '',
   ua: 'Mozilla/5.0 test-agent',
   is_bot: false,
+  suspect: false,
   automation: false,
   interacted: true,
   scroll_pct: 80,
