@@ -7,13 +7,17 @@ Receives anonymous page-view reports from the blog and stores them in Cloudflare
 | Where from | Fields |
 | --- | --- |
 | Cloudflare, per request | country, region, city, network name and number, time zone (when the browser did not send one) |
-| Request header | the browser identifier (`ua`, at most 300 characters) and what is read from it: browser, system, device type, whether it looks like a known crawler |
+| Request header | the browser identifier (`ua`, at most 300 characters) and what is read from it: browser, system, device type, whether it is a known crawler |
 | Browser, with the page view | path, referrer (path only, no query), screen size, window size, pixel ratio, touch points, language, time zone, how the page was opened (`nav`), the three `utm_*` campaign tags, whether the browser looks automated |
 | Browser, when the visitor leaves | time on page, whether a real click or key press happened, how far down the page the window got (0 to 100) |
 
 The rest of the address (query string, fragment) is never sent, only the three campaign tags. A visit from before a field existed keeps `NULL` (or an empty string) for it, which means "not measured", not "no".
 
 Fingerprinting techniques (canvas, audio, fonts, graphics card, CPU and memory) are deliberately not used.
+
+## Telling bots apart
+
+Bots are stored with `is_bot = 1` (`src/suspect.ts`) when the browser reports automation, the screen is 800x600 (the default of headless browsers), or the network is Microsoft, Google LLC, OpenAI or Ahrefs. Cloudflare is excluded because WARP exits carry real visitors. `suspect` only marks a likely scraper that real visitors could also match: 1920x1080, `en-US`, no referrer, a window narrower than the screen, and a browser time zone in another part of the world than the IP's. The statistics ignore it; `/api/visits` returns both flags.
 
 ## Deploy
 
@@ -114,7 +118,7 @@ npx wrangler deploy
 
 They use the same `Origin` and `STATS_TOKEN` checks as the stats API.
 
-Terms: the data is licensed by the Artificial Analysis [Data Platform Terms](https://artificialanalysiscdn.com/legal/ProDataPlatformTerms.pdf) for internal use. Keep the page behind the token, never commit API responses (tests and `pnpm dev:mock` use invented models), and keep the attribution on the page. If the API access ends, delete the `aa_*` tables within 30 days.
+Terms: the data is licensed for internal use by the Artificial Analysis [Data Platform Terms](https://artificialanalysiscdn.com/legal/ProDataPlatformTerms.pdf). Keep the attribution on the page; if the API access ends, delete the `aa_*` tables within 30 days.
 
 A deployed Worker has no button to run its cron on demand. After deploying, wait for the next full hour (watch it with `npx wrangler tail --format pretty`), then check the log:
 
