@@ -6,6 +6,7 @@ const snapshot = (days: Partial<Record<Board, string>>, runs: Latest['runs'] = [
   boards: Object.entries(days).map(([board, day]) => ({ board: board as Board, day, fetched_at: 0, models: 1 })),
   runs,
   daily: [],
+  index: null,
   llm: [],
   media: {},
 });

@@ -15,6 +15,10 @@ export interface LlmModel {
   ttft: number | null;
   ttfat: number | null;
   evaluations: Record<string, number | null>;
+  /** Scores under the indices as they were before AA redefined them; only models that had a score then. */
+  intelligence_legacy?: number | null;
+  coding_legacy?: number | null;
+  math_legacy?: number | null;
 }
 
 export const MEDIA_BOARDS = [
@@ -64,10 +68,17 @@ interface Run {
   error: string;
 }
 
+export interface IndexBreak {
+  since: string;
+  legacy: string;
+}
+
 export interface Latest {
   boards: BoardStatus[];
   runs: Run[];
-  daily: { day: string; top: number | null; models: number }[];
+  daily: { day: string; top: number | null; models: number; epoch: number }[];
+  /** Set once the indices were redefined: when the current ones began, and the last day of the old ones. */
+  index: IndexBreak | null;
   llm: LlmModel[];
   media: Partial<Record<MediaBoard, MediaModel[]>>;
 }
@@ -127,5 +138,6 @@ export interface History {
     price_blended: number | null;
     tps: number | null;
     ttft: number | null;
+    epoch: number;
   }[];
 }

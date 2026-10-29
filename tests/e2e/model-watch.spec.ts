@@ -50,9 +50,10 @@ const latest = {
     { board: 'llm', ts: NOW - 1000, ok: 1, models: 5, error: '' },
   ],
   daily: [
-    { day: '2026-10-23', top: 59, models: 4 },
-    { day: '2026-10-24', top: 60, models: 5 },
+    { day: '2026-10-23', top: 59, models: 4, epoch: 0 },
+    { day: '2026-10-24', top: 60, models: 5, epoch: 0 },
   ],
+  index: null as { since: string; legacy: string } | null,
   llm: [
     llm('nova-max', { name: 'Nova (Max)', intelligence: 60, price_blended: 10, tps: 50, release_date: '2026-10-01' }),
     llm('nova-low', { name: 'Nova (Low)', intelligence: 45, price_blended: 1, tps: 300, release_date: '2026-10-01' }),
@@ -129,8 +130,8 @@ const changes = (days: number, metric = 'intelligence') => ({
 const history = {
   id: 'swift',
   days: [
-    { day: '2026-10-23', name: 'Swift', intelligence: 48, price_blended: 1 },
-    { day: '2026-10-24', name: 'Swift', intelligence: 50, price_blended: 0.5 },
+    { day: '2026-10-23', name: 'Swift', intelligence: 48, price_blended: 1, epoch: 0 },
+    { day: '2026-10-24', name: 'Swift', intelligence: 50, price_blended: 0.5, epoch: 0 },
   ],
 };
 
@@ -729,6 +730,37 @@ test.describe('model watch page', () => {
     await page.locator('[data-days="30"]').click();
     await expect(page.locator('[data-changes]')).toContainText('还没有 30 天前的快照');
     expect(requests.some((u) => u.searchParams.get('days') === '30')).toBe(true);
+  });
+
+  test('offers the scores of the old indices, labelled as such, and says why changes start later', async ({ page }) => {
+    const old = {
+      ...latest,
+      index: { since: '2026-10-24', legacy: '2026-10-23' },
+      llm: [
+        llm('fresh', { name: 'Fresh', intelligence: 55, intelligence_legacy: null }),
+        llm('veteran', { name: 'Veteran', intelligence: null, intelligence_legacy: 62 }),
+      ],
+    };
+    await mockWorker(page, { snapshot: old });
+    await unlock(page);
+    const select = page.locator('[data-metric]');
+    await expect(select.locator('optgroup[label*="旧版"] option')).toHaveText([
+      '智能指数(旧版)',
+      '编程指数(旧版)',
+      '数学指数(旧版)',
+    ]);
+    await expect(page.locator('[data-board] .rank li').first()).toContainText('Fresh');
+    await select.selectOption('intelligence_legacy');
+    await expect(page.locator('[data-board] .rank li')).toHaveCount(1);
+    await expect(page.locator('[data-board] .rank li').first()).toContainText('Veteran');
+    await expect(page.locator('[data-changes]')).toContainText('从 2026-10-24 起换了算法');
+  });
+
+  test('has no old-index choices before the indices were ever redefined', async ({ page }) => {
+    await mockWorker(page);
+    await unlock(page);
+    await expect(page.locator('[data-metric] optgroup[label*="旧版"]')).toHaveCount(0);
+    await expect(page.locator('[data-changes]')).not.toContainText('换了算法');
   });
 
   test('says when there is not enough history to compare', async ({ page }) => {

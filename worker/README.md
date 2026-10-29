@@ -100,9 +100,10 @@ npx wrangler deploy
 
 - A cron trigger runs every hour. From 06:00 Tokyo time it fetches each board that has no snapshot for today yet, so a failed board is retried the next hour and a finished day costs no further requests (six a day, the limit is 1000).
 - Days are Tokyo dates. A price or speed of `0` from the API means "not measured" and is stored as `NULL`.
-- A response that is not JSON, lists no models, or has less than half the models of the previous snapshot is refused and logged in `aa_runs`; the page keeps showing the last good day.
+- A response that is not JSON, lists no models, or has less than half the models of the previous snapshot is refused and logged in `aa_runs`; the page keeps showing the last good day. If the next attempt sees exactly the same smaller count, it is taken as real (a board was reset, as image-to-video was on 2026-10-29) and stored.
 - The response is handed to SQLite as one value and taken apart there with `json_each`, so the Worker never parses the 0.6 MB list. D1 refuses values over 2 MB.
 - The best intelligence index of each day is stored with the LLM snapshot (`aa_snapshots.top`), so opening the page does not scan every row of `aa_llm`.
+- AA redefines its composite indices now and then (intelligence on 2026-10-29: about 700 scored models became 78, and the scores of the rest moved). A new `epoch` starts in `aa_snapshots` on the day when more than half of the models scored on both days changed their score, or fewer than a fifth of the previously scored models keep one. Changes compare only snapshots of the newest epoch, and `/api/models/latest` carries `index` (`since`, `legacy`) plus `intelligence_legacy`, `coding_legacy` and `math_legacy` taken from the last snapshot of the epoch before. Nothing is deleted. Migration `0005` marks 2026-10-29 as the first day of epoch 1.
 - A missing `AA_API_KEY` or a database error leaves no failed run behind. The page therefore also warns when a board's newest snapshot is two or more days old, or yesterday's after 08:00 Tokyo time.
 
 | Endpoint                          | Returns                                                                          |

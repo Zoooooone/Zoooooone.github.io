@@ -208,7 +208,8 @@ export function renderFrontier(months: MonthBest[], daily: Latest['daily'], opti
   };
 
   const records = months.filter((m) => m.record);
-  const snapshots = metric.key === 'intelligence' ? daily.filter((d) => d.top != null) : [];
+  const epoch = daily[daily.length - 1]?.epoch;
+  const snapshots = metric.key === 'intelligence' ? daily.filter((d) => d.top != null && d.epoch === epoch) : [];
   return panel(
     'frontier',
     options.state,

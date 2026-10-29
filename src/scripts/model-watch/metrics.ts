@@ -1,4 +1,4 @@
-import type { Board, LlmModel } from './types';
+import type { Board, IndexBreak, LlmModel } from './types';
 
 export interface Metric {
   key: string;
@@ -49,7 +49,18 @@ const BENCHMARKS: [string, string][] = [
 ];
 
 type Column =
-  'intelligence' | 'coding' | 'math' | 'tps' | 'ttft' | 'ttfat' | 'price_blended' | 'price_input' | 'price_output';
+  | 'intelligence'
+  | 'coding'
+  | 'math'
+  | 'intelligence_legacy'
+  | 'coding_legacy'
+  | 'math_legacy'
+  | 'tps'
+  | 'ttft'
+  | 'ttfat'
+  | 'price_blended'
+  | 'price_input'
+  | 'price_output';
 
 const column = (
   key: Column,
@@ -57,7 +68,7 @@ const column = (
   group: string,
   better: Metric['better'],
   format: Metric['format'],
-): Metric => ({ key, label, group, better, value: (m) => m[key], format });
+): Metric => ({ key, label, group, better, value: (m) => m[key] ?? null, format });
 
 const INDICES = '综合指数';
 const SPEED = '速度与延迟';
@@ -70,6 +81,15 @@ const FIXED: Metric[] = [
   column('coding', '编程指数', INDICES, 'high', formatScore),
   column('math', '数学指数', INDICES, 'high', formatScore),
 ];
+
+const legacyIndices = ({ legacy }: IndexBreak): Metric[] => {
+  const group = `旧版综合指数 · 至 ${legacy} 停更`;
+  return [
+    column('intelligence_legacy', '智能指数(旧版)', group, 'high', formatScore),
+    column('coding_legacy', '编程指数(旧版)', group, 'high', formatScore),
+    column('math_legacy', '数学指数(旧版)', group, 'high', formatScore),
+  ];
+};
 
 const SPEED_AND_PRICE: Metric[] = [
   column('tps', '输出速度', SPEED, 'high', formatSpeed),
@@ -90,11 +110,12 @@ const benchmark = (key: string, label: string): Metric => ({
 });
 
 /** Every metric worth ranking by; an evaluation the API adds later shows up under its raw name. */
-export function metricsFor(models: LlmModel[]): Metric[] {
+export function metricsFor(models: LlmModel[], index: IndexBreak | null = null): Metric[] {
   const known = new Set([...INDEX_KEYS, ...BENCHMARKS.map(([key]) => key)]);
   const extra = [...new Set(models.flatMap((m) => Object.keys(m.evaluations)))].filter((key) => !known.has(key)).sort();
   return [
     ...FIXED,
+    ...(index ? legacyIndices(index) : []),
     ...BENCHMARKS.map(([key, label]) => benchmark(key, label)),
     ...extra.map((key) => benchmark(key, key)),
     ...SPEED_AND_PRICE,

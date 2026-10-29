@@ -203,6 +203,19 @@ describe('model watch metrics', () => {
     expect(metrics.find((m) => m.key === 'gpqa')!.value(model({ evaluations: { gpqa: 0.5 } }))).toBe(0.5);
   });
 
+  it('adds the old indices, with the day they stopped, only once the indices were redefined', () => {
+    const old = metricsFor([model({})], { since: '2026-10-29', legacy: '2026-10-28' });
+    expect(old.filter((m) => m.group.includes('旧版')).map((m) => [m.key, m.label])).toEqual([
+      ['intelligence_legacy', '智能指数(旧版)'],
+      ['coding_legacy', '编程指数(旧版)'],
+      ['math_legacy', '数学指数(旧版)'],
+    ]);
+    expect(old.find((m) => m.key === 'intelligence_legacy')!.group).toContain('2026-10-28');
+    expect(old.find((m) => m.key === 'coding_legacy')!.value(model({ coding_legacy: 33 }))).toBe(33);
+    expect(old.find((m) => m.key === 'coding_legacy')!.value(model({}))).toBeNull();
+    expect(metricsFor([model({})]).some((m) => m.key.endsWith('_legacy'))).toBe(false);
+  });
+
   it('formats prices, shares and delays', () => {
     expect(formatPrice(0.5)).toBe('$0.50');
     expect(formatPrice(12.5)).toBe('$12.5');

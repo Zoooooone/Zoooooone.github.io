@@ -142,8 +142,15 @@ export const latest = () => ({
     day: daysAgo(n),
     top: round(Math.max(...llm.map((m) => m.intelligence ?? 0)) - n * 0.4),
     models: llm.length - n,
+    epoch: n === 3 ? 0 : 1,
   })),
-  llm,
+  index: { since: daysAgo(2), legacy: daysAgo(3) },
+  llm: llm.map((m) => ({
+    ...m,
+    intelligence_legacy: m.intelligence == null ? null : round(m.intelligence + 9),
+    coding_legacy: m.coding == null ? null : round(m.coding + 9),
+    math_legacy: null,
+  })),
   media,
 });
 
@@ -165,7 +172,7 @@ const arenaChange = (board) => {
 };
 
 export const changes = (days, metric = 'intelligence') => {
-  const span = { from: daysAgo(days > 3 ? 3 : days), to: today, partial: days > 3 };
+  const span = { from: daysAgo(days > 2 ? 2 : days), to: today, partial: days > 2 };
   const step = (key, i) => {
     const now = metricOf(
       llm.find((m) => metricOf(m, key) != null),
@@ -208,7 +215,8 @@ export const history = (id) => {
     days: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((n) => ({
       day: daysAgo(n),
       name: model.name,
-      intelligence: model.intelligence == null ? null : round(model.intelligence - n * 0.2),
+      intelligence: model.intelligence == null ? null : round(model.intelligence + (n > 2 ? 9 : 0) - n * 0.2),
+      epoch: n > 2 ? 0 : 1,
       coding: model.coding,
       math: model.math,
       price_blended: model.price_blended == null ? null : round(model.price_blended * (n > 5 ? 1.5 : 1), 2),

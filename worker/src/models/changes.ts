@@ -9,13 +9,16 @@ interface Span {
   partial: boolean;
 }
 
+// Snapshots from before the latest redefinition of the indices are not comparable, so they are never the other side.
 async function span(db: Database, board: string, days: number): Promise<Span | null> {
   const row = await db
     .prepare(
-      `SELECT (SELECT MAX(day) FROM aa_snapshots WHERE board = ?1) AS last,
-              (SELECT MAX(day) FROM aa_snapshots WHERE board = ?1
-                 AND day <= date((SELECT MAX(day) FROM aa_snapshots WHERE board = ?1), ?2)) AS back,
-              (SELECT MIN(day) FROM aa_snapshots WHERE board = ?1) AS first`,
+      `WITH same AS (
+         SELECT day FROM aa_snapshots WHERE board = ?1
+           AND epoch = (SELECT epoch FROM aa_snapshots WHERE board = ?1 ORDER BY day DESC LIMIT 1))
+       SELECT (SELECT MAX(day) FROM same) AS last,
+              (SELECT MAX(day) FROM same WHERE day <= date((SELECT MAX(day) FROM same), ?2)) AS back,
+              (SELECT MIN(day) FROM same) AS first`,
     )
     .bind(board, `-${days} days`)
     .first<{ last: string | null; back: string | null; first: string | null }>();

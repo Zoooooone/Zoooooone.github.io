@@ -94,7 +94,7 @@ onPage(() => {
   const visible = () => (view.latest?.llm ?? []).filter((m) => unlisted.checked || isListed(m));
 
   function fillMetrics() {
-    view.metrics = metricsFor(view.latest!.llm);
+    view.metrics = metricsFor(view.latest!.llm, view.latest!.index);
     const keep = (current: Metric) => view.metrics.find((m) => m.key === current.key) ?? INTELLIGENCE;
     view.metric = keep(view.metric);
     view.changeMetric = keep(view.changeMetric);
@@ -227,7 +227,10 @@ onPage(() => {
     $('[data-creators]').replaceChildren(renderCreators(visible()));
   }
 
-  const paintChanges = () => $('[data-changes]').replaceChildren(renderChanges(view.changes!, view.changeMetric));
+  const paintChanges = () => {
+    changeMetricSelect.disabled = !view.changes!.llm;
+    $('[data-changes]').replaceChildren(renderChanges(view.changes!, view.changeMetric, view.latest?.index ?? null));
+  };
 
   async function loadAll(): Promise<boolean> {
     const { signal, stale } = begin();

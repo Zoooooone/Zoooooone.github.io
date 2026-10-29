@@ -1,6 +1,6 @@
 import { h } from '@/scripts/core/dom';
 import { BOARD_LABELS, formatPrice, formatScore, type Metric } from '../metrics';
-import { MEDIA_BOARDS, type Changes, type LlmChange } from '../types';
+import { MEDIA_BOARDS, type Changes, type IndexBreak, type LlmChange } from '../types';
 import { CHANGE_PAGE, changeList, empty, group, note, type ChangeItem } from './shared';
 
 const signed = (n: number, digits = 1) => `${n > 0 ? '+' : n < 0 ? '−' : '±'}${Math.abs(n).toFixed(digits)}`;
@@ -126,12 +126,17 @@ function arenaSection(changes: Changes): HTMLElement {
   );
 }
 
-export function renderChanges(changes: Changes, metric: Metric): HTMLElement {
+export function renderChanges(changes: Changes, metric: Metric, index: IndexBreak | null = null): HTMLElement {
   const hasMedia = MEDIA_BOARDS.some((b) => changes.media[b]);
   if (!changes.llm && !hasMedia) return empty('至少要有两天的快照才能比较，明天起开始显示变化');
   return h(
     'div',
     { class: 'stack' },
+    index
+      ? note(
+          `综合指数从 ${index.since} 起换了算法，分数不能和之前比；语言模型的变化只对比这一天之后的快照${changes.llm ? '' : '，明天起开始显示'}`,
+        )
+      : null,
     ...(changes.llm ? [llmSection(changes.llm, changes.days, metric)] : []),
     arenaSection(changes),
   );

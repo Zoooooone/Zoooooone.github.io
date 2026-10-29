@@ -8,7 +8,13 @@ const FETCH_HOUR = 6;
 // The whole response goes to SQLite as one value, and D1 refuses values over 2 MB.
 const MAX_BODY = 1_900_000;
 // A list that suddenly halves is more likely an API fault than models leaving, and would show up as mass removals.
+// It is stored anyway once two attempts in a row see the same smaller count: a fault does not repeat itself exactly.
 const MIN_SHARE_OF_PREVIOUS = 0.5;
+
+// The composite indices are redefined now and then. A new epoch starts on the day when most models scored on both
+// days changed their score, or when the scored models all but disappeared; only snapshots of one epoch are compared.
+const MIN_COMMON_FOR_BREAK = 10;
+const MIN_SCORED_FOR_COLLAPSE = 20;
 
 export const BOARDS = [
   { board: 'llm', path: 'data/llms/models' },
@@ -55,11 +61,30 @@ const INSERT_MEDIA = `INSERT OR REPLACE INTO aa_media (day, board, id, name, slu
     COALESCE(json(value -> '$.categories'), '[]')
   FROM json_each(?3, '$.data') WHERE ${VALID_MODELS}`;
 
+const BEFORE = `(SELECT MAX(day) FROM aa_snapshots WHERE board = 'llm' AND day < ?1)`;
+const BOTH_SCORED = `FROM aa_llm t JOIN aa_llm o ON o.id = t.id AND o.day = ${BEFORE}
+  WHERE t.day = ?1 AND t.intelligence IS NOT NULL AND o.intelligence IS NOT NULL`;
+const EPOCH = `COALESCE((SELECT epoch FROM aa_snapshots WHERE board = 'llm' AND day = ${BEFORE}), 0) + CASE WHEN
+    (SELECT COUNT(*) >= ${MIN_COMMON_FOR_BREAK} AND SUM(t.intelligence <> o.intelligence) * 2 > COUNT(*) ${BOTH_SCORED})
+    OR (SELECT COUNT(intelligence) FROM aa_llm WHERE day = ${BEFORE}) >= ${MIN_SCORED_FOR_COLLAPSE}
+      AND (SELECT COUNT(intelligence) FROM aa_llm WHERE day = ?1) * 5
+        < (SELECT COUNT(intelligence) FROM aa_llm WHERE day = ${BEFORE})
+  THEN 1 ELSE 0 END`;
+
 const SNAPSHOT_ROW = {
-  llm: `INSERT OR REPLACE INTO aa_snapshots (day, board, fetched_at, models, top)
-    VALUES (?1, ?2, ?3, ?4, (SELECT MAX(intelligence) FROM aa_llm WHERE day = ?1))`,
+  llm: `INSERT OR REPLACE INTO aa_snapshots (day, board, fetched_at, models, top, epoch)
+    VALUES (?1, ?2, ?3, ?4, (SELECT MAX(intelligence) FROM aa_llm WHERE day = ?1), ${EPOCH})`,
   media: `INSERT OR REPLACE INTO aa_snapshots (day, board, fetched_at, models) VALUES (?1, ?2, ?3, ?4)`,
 };
+
+class Shrunk extends Error {
+  constructor(
+    readonly models: number,
+    previous: number,
+  ) {
+    super(`only ${models} models, down from ${previous}`);
+  }
+}
 
 type Fetcher = (url: string, init: RequestInit) => Promise<Response>;
 
@@ -88,7 +113,11 @@ async function ingestBoard(
     .bind(board)
     .first<{ models: number }>();
   if (previous && models < previous.models * MIN_SHARE_OF_PREVIOUS) {
-    throw new Error(`only ${models} models, down from ${previous.models}`);
+    const last = await db
+      .prepare('SELECT ok, models FROM aa_runs WHERE board = ? ORDER BY ts DESC LIMIT 1')
+      .bind(board)
+      .first<{ ok: number; models: number | null }>();
+    if (last?.ok !== 0 || last.models !== models) throw new Shrunk(models, previous.models);
   }
 
   await db.batch([
@@ -118,8 +147,8 @@ export async function ingestModels(env: Env, now = Date.now(), fetcher: Fetcher 
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       done[board] = message;
-      await env.DB.prepare('INSERT INTO aa_runs (ts, board, ok, error) VALUES (?, ?, 0, ?)')
-        .bind(now, board, message.slice(0, 300))
+      await env.DB.prepare('INSERT INTO aa_runs (ts, board, ok, models, error) VALUES (?, ?, 0, ?, ?)')
+        .bind(now, board, error instanceof Shrunk ? error.models : null, message.slice(0, 300))
         .run();
     }
   }

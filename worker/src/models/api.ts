@@ -5,11 +5,15 @@ import { changes, DEFAULT_METRIC, metricSql } from './changes';
 const LLM_OBJECT = `json_object('id', id, 'name', name, 'slug', slug, 'creator_id', creator_id, 'creator', creator,
   'release_date', release_date, 'intelligence', intelligence, 'coding', coding, 'math', math,
   'price_blended', price_blended, 'price_input', price_input, 'price_output', price_output,
-  'tps', tps, 'ttft', ttft, 'ttfat', ttfat, 'evaluations', json(evaluations))`;
+  'tps', tps, 'ttft', ttft, 'ttfat', ttfat, 'evaluations', json(evaluations),
+  'intelligence_legacy', intelligence_legacy, 'coding_legacy', coding_legacy, 'math_legacy', math_legacy)`;
 
 const MEDIA_OBJECT = `json_object('id', id, 'name', name, 'slug', slug, 'creator', creator,
   'release_date', release_date, 'elo', elo, 'rank', rank, 'ci95', ci95, 'appearances', appearances,
   'categories', json(categories))`;
+
+const LEGACY_LLM = `SELECT t.*, o.intelligence AS intelligence_legacy, o.coding AS coding_legacy, o.math AS math_legacy
+  FROM aa_llm t LEFT JOIN aa_llm o ON o.day = ?2 AND o.id = t.id WHERE t.day = ?1`;
 
 const MODEL_ID = /^[\w-]{1,64}$/;
 const DAILY_DAYS = 30;
@@ -28,17 +32,27 @@ async function latest(db: Database): Promise<string> {
     .all<Record<string, unknown>>();
   const daily = await db
     .prepare(
-      `SELECT day, top, models FROM
-         (SELECT day, top, models FROM aa_snapshots WHERE board = 'llm' ORDER BY day DESC LIMIT ${DAILY_DAYS})
+      `SELECT day, top, models, epoch FROM
+         (SELECT day, top, models, epoch FROM aa_snapshots WHERE board = 'llm' ORDER BY day DESC LIMIT ${DAILY_DAYS})
        ORDER BY day`,
     )
     .all<Record<string, unknown>>();
 
   const llmDay = boards.results.find((b) => b.board === 'llm')?.day;
+  const index = llmDay
+    ? await db
+        .prepare(
+          `SELECT MIN(day) AS since, (SELECT MAX(day) FROM aa_snapshots WHERE board = 'llm' AND epoch < s.epoch) AS legacy
+           FROM aa_snapshots s WHERE board = 'llm'
+             AND epoch = (SELECT epoch FROM aa_snapshots WHERE board = 'llm' AND day = ?1)`,
+        )
+        .bind(llmDay)
+        .first<{ since: string; legacy: string | null }>()
+    : null;
   const llm = llmDay
     ? await db
-        .prepare(`SELECT json_group_array(${LLM_OBJECT}) AS list FROM aa_llm WHERE day = ?`)
-        .bind(llmDay)
+        .prepare(`SELECT json_group_array(${LLM_OBJECT}) AS list FROM (${LEGACY_LLM})`)
+        .bind(llmDay, index?.legacy ?? null)
         .first<{ list: string }>()
     : null;
   const media = await db
@@ -53,14 +67,15 @@ async function latest(db: Database): Promise<string> {
   const mediaJson = media.results.map((r) => `${JSON.stringify(r.board)}:${r.list}`).join(',');
   return `{"boards":${JSON.stringify(boards.results)},"runs":${JSON.stringify(runs.results)},"daily":${JSON.stringify(
     daily.results,
-  )},"llm":${llm?.list ?? '[]'},"media":{${mediaJson}}}`;
+  )},"index":${JSON.stringify(index?.legacy ? index : null)},"llm":${llm?.list ?? '[]'},"media":{${mediaJson}}}`;
 }
 
 async function history(db: Database, id: string) {
   const rows = await db
     .prepare(
-      `SELECT day, name, intelligence, coding, math, price_blended, tps, ttft
-       FROM aa_llm WHERE id = ? ORDER BY day`,
+      `SELECT l.day, l.name, l.intelligence, l.coding, l.math, l.price_blended, l.tps, l.ttft, s.epoch
+       FROM aa_llm l JOIN aa_snapshots s ON s.board = 'llm' AND s.day = l.day
+       WHERE l.id = ? ORDER BY l.day`,
     )
     .bind(id)
     .all<Record<string, unknown>>();

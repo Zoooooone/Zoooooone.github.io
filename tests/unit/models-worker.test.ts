@@ -76,6 +76,12 @@ function fakeApi(bodies: Partial<Record<string, string | number>> = {}) {
   return { calls, fetcher };
 }
 
+const call = async (env: ReturnType<typeof world>['env'], path: string) => {
+  const res = await worker.fetch(get(path), env);
+  expect(res.status).toBe(200);
+  return res.json();
+};
+
 const world = () => setup({ STATS_TOKEN: TOKEN, AA_API_KEY: KEY });
 
 describe('model snapshots', () => {
@@ -164,6 +170,116 @@ describe('model snapshots', () => {
     const done = await ingestModels(env, at('2026-10-24', 6), fakeApi({ llm: llmBody(many.slice(0, 4)) }).fetcher);
     expect(done.llm).toBe('only 4 models, down from 10');
     expect(rows("SELECT * FROM aa_llm WHERE day = '2026-10-24'")).toEqual([]);
+    expect(rows("SELECT ok, models FROM aa_runs WHERE board = 'llm' AND ok = 0")).toEqual([{ ok: 0, models: 4 }]);
+  });
+
+  it('accepts the smaller list when the next attempt sees the same count, but not a different one', async () => {
+    const many = Array.from({ length: 10 }, (_, i) => ({ id: `m${i}`, intelligence: i }));
+    const four = llmBody(many.slice(0, 4));
+    const { env, rows } = world();
+    await ingestModels(env, at('2026-10-23', 6), fakeApi({ llm: llmBody(many) }).fetcher);
+
+    expect((await ingestModels(env, at('2026-10-24', 6), fakeApi({ llm: four }).fetcher)).llm).toBe(
+      'only 4 models, down from 10',
+    );
+    expect((await ingestModels(env, at('2026-10-24', 7), fakeApi({ llm: four }).fetcher)).llm).toBe(4);
+    expect(rows("SELECT models FROM aa_snapshots WHERE board = 'llm' AND day = '2026-10-24'")).toEqual([{ models: 4 }]);
+
+    const blip = world();
+    await ingestModels(blip.env, at('2026-10-23', 6), fakeApi({ llm: llmBody(many) }).fetcher);
+    await ingestModels(blip.env, at('2026-10-24', 6), fakeApi({ llm: llmBody(many.slice(0, 4)) }).fetcher);
+    const again = await ingestModels(
+      blip.env,
+      at('2026-10-24', 7),
+      fakeApi({ llm: llmBody(many.slice(0, 3)) }).fetcher,
+    );
+    expect(again.llm).toBe('only 3 models, down from 10');
+  });
+});
+
+describe('versions of the indices', () => {
+  const scored = (from: number, count: number, shift: number) =>
+    Array.from({ length: count }, (_, i) => ({ id: `m${from + i}`, intelligence: 20 + i + shift }));
+  const epochs = (rows: <T>(sql: string) => T[]) =>
+    rows<{ day: string; epoch: number }>("SELECT day, epoch FROM aa_snapshots WHERE board = 'llm' ORDER BY day").map(
+      (r) => r.epoch,
+    );
+  const day = (w: ReturnType<typeof world>, date: string, models: ReturnType<typeof scored>) =>
+    ingestModels(w.env, at(date, 6), fakeApi({ llm: llmBody(models) }).fetcher);
+
+  it('stays in one epoch while scores drift or models come and go', async () => {
+    const w = world();
+    await day(w, '2026-10-24', scored(0, 20, 0));
+    await day(w, '2026-10-25', [
+      ...scored(0, 20, 0).map((m, i) => (i < 3 ? { ...m, intelligence: m.intelligence + 1 } : m)),
+      ...scored(50, 3, 0),
+    ]);
+    expect(epochs(w.rows)).toEqual([0, 0]);
+  });
+
+  it('starts a new epoch when most of the models scored on both days changed their score', async () => {
+    const w = world();
+    await day(w, '2026-10-24', scored(0, 20, 0));
+    await day(w, '2026-10-25', scored(0, 20, 7));
+    await day(w, '2026-10-26', scored(0, 20, 7));
+    expect(epochs(w.rows)).toEqual([0, 1, 1]);
+  });
+
+  it('starts a new epoch when almost no model keeps a score', async () => {
+    const w = world();
+    await day(w, '2026-10-24', scored(0, 30, 0));
+    await day(w, '2026-10-25', [
+      ...scored(0, 30, 0).map((m) => ({ ...m, intelligence: null })),
+      { id: 'z', intelligence: 40 },
+      ...Array(0),
+    ]);
+    expect(epochs(w.rows)).toEqual([0, 1]);
+  });
+
+  it('does not compare across the break, and offers the old scores of the models that had them', async () => {
+    const w = world();
+    await day(w, '2026-10-24', scored(0, 20, 0));
+    await day(w, '2026-10-25', scored(0, 20, 7));
+
+    expect((await call(w.env, '/api/models/changes?days=7')).llm).toBeNull();
+    const latest = await call(w.env, '/api/models/latest');
+    expect(latest.index).toEqual({ since: '2026-10-25', legacy: '2026-10-24' });
+    expect(latest.llm.find((m: { id: string }) => m.id === 'm3')).toMatchObject({
+      intelligence: 30,
+      intelligence_legacy: 23,
+    });
+    expect(latest.daily.map((d: { epoch: number }) => d.epoch)).toEqual([0, 1]);
+
+    await day(
+      w,
+      '2026-10-26',
+      scored(0, 20, 7).map((m, i) => (i < 5 ? { ...m, intelligence: m.intelligence + 1 } : m)),
+    );
+    const { llm } = await call(w.env, '/api/models/changes?days=7');
+    expect(llm).toMatchObject({ from: '2026-10-25', to: '2026-10-26', partial: true });
+    expect(llm.rescored).toHaveLength(5);
+
+    const { days } = await call(w.env, '/api/models/history?id=m3');
+    expect(days.map((d: { epoch: number }) => d.epoch)).toEqual([0, 1, 1]);
+  });
+
+  it('has no old scores to offer before any break', async () => {
+    const w = world();
+    await day(w, '2026-10-24', scored(0, 12, 0));
+    expect((await call(w.env, '/api/models/latest')).index).toBeNull();
+  });
+
+  it('marks the snapshots from the day of the known break when the column is added', () => {
+    const before = ['0001_init.sql', '0002_signals.sql', '0003_models.sql', '0004_snapshot_top.sql'];
+    const { rows, sqlite } = setup({}, before);
+    sqlite.exec(`INSERT INTO aa_snapshots (day, board, fetched_at, models) VALUES
+      ('2026-10-28', 'llm', 0, 1), ('2026-10-29', 'llm', 0, 1), ('2026-10-29', 'text-to-image', 0, 1)`);
+    sqlite.exec(readFileSync(new URL('../../worker/migrations/0005_index_epoch.sql', import.meta.url), 'utf8'));
+    expect(rows('SELECT day, board, epoch FROM aa_snapshots ORDER BY day, board')).toEqual([
+      { day: '2026-10-28', board: 'llm', epoch: 0 },
+      { day: '2026-10-29', board: 'llm', epoch: 1 },
+      { day: '2026-10-29', board: 'text-to-image', epoch: 0 },
+    ]);
   });
 });
 
@@ -223,12 +339,6 @@ describe('model API', () => {
     );
     return w;
   }
-  const call = async (env: ReturnType<typeof world>['env'], path: string) => {
-    const res = await worker.fetch(get(path), env);
-    expect(res.status).toBe(200);
-    return res.json();
-  };
-
   it('needs the stats token', async () => {
     const { env } = world();
     expect((await worker.fetch(get('/api/models/latest', { token: 'wrong' }), env)).status).toBe(401);
@@ -254,8 +364,8 @@ describe('model API', () => {
       models: 3,
     });
     expect(latest.daily).toEqual([
-      { day: '2026-10-17', top: 50, models: 3 },
-      { day: '2026-10-24', top: 60, models: 3 },
+      { day: '2026-10-17', top: 50, models: 3, epoch: 0 },
+      { day: '2026-10-24', top: 60, models: 3, epoch: 0 },
     ]);
   });
 
