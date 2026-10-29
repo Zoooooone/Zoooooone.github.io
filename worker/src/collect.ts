@@ -1,4 +1,5 @@
 import type { Env } from './types';
+import { judge } from './suspect';
 import { parseAgent } from './ua';
 import {
   CAMPAIGN,
@@ -73,6 +74,21 @@ async function recordHit(request: Request, env: Env, body: Report): Promise<numb
   const ip = request.headers.get('cf-connecting-ip') ?? '';
   const day = new Date(now).toISOString().slice(0, 10);
   const ipHash = ip ? await hashIp(ip, env.HASH_SECRET, day) : '';
+  const referrer = matching(body.referrer, REFERRER, 300);
+  const screen = matching(body.screen, SCREEN, 11);
+  const viewport = matching(body.viewport, VIEWPORT, 11);
+  const tz = matching(body.tz, TIMEZONE, 64);
+  const automation = flag(body.automation);
+  const verdict = judge({
+    automation,
+    screen,
+    viewport,
+    lang: matching(body.lang, LANG, 20),
+    referrer,
+    tz,
+    ipTz: geo.timezone ?? '',
+    asOrg: geo.asOrganization ?? '',
+  });
 
   const recent = await env.DB.prepare(
     `SELECT (SELECT COUNT(*) FROM visits WHERE ip_hash = ? AND ts > ?) AS by_ip,
@@ -87,28 +103,29 @@ async function recordHit(request: Request, env: Env, body: Report): Promise<numb
     visitor_id: body.visitor,
     ts: now,
     path,
-    referrer: matching(body.referrer, REFERRER, 300),
+    referrer,
     country: geo.country ?? '',
     region: geo.region ?? '',
     city: geo.city ?? '',
     asn: geo.asn ?? 0,
     as_org: geo.asOrganization ?? '',
-    tz: matching(body.tz, TIMEZONE, 64) || geo.timezone || '',
+    tz: tz || geo.timezone || '',
     browser: agent.browser,
     os: agent.os,
     device: agent.device,
-    screen: matching(body.screen, SCREEN, 11),
+    screen,
     lang: matching(body.lang, LANG, 20),
-    is_bot: agent.bot ? 1 : 0,
+    is_bot: agent.bot || verdict.bot ? 1 : 0,
+    suspect: verdict.suspect ? 1 : 0,
     ip_hash: ipHash,
-    viewport: matching(body.viewport, VIEWPORT, 11),
+    viewport,
     dpr: matching(body.dpr, PIXEL_RATIO, 5),
     touch: whole(body.touch, 20),
     nav: NAV_TYPES.includes(body.nav as string) ? (body.nav as string) : '',
     utm_source: matching(body.utm_source, CAMPAIGN, 64),
     utm_medium: matching(body.utm_medium, CAMPAIGN, 64),
     utm_campaign: matching(body.utm_campaign, CAMPAIGN, 64),
-    automation: flag(body.automation),
+    automation,
     ua: userAgent,
   };
   const columns = Object.keys(row);

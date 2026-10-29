@@ -42,7 +42,7 @@ export async function visits(
     .prepare(
       `SELECT v.visitor_id, v.ts, v.path, v.referrer, v.country, v.region, v.city, v.asn, v.as_org, v.tz, v.browser, v.os,
               v.device, v.screen, v.viewport, v.dpr, v.touch, v.lang, v.nav, v.utm_source, v.utm_medium, v.utm_campaign,
-              v.ua, v.is_bot, v.automation, v.interacted, v.scroll_pct, v.duration_ms, ${firstOfVisitor} AS is_first
+              v.ua, v.is_bot, v.suspect, v.automation, v.interacted, v.scroll_pct, v.duration_ms, ${firstOfVisitor} AS is_first
        FROM visits v WHERE ${conditions.join(' AND ')} ORDER BY v.ts DESC LIMIT ?`,
     )
     .bind(...values, limit + 1)
@@ -50,6 +50,7 @@ export async function visits(
       Record<string, unknown> & {
         ts: number;
         is_bot: number;
+        suspect: number;
         is_first: number;
         automation: number | null;
         interacted: number | null;
@@ -61,6 +62,7 @@ export async function visits(
     visits: page.map((row) => ({
       ...row,
       is_bot: row.is_bot === 1,
+      suspect: row.suspect === 1,
       is_first: row.is_first === 1,
       automation: bool(row.automation),
       interacted: bool(row.interacted),

@@ -153,7 +153,7 @@ describe('summary of the signals', () => {
     await worker.fetch(post(leave({ pv: PV2, visitor: V2, scroll: 10, interacted: false })), env);
 
     await worker.fetch(post({ type: 'hit', pv: PV3, visitor: V3, path: '/', lang: 'en-US' }, { cf }), env);
-    const summary = async () => (await (await worker.fetch(get('/api/summary?days=30'), env)).json()) as Summary;
+    const summary = async () => (await (await worker.fetch(get('/api/summary?days=30&bots=1'), env)).json()) as Summary;
     return { ...world, summary };
   }
 
@@ -165,6 +165,14 @@ describe('summary of the signals', () => {
       touch: { measured: 2, yes: 1 },
       scroll: { measured: 2, average: 55 },
     });
+  });
+
+  it('hides a visit that reports automation unless bots are asked for', async () => {
+    const { env } = await filled();
+    const { visits } = (await (await worker.fetch(get('/api/visits?days=30&limit=10'), env)).json()) as {
+      visits: { visitor_id: string }[];
+    };
+    expect(visits.map((v) => v.visitor_id)).not.toContain(V2);
   });
 
   it('puts scroll depth into quarters', async () => {
@@ -211,7 +219,7 @@ describe('summary of the signals', () => {
 
   it('returns every field of a visit, with unknown kept as null', async () => {
     const { env } = await filled();
-    const { visits } = (await (await worker.fetch(get('/api/visits?days=30&limit=10'), env)).json()) as {
+    const { visits } = (await (await worker.fetch(get('/api/visits?days=30&limit=10&bots=1'), env)).json()) as {
       visits: Record<string, unknown>[];
     };
     const byVisitor = (v: string) => visits.find((row) => row.visitor_id === v)!;
@@ -244,7 +252,7 @@ describe('a database that already has visits from before the signals existed', (
     for (const file of files.slice(1))
       sqlite.exec(readFileSync(new URL(`../../worker/migrations/${file}`, import.meta.url), 'utf8'));
 
-    const summary = (await (await worker.fetch(get('/api/summary?days=30'), env)).json()) as {
+    const summary = (await (await worker.fetch(get('/api/summary?days=30&bots=1'), env)).json()) as {
       totals: { views: number };
       behavior: { interaction: { measured: number } };
     };

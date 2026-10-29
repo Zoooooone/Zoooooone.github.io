@@ -69,6 +69,7 @@ export interface VisitRow {
   utm_campaign: string;
   ua: string;
   is_bot: boolean;
+  suspect: boolean;
   automation: boolean | null;
   interacted: boolean | null;
   scroll_pct: number | null;

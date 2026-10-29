@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import worker, { hashIp } from '../../worker/src/index';
+import { judge } from '../../worker/src/suspect';
 import { parseAgent } from '../../worker/src/ua';
 import { IP, post } from './helpers/requests';
 import { ORIGIN, setup } from './helpers/worker-db';
@@ -202,5 +203,60 @@ describe('parseAgent', () => {
     ['', 'Other', 'Other', 'desktop', true],
   ])('%s', (ua, browser, os, device, bot) => {
     expect(parseAgent(ua)).toEqual({ browser, os, device, bot });
+  });
+});
+
+describe('judge', () => {
+  const human = {
+    automation: 0 as const,
+    screen: '1710x1112',
+    viewport: '1710x905',
+    lang: 'zh-CN',
+    referrer: '',
+    tz: 'Asia/Tokyo',
+    ipTz: 'Asia/Tokyo',
+    asOrg: 'Japan Network Information Center',
+  };
+  const scraper = {
+    ...human,
+    screen: '1920x1080',
+    viewport: '1804x762',
+    lang: 'en-US',
+    tz: 'Asia/Shanghai',
+    ipTz: 'America/Bogota',
+  };
+
+  it('leaves an ordinary visitor alone', () => {
+    expect(judge(human)).toEqual({ bot: false, suspect: false });
+  });
+
+  it.each([
+    ['an automation flag', { automation: 1 as const }],
+    ['the 800x600 default screen', { screen: '800x600' }],
+    ['a Microsoft network', { asOrg: 'Microsoft Corporation' }],
+    ['an OpenAI network', { asOrg: 'OpenAI' }],
+    ['Google LLC', { asOrg: 'Google LLC' }],
+  ])('counts %s as a bot', (_, change) => {
+    expect(judge({ ...human, ...change }).bot).toBe(true);
+  });
+
+  it('does not mistake Google Fiber or Cloudflare WARP for a datacenter', () => {
+    expect(judge({ ...human, asOrg: 'Google Fiber Inc.' }).bot).toBe(false);
+    expect(judge({ ...human, asOrg: 'Cloudflare London, LLC' }).bot).toBe(false);
+  });
+
+  it('only records a scraper pattern without calling it a bot', () => {
+    expect(judge(scraper)).toEqual({ bot: false, suspect: true });
+  });
+
+  it.each([
+    ['a referrer', { referrer: '/posts/x/' }],
+    ['a time zone in the same part of the world', { ipTz: 'Asia/Tokyo' }],
+    ['no time zone from the network', { ipTz: '' }],
+    ['a full-screen window', { viewport: '1920x1080' }],
+    ['another screen', { screen: '1536x864' }],
+    ['another language', { lang: 'ja' }],
+  ])('stops suspecting a scraper pattern with %s', (_, change) => {
+    expect(judge({ ...scraper, ...change }).suspect).toBe(false);
   });
 });
