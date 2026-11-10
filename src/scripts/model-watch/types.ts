@@ -58,6 +58,7 @@ interface BoardStatus {
   day: string;
   fetched_at: number;
   models: number;
+  intelligence_index_version?: number | null;
 }
 
 interface Run {

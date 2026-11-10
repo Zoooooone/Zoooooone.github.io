@@ -4,6 +4,7 @@ import {
   collapse,
   creatorBoard,
   frontierByMonth,
+  isListed,
   leadingCreators,
   pareto,
   rank,
@@ -192,15 +193,20 @@ describe('release timeline', () => {
 });
 
 describe('model watch metrics', () => {
-  it('offers the indices, every benchmark, speed and price, plus benchmarks the API adds later', () => {
-    const metrics = metricsFor([model({ evaluations: { gpqa: 0.5, brand_new_eval: 0.1 } })]);
+  it('offers measured metrics, including new benchmarks, and skips empty metrics', () => {
+    const freeModel = model({
+      price_input: 0.5,
+      tps: 100,
+      evaluations: { gpqa: 0.5, brand_new_eval: 0.1, empty: null },
+    });
+    const metrics = metricsFor([freeModel]);
     const keys = metrics.map((m) => m.key);
-    expect(keys.slice(0, 3)).toEqual(['intelligence', 'coding', 'math']);
-    expect(keys).toContain('tau2');
-    expect(keys).toContain('brand_new_eval');
-    expect(keys).not.toContain('artificial_analysis_intelligence_index');
-    expect(metrics.find((m) => m.key === 'price_blended')!.better).toBe('low');
+    expect(keys).toEqual(['intelligence', 'gpqa', 'brand_new_eval', 'tps', 'price_input']);
+    expect(metrics.find((m) => m.key === 'price_input')!.better).toBe('low');
     expect(metrics.find((m) => m.key === 'gpqa')!.value(model({ evaluations: { gpqa: 0.5 } }))).toBe(0.5);
+    expect(isListed(freeModel)).toBe(true);
+    expect(isListed(model({ price_output: 1 }))).toBe(true);
+    expect(isListed(model({}))).toBe(false);
   });
 
   it('adds the old indices, with the day they stopped, only once the indices were redefined', () => {

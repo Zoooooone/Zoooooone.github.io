@@ -12,7 +12,12 @@ const sub = (m: LlmChange) => [m.creator, m.release_date && `发布 ${m.release_
 
 const title = (text: string) => h('h3', { class: 'section-title mono-label' }, text);
 
-function llmSection(llm: NonNullable<Changes['llm']>, days: number, metric: Metric): HTMLElement {
+function llmSection(
+  llm: NonNullable<Changes['llm']>,
+  days: number,
+  metric: Metric,
+  hasBlendedPrice: boolean,
+): HTMLElement {
   const shown = (n: number | null | undefined) => (n == null ? '—' : metric.format(n));
   return h(
     'div',
@@ -69,7 +74,7 @@ function llmSection(llm: NonNullable<Changes['llm']>, days: number, metric: Metr
               model: m.id,
             };
           }),
-          '价格没有变化',
+          hasBlendedPrice ? '价格没有变化' : '暂无混合价格',
           CHANGE_PAGE,
         ),
       ),
@@ -126,7 +131,12 @@ function arenaSection(changes: Changes): HTMLElement {
   );
 }
 
-export function renderChanges(changes: Changes, metric: Metric, index: IndexBreak | null = null): HTMLElement {
+export function renderChanges(
+  changes: Changes,
+  metric: Metric,
+  index: IndexBreak | null,
+  hasBlendedPrice: boolean,
+): HTMLElement {
   const hasMedia = MEDIA_BOARDS.some((b) => changes.media[b]);
   if (!changes.llm && !hasMedia) return empty('至少要有两天的快照才能比较，明天起开始显示变化');
   return h(
@@ -137,7 +147,7 @@ export function renderChanges(changes: Changes, metric: Metric, index: IndexBrea
           `综合指数从 ${index.since} 起换了算法，分数不能和之前比；语言模型的变化只对比这一天之后的快照${changes.llm ? '' : '，明天起开始显示'}`,
         )
       : null,
-    ...(changes.llm ? [llmSection(changes.llm, changes.days, metric)] : []),
+    changes.llm ? llmSection(changes.llm, changes.days, metric, hasBlendedPrice) : null,
     arenaSection(changes),
   );
 }

@@ -17,10 +17,11 @@ interface FakeLlm {
   tps?: number;
   gpqa?: number;
 }
-const llmBody = (models: FakeLlm[]) =>
+const llmBody = (models: FakeLlm[], page = 1, pages = 1, pageSize = models.length, version = 5) =>
   JSON.stringify({
-    status: 200,
-    prompt_options: { parallel_queries: 1, prompt_length: 1000 },
+    tier: 'free',
+    intelligence_index_version: version,
+    pagination: { page, total_pages: pages, page_size: pageSize, has_more: page < pages },
     data: models.map((m) => ({
       id: m.id,
       name: m.name ?? `Model ${m.id}`,
@@ -33,9 +34,11 @@ const llmBody = (models: FakeLlm[]) =>
         new_bench: 0.25,
       },
       pricing: { price_1m_blended_3_to_1: m.price ?? 1, price_1m_input_tokens: 0.5, price_1m_output_tokens: 2 },
-      median_output_tokens_per_second: m.tps ?? 100,
-      median_time_to_first_token_seconds: 0.5,
-      median_time_to_first_answer_token: 0,
+      performance: {
+        median_output_tokens_per_second: m.tps ?? 100,
+        median_time_to_first_token_seconds: 0.5,
+        median_time_to_first_answer_token_seconds: 0,
+      },
     })),
   });
 
@@ -69,8 +72,9 @@ function fakeApi(bodies: Partial<Record<string, string | number>> = {}) {
   const calls: { url: string; key: string | null }[] = [];
   const fetcher = async (url: string, init: RequestInit) => {
     calls.push({ url, key: new Headers(init.headers).get('x-api-key') });
-    const board = BOARDS.find((b) => url.endsWith(b.path))!.board;
-    const body = bodies[board] ?? (board === 'llm' ? llmBody(DEFAULT_LLM) : mediaBody(DEFAULT_MEDIA));
+    const { pathname, search } = new URL(url);
+    const board = BOARDS.find((b) => pathname.endsWith(b.path))!.board;
+    const body = bodies[board + search] ?? (board === 'llm' ? llmBody(DEFAULT_LLM) : mediaBody(DEFAULT_MEDIA));
     return typeof body === 'number' ? new Response('nope', { status: body }) : new Response(body);
   };
   return { calls, fetcher };
@@ -151,8 +155,49 @@ describe('model snapshots', () => {
     expect(retry.calls.map((c) => c.url)).toEqual([expect.stringContaining('text-to-speech')]);
   });
 
+  it('publishes all language model pages together after retrying a failed second page', async () => {
+    const { env, rows } = world();
+    await ingestModels(env, at('2026-10-23', 6), fakeApi().fetcher);
+    const first = llmBody([{ id: 'new-a' }], 1, 2);
+    const failed = fakeApi({ llm: first, 'llm?page=2': 500 });
+    expect((await ingestModels(env, at('2026-10-24', 6), failed.fetcher)).llm).toBe('HTTP 500');
+    expect(rows("SELECT day FROM aa_snapshots WHERE board = 'llm'")).toEqual([{ day: '2026-10-23' }]);
+    expect(rows("SELECT id FROM aa_llm WHERE day = '2026-10-24'")).toEqual([]);
+
+    const duplicate = fakeApi({ llm: first, 'llm?page=2': llmBody([{ id: 'new-a' }], 2, 2) });
+    expect((await ingestModels(env, at('2026-10-24', 7), duplicate.fetcher)).llm).toBe('duplicate model ID on page 2');
+    expect(rows("SELECT id FROM aa_llm WHERE day = '2026-10-24'")).toEqual([]);
+
+    const retry = fakeApi({ llm: first, 'llm?page=2': llmBody([{ id: 'new-b' }], 2, 2) });
+    expect(await ingestModels(env, at('2026-10-24', 8), retry.fetcher)).toEqual({ llm: 2 });
+    expect(retry.calls.map(({ url }) => new URL(url).pathname + new URL(url).search)).toEqual([
+      '/api/v2/language/models/free',
+      '/api/v2/language/models/free?page=2',
+    ]);
+    expect(rows("SELECT id FROM aa_llm WHERE day = '2026-10-24' ORDER BY id")).toEqual([
+      { id: 'new-a' },
+      { id: 'new-b' },
+    ]);
+  });
+
+  it('ranks the free media response by Elo and keeps its confidence interval', async () => {
+    const { env, rows } = world();
+    const body = JSON.stringify({
+      tier: 'free',
+      data: [
+        { id: 'low', name: 'Low', elo: 1100, ci_95: null },
+        { id: 'high', name: 'High', elo: 1200, ci_95: 11 },
+      ],
+    });
+    await ingestModels(env, at('2026-10-24', 6), fakeApi({ 'text-to-image': body }).fetcher);
+    expect(rows("SELECT id, rank, ci95 FROM aa_media WHERE board = 'text-to-image' ORDER BY rank")).toEqual([
+      { id: 'high', rank: 1, ci95: '11/11' },
+      { id: 'low', rank: 2, ci95: '' },
+    ]);
+  });
+
   it.each([
-    ['text that is not JSON', 'Service unavailable', 'response is not JSON'],
+    ['text that is not JSON', 'Service unavailable', 'response is not JSON or has no data array'],
     ['an empty list', JSON.stringify({ status: 200, data: [] }), 'response lists no models'],
     ['models without an id', JSON.stringify({ data: [{ name: 'x' }] }), 'response lists no models'],
   ])('refuses %s and stores nothing', async (_, body, error) => {
@@ -204,34 +249,45 @@ describe('versions of the indices', () => {
     rows<{ day: string; epoch: number }>("SELECT day, epoch FROM aa_snapshots WHERE board = 'llm' ORDER BY day").map(
       (r) => r.epoch,
     );
-  const day = (w: ReturnType<typeof world>, date: string, models: ReturnType<typeof scored>) =>
-    ingestModels(w.env, at(date, 6), fakeApi({ llm: llmBody(models) }).fetcher);
+  const day = (w: ReturnType<typeof world>, date: string, models: FakeLlm[], version = 5) =>
+    ingestModels(w.env, at(date, 6), fakeApi({ llm: llmBody(models, 1, 1, models.length, version) }).fetcher);
 
-  it('stays in one epoch while scores drift or models come and go', async () => {
+  it('stays in one epoch when the official version matches even if most scores change', async () => {
     const w = world();
     await day(w, '2026-10-24', scored(0, 20, 0));
-    await day(w, '2026-10-25', [
-      ...scored(0, 20, 0).map((m, i) => (i < 3 ? { ...m, intelligence: m.intelligence + 1 } : m)),
-      ...scored(50, 3, 0),
-    ]);
+    await day(w, '2026-10-25', scored(0, 20, 7));
     expect(epochs(w.rows)).toEqual([0, 0]);
+    expect((await call(w.env, '/api/models/changes?days=1')).llm.rescored).toHaveLength(20);
   });
 
-  it('starts a new epoch when most of the models scored on both days changed their score', async () => {
+  it('starts a new epoch when the official version changes even if scores stay the same', async () => {
     const w = world();
     await day(w, '2026-10-24', scored(0, 20, 0));
+    await day(w, '2026-10-25', scored(0, 20, 0), 5.1);
+    expect(epochs(w.rows)).toEqual([0, 1]);
+    expect(w.rows("SELECT intelligence_index_version FROM aa_snapshots WHERE board = 'llm' ORDER BY day")).toEqual([
+      { intelligence_index_version: 5 },
+      { intelligence_index_version: 5.1 },
+    ]);
+    expect((await call(w.env, '/api/models/changes?days=7')).llm).toBeNull();
+  });
+
+  it('uses score changes to detect a break from a legacy snapshot', async () => {
+    const w = world();
+    await day(w, '2026-10-24', scored(0, 20, 0));
+    w.sqlite.exec('UPDATE aa_snapshots SET intelligence_index_version = NULL');
     await day(w, '2026-10-25', scored(0, 20, 7));
     await day(w, '2026-10-26', scored(0, 20, 7));
     expect(epochs(w.rows)).toEqual([0, 1, 1]);
   });
 
-  it('starts a new epoch when almost no model keeps a score', async () => {
+  it('detects a break from a legacy snapshot when almost no model keeps a score', async () => {
     const w = world();
     await day(w, '2026-10-24', scored(0, 30, 0));
+    w.sqlite.exec('UPDATE aa_snapshots SET intelligence_index_version = NULL');
     await day(w, '2026-10-25', [
       ...scored(0, 30, 0).map((m) => ({ ...m, intelligence: null })),
       { id: 'z', intelligence: 40 },
-      ...Array(0),
     ]);
     expect(epochs(w.rows)).toEqual([0, 1]);
   });
@@ -239,11 +295,15 @@ describe('versions of the indices', () => {
   it('does not compare across the break, and offers the old scores of the models that had them', async () => {
     const w = world();
     await day(w, '2026-10-24', scored(0, 20, 0));
-    await day(w, '2026-10-25', scored(0, 20, 7));
+    await day(w, '2026-10-25', scored(0, 20, 7), 5.1);
 
     expect((await call(w.env, '/api/models/changes?days=7')).llm).toBeNull();
     const latest = await call(w.env, '/api/models/latest');
     expect(latest.index).toEqual({ since: '2026-10-25', legacy: '2026-10-24' });
+    expect(latest.boards.find((b: { board: string }) => b.board === 'llm')).toMatchObject({
+      day: '2026-10-25',
+      intelligence_index_version: 5.1,
+    });
     expect(latest.llm.find((m: { id: string }) => m.id === 'm3')).toMatchObject({
       intelligence: 30,
       intelligence_legacy: 23,
@@ -254,6 +314,7 @@ describe('versions of the indices', () => {
       w,
       '2026-10-26',
       scored(0, 20, 7).map((m, i) => (i < 5 ? { ...m, intelligence: m.intelligence + 1 } : m)),
+      5.1,
     );
     const { llm } = await call(w.env, '/api/models/changes?days=7');
     expect(llm).toMatchObject({ from: '2026-10-25', to: '2026-10-26', partial: true });
@@ -280,6 +341,14 @@ describe('versions of the indices', () => {
       { day: '2026-10-29', board: 'llm', epoch: 1 },
       { day: '2026-10-29', board: 'text-to-image', epoch: 0 },
     ]);
+  });
+
+  it('keeps the existing epoch when the first official version has comparable scores', async () => {
+    const w = world();
+    await day(w, '2026-10-29', scored(0, 20, 0));
+    w.sqlite.exec("UPDATE aa_snapshots SET epoch = 1, intelligence_index_version = NULL WHERE board = 'llm'");
+    await day(w, '2026-11-08', scored(0, 20, 0));
+    expect(epochs(w.rows)).toEqual([1, 1]);
   });
 });
 
@@ -385,6 +454,27 @@ describe('model API', () => {
     expect(llm.rescored).toMatchObject([{ id: 'a', was_metric: 50, now_metric: 52 }]);
     expect(llm.repriced).toMatchObject([{ id: 'b', was_price: 2, now_price: 1 }]);
     expect(media['text-to-video'].moved.map((m: { id: string }) => m.id)).toEqual(['y', 'x']);
+  });
+
+  it('reports changes only when both snapshots have a value', async () => {
+    const { env } = world();
+    const before = [
+      { id: 'a', intelligence: 50, price: 4 },
+      { id: 'b', intelligence: null, price: 0 },
+      { id: 'c', intelligence: 30, price: 2 },
+    ];
+    const after = [
+      { id: 'a', intelligence: null, price: 0 },
+      { id: 'b', intelligence: 40, price: 1 },
+      { id: 'c', intelligence: 35, price: 1 },
+    ];
+    await ingestModels(env, at('2026-10-17', 6), fakeApi({ llm: llmBody(before) }).fetcher);
+    await ingestModels(env, at('2026-10-24', 6), fakeApi({ llm: llmBody(after) }).fetcher);
+    const { llm } = await call(env, '/api/models/changes?days=7');
+    expect(llm.rescored).toMatchObject([{ id: 'c', was_metric: 30, now_metric: 35 }]);
+    expect(llm.repriced).toMatchObject([{ id: 'c', was_price: 2, now_price: 1 }]);
+    expect(llm.added).toEqual([]);
+    expect(llm.removed).toEqual([]);
   });
 
   it('compares another metric when asked: a column, or a benchmark kept in the evaluations', async () => {

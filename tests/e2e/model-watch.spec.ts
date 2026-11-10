@@ -16,13 +16,13 @@ const llm = (id: string, over: Record<string, unknown> = {}) => ({
   intelligence: 40,
   coding: 30,
   math: 50,
-  price_blended: 2,
+  price_blended: 2 as number | null,
   price_input: 1,
   price_output: 4,
   tps: 100,
   ttft: 0.5,
   ttfat: 0.5,
-  evaluations: { gpqa: 0.5, hle: 0.2 },
+  evaluations: { gpqa: 0.5, hle: 0.2 } as Record<string, number | null>,
   ...over,
 });
 
@@ -70,6 +70,8 @@ const latest = {
       creator: 'Bolt',
       intelligence: 20,
       price_blended: null,
+      price_input: null,
+      price_output: null,
       tps: null,
       release_date: '2024-01-05',
     }),
@@ -137,7 +139,11 @@ const history = {
 
 async function mockWorker(
   page: Page,
-  { noHistory = false, snapshot = latest }: { noHistory?: boolean; snapshot?: typeof latest } = {},
+  {
+    noHistory = false,
+    snapshot = latest,
+    modelHistory = history,
+  }: { noHistory?: boolean; snapshot?: typeof latest; modelHistory?: typeof history } = {},
 ) {
   const requests: URL[] = [];
   await page.route(`https://${HOST}/**`, async (route) => {
@@ -156,7 +162,7 @@ async function mockWorker(
         headers: cors,
       });
     }
-    if (url.pathname === '/api/models/history') return route.fulfill({ json: history, headers: cors });
+    if (url.pathname === '/api/models/history') return route.fulfill({ json: modelHistory, headers: cors });
     return route.fulfill({ status: 404, headers: cors });
   });
   return requests;
@@ -756,8 +762,38 @@ test.describe('model watch page', () => {
   test('has no old-index choices before the indices were ever redefined', async ({ page }) => {
     await mockWorker(page);
     await unlock(page);
+    await expect(page.locator('[data-index-version]')).toHaveText('AA 评分版本未记录');
     await expect(page.locator('[data-metric] optgroup[label*="旧版"]')).toHaveCount(0);
     await expect(page.locator('[data-changes]')).not.toContainText('换了算法');
+  });
+
+  test('labels the current intelligence index and separates every scoring epoch in model history', async ({ page }) => {
+    await mockWorker(page, {
+      snapshot: {
+        ...latest,
+        boards: latest.boards.map((board) => ({
+          ...board,
+          intelligence_index_version: board.board === 'llm' ? 5 : null,
+        })),
+      },
+      modelHistory: {
+        ...history,
+        days: [
+          ...history.days,
+          ...history.days.map((day, i) => ({ ...day, day: `2026-10-${25 + i}`, epoch: 1 })),
+          ...history.days.map((day, i) => ({ ...day, day: `2026-10-${27 + i}`, epoch: 2 })),
+        ],
+      },
+    });
+    await unlock(page);
+    const label = page.locator('[data-index-version]');
+    await expect(label).toBeVisible();
+    await expect(label).toHaveText('AA 评分 v5.0');
+    await page.locator('[data-metric]').selectOption('price_blended');
+    await expect(label).toBeHidden();
+
+    await page.locator('[data-changes] [data-model="swift"]').first().click();
+    await expect(page.locator('.detail-row .spark').filter({ hasText: '智能指数' })).toHaveCount(3);
   });
 
   test('says when there is not enough history to compare', async ({ page }) => {
@@ -777,6 +813,30 @@ test.describe('model watch page', () => {
     await expect(arena.first()).toContainText('Clip d');
     await page.locator('[data-media="text-to-speech"]').click();
     await expect(page.locator('[data-media-list]')).toContainText('这个竞技场还没有数据');
+  });
+
+  test('keeps models with token prices visible when the free API omits blended prices and categories', async ({
+    page,
+  }) => {
+    await mockWorker(page, {
+      snapshot: {
+        ...latest,
+        llm: latest.llm.map((model) => ({ ...model, price_blended: null, evaluations: {} })),
+        media: {
+          ...latest.media,
+          'text-to-image': latest.media['text-to-image'].map((item) => ({ ...item, categories: [] })),
+        },
+      },
+      noHistory: true,
+    });
+    await unlock(page);
+    await expect(leaderboard(page).first()).toContainText('Nova');
+    await expect(page.locator('[data-metric] option[value="price_input"]')).toHaveCount(1);
+    await expect(page.locator('[data-metric] option[value="price_blended"]')).toHaveCount(0);
+    await expect(page.locator('[data-metric] option[value="gpqa"]')).toHaveCount(0);
+    await expect(page.locator('[data-value]')).toContainText('暂无混合价格');
+    await expect(page.locator('[data-category]')).toBeHidden();
+    await expect(page.locator('[data-media-list] .rank li').first()).toContainText('Clip a');
   });
 
   test('shows model names as text and never as markup', async ({ page }) => {

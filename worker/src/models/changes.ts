@@ -69,7 +69,7 @@ async function llmChanges(db: Database, s: Span, metric: string) {
               ${was} AS was_metric, ${now} AS now_metric,
               f.price_blended AS was_price, t.price_blended AS now_price, f.id IS NULL AS added
        FROM aa_llm t LEFT JOIN aa_llm f ON f.day = ?2 AND f.id = t.id
-       WHERE t.day = ?1 AND (f.id IS NULL OR ${was} IS NOT ${now} OR f.price_blended IS NOT t.price_blended)`,
+       WHERE t.day = ?1 AND (f.id IS NULL OR ${was} <> ${now} OR f.price_blended <> t.price_blended)`,
     )
     .bind(s.to, s.from)
     .all<LlmChange>();
@@ -95,11 +95,11 @@ async function llmChanges(db: Database, s: Span, metric: string) {
       .slice(0, LIST_LIMIT),
     removed: removed.results,
     rescored: rows
-      .filter((r) => !r.added && r.was_metric !== r.now_metric)
+      .filter((r) => !r.added && r.was_metric != null && r.now_metric != null && r.was_metric !== r.now_metric)
       .sort(byGap(scoreGap))
       .slice(0, LIST_LIMIT),
     repriced: rows
-      .filter((r) => !r.added && r.was_price !== r.now_price)
+      .filter((r) => !r.added && r.was_price != null && r.now_price != null && r.was_price !== r.now_price)
       .sort(byGap(priceGap))
       .slice(0, LIST_LIMIT),
   };

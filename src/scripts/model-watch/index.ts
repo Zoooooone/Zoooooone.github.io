@@ -15,7 +15,7 @@ import { renderLeaderboard } from './render/leaderboard';
 import { renderTimeline } from './render/timeline';
 import { assignSlots, SLOTS, type WindowKey } from './timeline-data';
 import { renderKpis } from './render/overview';
-import { fillSelect, turnPage } from './render/shared';
+import { empty, fillSelect, turnPage } from './render/shared';
 import { explain, statusLine, warnings } from './status';
 import type { Changes, Latest, MediaBoard } from './types';
 
@@ -114,6 +114,11 @@ onPage(() => {
   }
 
   function paintLeaderboard() {
+    const version = view.latest?.boards.find((board) => board.board === 'llm')?.intelligence_index_version;
+    const label = $('[data-index-version]');
+    label.hidden = view.metric.key !== INTELLIGENCE.key;
+    label.textContent =
+      version == null ? 'AA 评分版本未记录' : `AA 评分 v${Number.isInteger(version) ? version.toFixed(1) : version}`;
     $('[data-board]').replaceChildren(renderLeaderboard(visible(), view.metric, merge.checked));
   }
 
@@ -170,21 +175,24 @@ onPage(() => {
 
   function paintScatters() {
     const models = visible();
-    const byIntelligence = merge.checked ? collapse(models, (m) => m.intelligence) : models;
-    const draw = (selector: string, options: Omit<ScatterOptions, 'width' | 'state'>) => {
+    const draw = (selector: string, list: typeof models, options: Omit<ScatterOptions, 'width' | 'state'>) => {
       const slot = $(selector);
+      const byIntelligence = merge.checked ? collapse(list, (m) => m.intelligence) : list;
       slot.replaceChildren(renderScatter(byIntelligence, { ...options, width: chartsWidth(), state: chartState() }));
     };
-    draw('[data-value]', {
-      key: 'value',
-      x: (m) => m.price_blended,
-      xTitle: '混合价格 · 美元 / 百万 token（对数）',
-      xFormat: formatPrice,
-      xBetter: 'low',
-      tradeoff: '便宜',
-      label: '智能指数与价格',
-    });
-    draw('[data-speed]', {
+    const priced = models.filter((m) => m.price_blended != null);
+    if (priced.length)
+      draw('[data-value]', priced, {
+        key: 'value',
+        x: (m) => m.price_blended,
+        xTitle: '混合价格 · 美元 / 百万 token（对数）',
+        xFormat: formatPrice,
+        xBetter: 'low',
+        tradeoff: '便宜',
+        label: '智能指数与价格',
+      });
+    else $('[data-value]').replaceChildren(empty('暂无混合价格'));
+    draw('[data-speed]', models, {
       key: 'speed',
       x: (m) => m.tps,
       xTitle: '输出速度 · token / 秒（对数）',
@@ -212,7 +220,7 @@ onPage(() => {
       h('option', { value: '', selected: !view.category }, '总榜'),
       ...categories.map((c) => h('option', { value: c, selected: c === view.category }, c)),
     );
-    categorySelect.disabled = !categories.length;
+    categorySelect.hidden = !categories.length;
     dashboard
       .querySelectorAll<HTMLElement>('[data-media]')
       .forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.media === view.board)));
@@ -228,7 +236,14 @@ onPage(() => {
 
   const paintChanges = () => {
     changeMetricSelect.disabled = !view.changes!.llm;
-    $('[data-changes]').replaceChildren(renderChanges(view.changes!, view.changeMetric, view.latest?.index ?? null));
+    $('[data-changes]').replaceChildren(
+      renderChanges(
+        view.changes!,
+        view.changeMetric,
+        view.latest?.index ?? null,
+        view.metrics.some((metric) => metric.key === 'price_blended'),
+      ),
+    );
   };
 
   async function loadAll(): Promise<boolean> {

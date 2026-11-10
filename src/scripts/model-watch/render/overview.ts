@@ -58,7 +58,11 @@ export function renderKpis(latest: Latest): HTMLElement[] {
     kpi(
       'VALUE · 前沿性价比',
       value ? formatPrice(value.value) : '—',
-      value ? `${value.item.name} · 智能达到第一的 ${VALUE_SHARE * 100}%` : '没有符合条件的模型',
+      value
+        ? `${value.item.name} · 智能达到第一的 ${VALUE_SHARE * 100}%`
+        : listed.some((m) => m.price_blended != null)
+          ? '没有符合条件的模型'
+          : '暂无混合价格',
     ),
     kpi(
       'FAST · 前沿最快',

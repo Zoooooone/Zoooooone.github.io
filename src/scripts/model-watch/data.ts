@@ -7,7 +7,8 @@ export const baseName = (name: string) => name.replace(VARIANT, '').trim();
 export const variantOf = (name: string) => VARIANT.exec(name)?.[1] ?? '';
 
 /** Models with a price are the ones still offered through an API; the rest are retired or never served. */
-export const isListed = (model: LlmModel) => model.price_blended != null;
+export const isListed = (model: LlmModel) =>
+  model.price_input != null || model.price_output != null || model.price_blended != null;
 
 const beats = (better: 'high' | 'low', a: number, b: number) => (better === 'high' ? a > b : a < b);
 

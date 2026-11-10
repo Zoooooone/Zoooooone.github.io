@@ -133,6 +133,7 @@ export const latest = () => ({
     day: board === 'text-to-speech' ? daysAgo(1) : today,
     fetched_at: now - 2 * 60 * 60 * 1000,
     models: board === 'llm' ? llm.length : media[board].length,
+    intelligence_index_version: board === 'llm' ? 5 : null,
   })),
   runs: [
     { board: 'text-to-speech', ts: now - 60 * 60 * 1000, ok: 0, models: null, error: 'HTTP 500' },

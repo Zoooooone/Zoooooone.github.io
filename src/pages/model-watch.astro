@@ -111,7 +111,10 @@ const chartTabs = [
           </label>
           <select id="model-watch-metric" class="pick" data-metric data-show="rank:metric"></select>
         </div>
-        <div data-pane="rank:metric" data-board></div>
+        <div data-pane="rank:metric">
+          <p class="stats-note" data-index-version hidden></p>
+          <div data-board></div>
+        </div>
         <div data-pane="rank:creator" data-creators hidden></div>
       </section>
 

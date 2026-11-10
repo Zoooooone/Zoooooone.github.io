@@ -26,19 +26,16 @@ function spark(values: (number | null)[], label: string, format: (n: number) => 
 export function renderDetail(model: LlmModel, metrics: Metric[], history: History | null): HTMLElement {
   const groups = [...new Set(metrics.map((m) => m.group))];
   const days = history?.days ?? [];
-  const current = days.filter((d) => d.epoch === days[days.length - 1]?.epoch);
-  const earlier = days.filter((d) => d.epoch < (days[days.length - 1]?.epoch ?? 0));
+  const epochs = Map.groupBy(days, (day) => day.epoch);
+  const current = days[days.length - 1]?.epoch;
   const sparks = [
-    spark(
-      current.map((d) => d.intelligence),
-      '智能指数',
-      formatScore,
-    ),
-    spark(
-      earlier.map((d) => d.intelligence),
-      '智能指数(旧版)',
-      formatScore,
-    ),
+    ...Array.from(epochs, ([epoch, segment]) =>
+      spark(
+        segment.map((d) => d.intelligence),
+        epoch === current ? '智能指数' : `智能指数(旧版 · ${segment[0].day})`,
+        formatScore,
+      ),
+    ).reverse(),
     spark(
       days.map((d) => d.price_blended),
       '混合价格',

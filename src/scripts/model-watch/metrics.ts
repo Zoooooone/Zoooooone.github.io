@@ -113,11 +113,11 @@ const benchmark = (key: string, label: string): Metric => ({
 export function metricsFor(models: LlmModel[], index: IndexBreak | null = null): Metric[] {
   const known = new Set([...INDEX_KEYS, ...BENCHMARKS.map(([key]) => key)]);
   const extra = [...new Set(models.flatMap((m) => Object.keys(m.evaluations)))].filter((key) => !known.has(key)).sort();
-  return [
-    ...FIXED,
-    ...(index ? legacyIndices(index) : []),
+  const available = (metric: Metric) => metric === INTELLIGENCE || models.some((model) => metric.value(model) != null);
+  const other = [
     ...BENCHMARKS.map(([key, label]) => benchmark(key, label)),
     ...extra.map((key) => benchmark(key, key)),
     ...SPEED_AND_PRICE,
   ];
+  return [...FIXED.filter(available), ...(index ? legacyIndices(index) : []), ...other.filter(available)];
 }

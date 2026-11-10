@@ -25,8 +25,16 @@ const prebuilt = (body: string, headers: ResponseHeaders) =>
 async function latest(db: Database): Promise<string> {
   // SQLite returns the other columns from the row that holds MAX(day).
   const boards = await db
-    .prepare('SELECT board, MAX(day) AS day, fetched_at, models FROM aa_snapshots GROUP BY board ORDER BY board')
-    .all<{ board: string; day: string; fetched_at: number; models: number }>();
+    .prepare(
+      'SELECT board, MAX(day) AS day, fetched_at, models, intelligence_index_version FROM aa_snapshots GROUP BY board ORDER BY board',
+    )
+    .all<{
+      board: string;
+      day: string;
+      fetched_at: number;
+      models: number;
+      intelligence_index_version: number | null;
+    }>();
   const runs = await db
     .prepare('SELECT board, ts, ok, models, error FROM aa_runs ORDER BY ts DESC LIMIT 30')
     .all<Record<string, unknown>>();
