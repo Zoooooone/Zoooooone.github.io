@@ -1,0 +1,28 @@
+name: Verify changes
+description: Run the checks selected for this change
+inputs:
+  scope:
+    description: Verification scope
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        CHECK_SCOPE: ${{ inputs.scope }}
+      run: |
+        case "$CHECK_SCOPE" in
+          articles)
+            pnpm build
+            pnpm check:links
+            ;;
+          model-watch)
+            pnpm verify:code
+            pnpm build
+            pnpm check:links
+            pnpm test:e2e tests/e2e/model-watch.spec.ts
+            ;;
+          *)
+            pnpm verify
+            ;;
+        esac

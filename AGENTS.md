@@ -7,8 +7,10 @@ Personal blog built with Astro, TypeScript and plain CSS. Package manager: pnpm.
 - `pnpm dev` — thumbnails + dev server at `localhost:4321`
 - `pnpm dev:mock` — the same, with a fake stats Worker, made-up visits and made-up model lists, to try `/stats/` and `/model-watch/` (any token works)
 - `pnpm test` — unit tests (Vitest); `pnpm test:e2e` — browser smoke tests (Playwright, needs a build and Chrome)
-- `pnpm verify` — format check, ESLint, Stylelint, `astro check`, knip, unit tests, build, link check, browser tests. Run before committing.
+- `pnpm verify` — format check, ESLint, Stylelint, `astro check`, knip, unit tests, build, link check, browser tests. Run for shared code, dependencies, build configuration, or uncertain changes.
 - `pnpm format` — Prettier over the whole repo
+
+For article-only changes, check formatting and preview the affected posts locally. The deploy workflow builds the site and checks links. For feature changes, run the affected tests locally. The workflow runs all unit tests and the Model Watch browser tests for changes confined to Model Watch. Other code changes use full verification. A push to `main` selects checks by comparing with the last successful deployment. Manual runs and unavailable comparison bases use full verification.
 
 ## Conventions
 

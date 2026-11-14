@@ -23,7 +23,8 @@
     "knip": "knip",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "verify": "pnpm format:check && pnpm lint && pnpm lint:css && pnpm typecheck && pnpm knip && pnpm test && pnpm build && pnpm check:links && pnpm test:e2e",
+    "verify:code": "pnpm format:check && pnpm lint && pnpm lint:css && pnpm typecheck && pnpm knip && pnpm test",
+    "verify": "pnpm verify:code && pnpm build && pnpm check:links && pnpm test:e2e",
     "prepare": "husky"
   },
   "dependencies": {
